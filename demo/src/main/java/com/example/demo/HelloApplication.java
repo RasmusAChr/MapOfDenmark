@@ -1,4 +1,4 @@
-package com.example.first_year_gr4_java17;
+package com.example.demo;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

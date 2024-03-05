@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$/demo" />
     <file type="web" url="file://$PROJECT_DIR$/First_Year_Gr4" />
     <file type="web" url="file://$PROJECT_DIR$/First_Year_Gr4_java17" />
   </component>
