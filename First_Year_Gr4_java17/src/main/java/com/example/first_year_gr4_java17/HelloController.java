@@ -1,4 +1,4 @@
-package com.example.first_year_gr4;
+package com.example.first_year_gr4_java17;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

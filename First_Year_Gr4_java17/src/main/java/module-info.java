@@ -1,4 +1,4 @@
-module com.example.first_year_gr4 {
+module com.example.first_year_gr4_java17 {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
@@ -11,6 +11,6 @@ module com.example.first_year_gr4 {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
 
-    opens com.example.first_year_gr4 to javafx.fxml;
-    exports com.example.first_year_gr4;
+    opens com.example.first_year_gr4_java17 to javafx.fxml;
+    exports com.example.first_year_gr4_java17;
 }
