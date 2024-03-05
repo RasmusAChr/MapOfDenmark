@@ -11,7 +11,9 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         //String filename = "data/denmark.osm.zip.obj";
-        String filename = "C:\\Users\\mathi\\Documents\\GitHub\\BFST2024mnla\\xmlparsinglivecoding\\app\\data\\map-2.osm";
+        String path = System.getProperty("user.dir"); // gets which directory the project is placed
+        String filename = path+"\\data\\small.osm";
+        System.out.println(path);
         var model = Model.load(filename);
         var view = new View(model, primaryStage);
         new Controller(model, view);
