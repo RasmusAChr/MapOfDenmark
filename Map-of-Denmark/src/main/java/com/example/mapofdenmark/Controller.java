@@ -13,7 +13,7 @@ public class Controller {
             lastY = e.getY();
         });
         view.canvas.setOnMouseDragged(e -> {
-            if (e.isPrimaryButtonDown()) {
+            if (e.isPrimaryButtonDown()&&e.isControlDown()) {
                 Point2D lastmodel = view.mousetoModel(lastX, lastY);
                 Point2D newmodel = view.mousetoModel(e.getX(), e.getY());
                 model.add(lastmodel, newmodel);
@@ -30,7 +30,6 @@ public class Controller {
         view.canvas.setOnScroll(e -> {
             double factor = e.getDeltaY();
             view.zoom(e.getX(), e.getY(), Math.pow(1.01, factor));
-
         });
     }
 }
