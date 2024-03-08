@@ -93,6 +93,8 @@ public class Model implements Serializable {
                     var v = input.getAttributeValue(null, "v");
                     if (v.equals("coastline")) {
                         coast = true;
+                    } else if (v.equals("building")) {
+
                     }
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
