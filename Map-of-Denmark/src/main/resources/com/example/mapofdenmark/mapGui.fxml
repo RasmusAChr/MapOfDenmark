@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -14,6 +15,11 @@
    <children>
       <HBox prefHeight="53.0" prefWidth="1190.0" style="-fx-background-color: #273c75;" />
       <TextField layoutX="128.0" layoutY="78.0" prefHeight="54.0" prefWidth="334.0" />
+      <ImageView fitHeight="47.0" fitWidth="44.0" layoutX="411.0" layoutY="83.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../../../../GUI%20Icons/icons8-search-500.png" />
+         </image>
+      </ImageView>
       <VBox layoutY="54.0" prefHeight="638.0" prefWidth="100.0" style="-fx-background-color: #dcdde1;">
          <children>
             <StackPane prefHeight="94.0" prefWidth="100.0">
@@ -59,5 +65,6 @@
             </StackPane>
          </children>
       </VBox>
+      <Slider layoutX="1065.0" layoutY="127.0" orientation="VERTICAL" prefHeight="529.0" prefWidth="110.0" />
    </children>
 </AnchorPane>
