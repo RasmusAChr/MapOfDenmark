@@ -92,13 +92,11 @@ public class Model implements Serializable {
                 } else if (name == "tag") {
                     var v = input.getAttributeValue(null, "v");
                     var k = input.getAttributeValue(null, "k");
-                    if (v.equals("coastline")) {
-                        wayType = "coast";
-                    }
-                    else if (k.equals("building")){
-                        wayType = "building";
+                    /*if (v.equals("coastline")) {
+                        wayType = "coastline";
+                    }*/
+                    if (k.equals("building")) wayType = "building";
 
-                    }
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
                     var node = id2node.get(ref);

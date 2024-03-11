@@ -32,8 +32,9 @@ public class Way implements Serializable {
     }
 
     public void fillPolygon(GraphicsContext gc){
-        // Assuming that the coordinates are in pairs (x, y)
-        gc.setFill(Color.GREEN); // Set your desired fill color
+        if (type.equals("building")) gc.setFill(Color.GREEN);
+
+        // Andre tags her
 
         double[] xPoints = new double[coords.length / 2];
         double[] yPoints = new double[coords.length / 2];
@@ -43,7 +44,6 @@ public class Way implements Serializable {
             yPoints[i / 2] = coords[i + 1];
         }
 
-        // Draw the filled polygon on the GraphicsContext
         gc.fillPolygon(xPoints, yPoints, xPoints.length);
     }
 
