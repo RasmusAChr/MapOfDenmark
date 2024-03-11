@@ -71,7 +71,7 @@ public class Model implements Serializable {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream));
         var id2node = new HashMap<Long, Node>();
         var way = new ArrayList<Node>();
-        var coast = false;
+        String wayType = "";
         while (input.hasNext()) {
             var tagKind = input.next();
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
@@ -88,11 +88,15 @@ public class Model implements Serializable {
                     id2node.put(id, new Node(lat, lon));
                 } else if (name == "way") {
                     way.clear();
-                    coast = false;
+                    wayType = "";
                 } else if (name == "tag") {
                     var v = input.getAttributeValue(null, "v");
+                    var k = input.getAttributeValue(null, "k");
                     if (v.equals("coastline")) {
-                        coast = true;
+                        wayType = "coast";
+                    }
+                    else if (k.equals("building")){
+                        wayType = "building";
                     }
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
@@ -103,7 +107,7 @@ public class Model implements Serializable {
                 var name = input.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name == "way") {
-                    ways.add(new Way(way));
+                    ways.add(new Way(way, wayType));
                 }
             }
         }

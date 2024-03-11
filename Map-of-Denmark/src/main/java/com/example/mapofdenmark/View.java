@@ -46,6 +46,10 @@ public class View {
         }
         for (var way : model.ways) {
             way.draw(gc);
+            if (!way.type.isEmpty()){
+                way.fillPolygon(gc);
+            }
+            System.out.println(way.type);
         }
     }
 

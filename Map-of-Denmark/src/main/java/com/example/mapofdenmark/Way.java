@@ -4,11 +4,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
 
 public class Way implements Serializable {
     double[] coords;
+    String type;
 
-    public Way(ArrayList<Node> way) {
+
+    public Way(ArrayList<Node> way, String type) {
+        this.type = type;
         coords = new double[way.size() * 2];
         for (int i = 0 ; i < way.size() ; ++i) {
             var node = way.get(i);
@@ -24,6 +29,22 @@ public class Way implements Serializable {
             gc.lineTo(coords[i], coords[i+1]);
         }
         gc.stroke();
+    }
+
+    public void fillPolygon(GraphicsContext gc){
+        // Assuming that the coordinates are in pairs (x, y)
+        gc.setFill(Color.GREEN); // Set your desired fill color
+
+        double[] xPoints = new double[coords.length / 2];
+        double[] yPoints = new double[coords.length / 2];
+
+        for (int i = 0; i < coords.length; i += 2) {
+            xPoints[i / 2] = coords[i];
+            yPoints[i / 2] = coords[i + 1];
+        }
+
+        // Draw the filled polygon on the GraphicsContext
+        gc.fillPolygon(xPoints, yPoints, xPoints.length);
     }
 
 }
