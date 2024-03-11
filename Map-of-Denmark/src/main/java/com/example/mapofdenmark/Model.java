@@ -97,6 +97,7 @@ public class Model implements Serializable {
                     }
                     else if (k.equals("building")){
                         wayType = "building";
+
                     }
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
