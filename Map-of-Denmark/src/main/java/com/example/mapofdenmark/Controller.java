@@ -1,13 +1,18 @@
 package com.example.mapofdenmark;
 
 
+import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 
 public class Controller {
     double lastX;
     double lastY;
+    private Model model;
+    private View view;
 
-    public Controller(Model model, View view) {
+    public Controller(Model inputModel, View inputView) {
+        this.model = inputModel;
+        this.view = inputView;
         view.canvas.setOnMousePressed(e -> {
             lastX = e.getX();
             lastY = e.getY();
@@ -32,5 +37,9 @@ public class Controller {
             view.zoom(e.getX(), e.getY(), Math.pow(1.01, factor));
 
         });
+    }
+    @FXML
+    private void toggleTheme(){
+
     }
 }
