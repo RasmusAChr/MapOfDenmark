@@ -18,6 +18,7 @@ public class View {
     double y1 = 100;
     double x2 = 200;
     double y2 = 800;
+    double zoom = -2;
 
     Affine trans = new Affine();
 
@@ -37,7 +38,7 @@ public class View {
 
     void redraw() {
         gc.setTransform(new Affine());
-        gc.setFill(Color.web("#addeff"));
+        gc.setFill(Color.web("#ffffff"));//"#addeff"));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
         gc.setLineWidth(1/Math.sqrt(trans.determinant()));
@@ -46,8 +47,7 @@ public class View {
         }
         for (var way : model.ways) {
             way.draw(gc);
-            if (!way.type.isEmpty() && way.objectType){ // typen stroke
-
+            if (!way.type.isEmpty() && way.objectType) { // typen stroke
                 way.fillPolygon(gc);
             }
         }
@@ -60,6 +60,7 @@ public class View {
 
     void zoom(double dx, double dy, double factor) {
         pan(-dx, -dy);
+        zoom = -2;
         trans.prependScale(factor, factor);
         pan(dx, dy);
         redraw();

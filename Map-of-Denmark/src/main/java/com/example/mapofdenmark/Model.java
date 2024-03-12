@@ -11,10 +11,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.zip.ZipInputStream;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -70,8 +67,9 @@ public class Model implements Serializable {
     private void parseOSM(InputStream inputStream) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream));
         var id2node = new HashMap<Long, Node>();
+        var id2way = new HashMap<Long, Way>();
         var way = new ArrayList<Node>();
-        String wayType = "";
+        var wayType = "";
         boolean objectType = false; // false = stroke, true = polygon
         while (input.hasNext()) {
             var tagKind = input.next();
@@ -88,9 +86,15 @@ public class Model implements Serializable {
                     var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
                     id2node.put(id, new Node(lat, lon));
                 } else if (name == "way") {
+                    var wayId = Long.parseLong(input.getAttributeValue(null, "ref"));
                     way.clear();
                     wayType = "";
-                } else if (name == "tag") {
+                } else if (name == "member"){
+                    var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
+
+                    var wayObj = ways.get(ref);
+
+                } else if (name.equals("tag")) {
                     var v = input.getAttributeValue(null, "v");
                     var k = input.getAttributeValue(null, "k");
 
@@ -106,10 +110,45 @@ public class Model implements Serializable {
                         wayType = "park";
                         objectType = true;
                     }
+                    else if (v.equals("coastline")){
+                        wayType = "coastline";
+                    }
                     else if (v.equals("asphalt")) {
                         wayType = "asphalt";
                         objectType = false;
                     }
+                    else if (v.equals("paved")) {
+                        wayType = "paved";
+                        objectType = false;
+                    }
+                    else if (v.equals("recreation_ground")) {
+                        wayType = "recreation_ground";
+                        objectType = true;
+                    }
+                    else if (v.equals("grass")) {
+                        wayType = "grass";
+                        objectType = true;
+                    }
+                    else if (v.equals("wetland")) {
+                        wayType = "wetland";
+                        objectType = true;
+                    }
+                    else if (v.equals("wood")) {
+                        wayType = "wood";
+                        objectType = true;
+                    }else if (v.equals("school")) {
+                        wayType = "school";
+                        objectType = true;
+                    }else if (v.equals("footway")) {
+                        wayType = "footway";
+                        objectType = false;
+                    }else if (v.equals("garden")) {
+                        wayType = "garden";
+                        objectType = true;
+                    }
+
+
+
 
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
@@ -119,7 +158,10 @@ public class Model implements Serializable {
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
-                if (name == "way") ways.add(new Way(way, wayType, objectType));
+                if (name.equals("way")) {
+                    ways.add(new Way(way, wayType, objectType));
+                    id2way.put(way.,(new Way(way, wayType, objectType)));
+                }
             }
         }
     }
