@@ -5,6 +5,11 @@ import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 
 public class Controller {
+
+    public Controller(){
+
+    }
+
     double lastX;
     double lastY;
     private Model model;

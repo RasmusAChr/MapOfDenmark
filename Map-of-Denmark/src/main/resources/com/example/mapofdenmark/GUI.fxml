@@ -3,7 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
-   <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="692.0" prefWidth="1190.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mapofdenmark.MapGui">
+<AnchorPane prefHeight="692.0" prefWidth="1190.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mapofdenmark.Controller">
    <children>
       <HBox prefHeight="53.0" prefWidth="1190.0" style="-fx-background-color: #273c75;" />
       <TextField layoutX="128.0" layoutY="78.0" prefHeight="54.0" prefWidth="334.0" style="-fx-background-radius: 50;" />
@@ -46,7 +46,7 @@
             <HBox prefHeight="375.0" prefWidth="100.0" />
             <StackPane prefHeight="94.0" prefWidth="100.0">
                <children>
-                  <ToggleButton fx:id="ThemeToggle" mnemonicParsing="false" onAction="toggleTheme" prefHeight="42.0" prefWidth="90.0" style="-fx-background-radius: 50;" stylesheets="@Togglebutton.css" text="Dark/Light" />
+                  <ToggleButton fx:id="ThemeToggle" mnemonicParsing="false" prefHeight="42.0" prefWidth="90.0" style="-fx-background-radius: 50;" stylesheets="@Togglebutton.css" text="Dark/Light" />
                </children>
             </StackPane>
          </children>

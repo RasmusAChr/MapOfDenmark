@@ -1,7 +1,9 @@
 package com.example.mapofdenmark;
 
 
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -10,6 +12,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class View {
     Canvas canvas = new Canvas(1920, 1080);
@@ -23,11 +27,17 @@ public class View {
 
     Model model;
 
-    public View(Model model, Stage primaryStage) {
+    public View(Model model, Stage primaryStage) throws IOException {
         this.model = model;
         primaryStage.setTitle("Draw Lines");
-        BorderPane pane = new BorderPane(canvas);
-        Scene scene = new Scene(pane);
+
+        Parent root = FXMLLoader.load(getClass().getResource("GUI.fxml"));
+        Controller controller = new Controller(model, this);
+
+        Scene scene = new Scene(root);
+
+        //BorderPane pane = new BorderPane(canvas);
+        //Scene scene = new Scene(pane);
         primaryStage.setScene(scene);
         primaryStage.show();
         redraw();
