@@ -14,13 +14,7 @@
 
 <AnchorPane prefHeight="692.0" prefWidth="1190.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mapofdenmark.Controller">
    <children>
-      <HBox prefHeight="53.0" prefWidth="1190.0" style="-fx-background-color: #273c75;" />
-      <TextField layoutX="128.0" layoutY="78.0" prefHeight="54.0" prefWidth="334.0" style="-fx-background-radius: 50;" />
-      <ImageView fitHeight="47.0" fitWidth="44.0" layoutX="411.0" layoutY="83.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../../../../../../GUI%20Icons/icons8-search-500.png" />
-         </image>
-      </ImageView>
+      <Pane fx:id="mapPane" layoutX="100.0" layoutY="54.0" prefHeight="638.0" prefWidth="1091.0" />
       <VBox layoutY="54.0" prefHeight="638.0" prefWidth="100.0" style="-fx-background-color: #dcdde1;">
          <children>
             <StackPane prefHeight="94.0" prefWidth="100.0">
@@ -28,7 +22,7 @@
                   <Button mnemonicParsing="false" prefHeight="94.0" prefWidth="100.0" visible="false" />
                   <ImageView fitHeight="60.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../../../../GUI%20Icons/icons8-folder-512.png" />
+                        <Image url="@GUI%20Icons/icons8-folder-512.png" />
                      </image>
                   </ImageView>
                </children>
@@ -38,7 +32,7 @@
                   <Button mnemonicParsing="false" prefHeight="94.0" prefWidth="100.0" visible="false" />
                   <ImageView fitHeight="60.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../../../../GUI%20Icons/icons8-place-marker-100.png" />
+                        <Image url="@GUI%20Icons/icons8-place-marker-100.png" />
                      </image>
                   </ImageView>
                </children>
@@ -51,7 +45,13 @@
             </StackPane>
          </children>
       </VBox>
+      <HBox prefHeight="53.0" prefWidth="1190.0" style="-fx-background-color: #273c75;" />
+      <TextField layoutX="128.0" layoutY="78.0" prefHeight="54.0" prefWidth="334.0" style="-fx-background-radius: 50;" />
+      <ImageView fitHeight="47.0" fitWidth="44.0" layoutX="411.0" layoutY="83.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@GUI%20Icons/icons8-search-500.png" />
+         </image>
+      </ImageView>
       <Slider layoutX="1065.0" layoutY="127.0" orientation="VERTICAL" prefHeight="529.0" prefWidth="110.0" />
-      <Pane fx:id="mapPane" layoutX="100.0" layoutY="54.0" prefHeight="638.0" prefWidth="1091.0" />
    </children>
 </AnchorPane>
