@@ -7,9 +7,7 @@ import javafx.scene.layout.Pane;
 
 public class Controller {
 
-    public Controller(){
-
-    }
+    public Controller(){} // For some reason the code will not run without this line, so don't delete pls....
 
     double lastX;
     double lastY;
