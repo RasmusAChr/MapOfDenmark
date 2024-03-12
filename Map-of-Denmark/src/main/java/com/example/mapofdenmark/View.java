@@ -12,7 +12,7 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.stage.Stage;
 
 public class View {
-    Canvas canvas = new Canvas(1920, 1080);
+    Canvas canvas = new Canvas(750, 800);
     GraphicsContext gc = canvas.getGraphicsContext2D();
     double x1 = 100;
     double y1 = 100;
@@ -37,7 +37,7 @@ public class View {
 
     void redraw() {
         gc.setTransform(new Affine());
-        gc.setFill(Color.WHITE);
+        gc.setFill(Color.web("#addeff"));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
         gc.setLineWidth(1/Math.sqrt(trans.determinant()));
@@ -46,10 +46,10 @@ public class View {
         }
         for (var way : model.ways) {
             way.draw(gc);
-            if (!way.type.isEmpty()){
+            if (!way.type.isEmpty() && way.objectType){ // typen stroke
+
                 way.fillPolygon(gc);
             }
-            System.out.println(way.type);
         }
     }
 

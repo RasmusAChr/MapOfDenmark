@@ -10,10 +10,13 @@ import javafx.scene.shape.Polygon;
 public class Way implements Serializable {
     double[] coords;
     String type;
+    boolean objectType;
 
 
-    public Way(ArrayList<Node> way, String type) {
-        this.type = type;
+
+    public Way(ArrayList<Node> way, String wayType, boolean objectType) {
+        this.type = wayType;
+        this.objectType = objectType;
         coords = new double[way.size() * 2];
         for (int i = 0 ; i < way.size() ; ++i) {
             var node = way.get(i);
@@ -28,11 +31,17 @@ public class Way implements Serializable {
         for (int i = 2 ; i < coords.length ; i += 2) {
             gc.lineTo(coords[i], coords[i+1]);
         }
+        if (type.equals("asphalt")) gc.setStroke(Color.web("#ffffff"));
+        else{gc.setStroke(Color.BLACK);}
         gc.stroke();
+
     }
 
-    public void fillPolygon(GraphicsContext gc){
-        if (type.equals("building")) gc.setFill(Color.GREEN);
+    public void fillPolygon(GraphicsContext gc) {
+        if (type.equals("building")) gc.setFill(Color.web("#fcffa8"));
+        if (type.equals("water")) gc.setFill(Color.web("#addeff"));
+        if (type.equals("park")) gc.setFill(Color.web("#cbe4c4"));
+
 
         // Andre tags her
 

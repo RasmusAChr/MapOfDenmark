@@ -72,6 +72,7 @@ public class Model implements Serializable {
         var id2node = new HashMap<Long, Node>();
         var way = new ArrayList<Node>();
         String wayType = "";
+        boolean objectType = false; // false = stroke, true = polygon
         while (input.hasNext()) {
             var tagKind = input.next();
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
@@ -92,10 +93,23 @@ public class Model implements Serializable {
                 } else if (name == "tag") {
                     var v = input.getAttributeValue(null, "v");
                     var k = input.getAttributeValue(null, "k");
-                    /*if (v.equals("coastline")) {
-                        wayType = "coastline";
-                    }*/
-                    if (k.equals("building")) wayType = "building";
+
+                    if (k.equals("building")) {
+                        wayType = "building";
+                        objectType = true;
+                    }
+                    else if (v.equals("water")) {
+                        wayType = "water";
+                        objectType = true;
+                    }
+                    else if (v.equals("park")) {
+                        wayType = "park";
+                        objectType = true;
+                    }
+                    else if (v.equals("asphalt")) {
+                        wayType = "asphalt";
+                        objectType = false;
+                    }
 
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
@@ -105,9 +119,7 @@ public class Model implements Serializable {
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
-                if (name == "way") {
-                    ways.add(new Way(way, wayType));
-                }
+                if (name == "way") ways.add(new Way(way, wayType, objectType));
             }
         }
     }
