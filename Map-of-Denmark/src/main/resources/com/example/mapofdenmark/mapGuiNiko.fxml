@@ -14,7 +14,7 @@
 <AnchorPane prefHeight="692.0" prefWidth="1190.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mapofdenmark.MapGui">
    <children>
       <HBox prefHeight="53.0" prefWidth="1190.0" style="-fx-background-color: #273c75;" />
-      <TextField layoutX="128.0" layoutY="78.0" prefHeight="54.0" prefWidth="334.0" />
+      <TextField layoutX="128.0" layoutY="78.0" prefHeight="54.0" prefWidth="334.0" style="-fx-background-radius: 50;" />
       <ImageView fitHeight="47.0" fitWidth="44.0" layoutX="411.0" layoutY="83.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../../../../../../GUI%20Icons/icons8-search-500.png" />
@@ -22,16 +22,6 @@
       </ImageView>
       <VBox layoutY="54.0" prefHeight="638.0" prefWidth="100.0" style="-fx-background-color: #dcdde1;">
          <children>
-            <StackPane prefHeight="94.0" prefWidth="100.0">
-               <children>
-                  <Button mnemonicParsing="false" prefHeight="94.0" prefWidth="100.0" visible="false" />
-                  <ImageView fitHeight="60.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../../../../../../GUI%20Icons/icons8-settings-480.png" />
-                     </image>
-                  </ImageView>
-               </children>
-            </StackPane>
             <StackPane prefHeight="94.0" prefWidth="100.0">
                <children>
                   <Button mnemonicParsing="false" prefHeight="94.0" prefWidth="100.0" visible="false" />
@@ -52,7 +42,7 @@
                   </ImageView>
                </children>
             </StackPane>
-            <HBox prefHeight="262.0" prefWidth="100.0" />
+            <HBox prefHeight="375.0" prefWidth="100.0" />
             <StackPane prefHeight="94.0" prefWidth="100.0">
                <children>
                   <ToggleButton mnemonicParsing="false" prefHeight="42.0" prefWidth="90.0" style="-fx-background-radius: 50;" text="Dark/Light" />
