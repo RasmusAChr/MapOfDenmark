@@ -3,6 +3,7 @@ package com.example.mapofdenmark;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
+import javafx.scene.layout.Pane;
 
 public class Controller {
 
@@ -14,6 +15,9 @@ public class Controller {
     double lastY;
     private Model model;
     private View view;
+
+    @FXML
+    private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
 
     public Controller(Model inputModel, View inputView) {
         this.model = inputModel;
