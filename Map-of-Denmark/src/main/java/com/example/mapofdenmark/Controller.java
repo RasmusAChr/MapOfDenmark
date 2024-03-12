@@ -3,6 +3,7 @@ package com.example.mapofdenmark;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.Pane;
 
 public class Controller {
@@ -16,6 +17,8 @@ public class Controller {
 
     @FXML
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
+    @FXML
+    private ToggleButton themeToggleBtn;
 
     public Controller(Model inputModel, View inputView) {
         this.model = inputModel;
@@ -46,7 +49,20 @@ public class Controller {
         });
     }
     @FXML
-    private void toggleTheme(){
+    private void initialize(){
+        themeToggleBtn.getStyleClass().add("root-light");
+    }
 
+    @FXML
+    private void toggleTheme(){
+        if (themeToggleBtn.isSelected()) {
+            themeToggleBtn.getStyleClass().remove("root-light");
+            themeToggleBtn.getStyleClass().add("root-dark");
+            System.out.println("Dark theme");
+        } else {
+            themeToggleBtn.getStyleClass().remove("root-dark");
+            themeToggleBtn.getStyleClass().add("root-light");
+            System.out.println("Light theme");
+        }
     }
 }

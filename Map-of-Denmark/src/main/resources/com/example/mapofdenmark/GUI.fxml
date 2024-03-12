@@ -40,7 +40,7 @@
             <HBox prefHeight="375.0" prefWidth="100.0" />
             <StackPane prefHeight="94.0" prefWidth="100.0">
                <children>
-                  <ToggleButton fx:id="ThemeToggle" mnemonicParsing="false" prefHeight="42.0" prefWidth="90.0" style="-fx-background-radius: 50;" stylesheets="@Togglebutton.css" text="Dark/Light" />
+                  <ToggleButton fx:id="themeToggleBtn" onMouseClicked="#toggleTheme" mnemonicParsing="false" prefHeight="42.0" prefWidth="90.0" style="-fx-background-radius: 50;" stylesheets="@Togglebutton.css" text="Dark/Light" />
                </children>
             </StackPane>
          </children>
