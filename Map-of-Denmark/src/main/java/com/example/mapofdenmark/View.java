@@ -35,6 +35,17 @@ public class View {
         zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
     }
 
+    // These layers should be drawn separately (to be able to not be drawn at a certain zoom distance).
+    // These should be saved in Lists in the Model.java.
+    // --Layers--
+    // Background land: island, peninsula, islet
+    // Naturals
+    // Landuses
+    // Buildings
+    // Small roads
+    // Medium roads
+    // Big roads
+
     void redraw() {
         gc.setTransform(new Affine());
         gc.setFill(Color.WHITE);
