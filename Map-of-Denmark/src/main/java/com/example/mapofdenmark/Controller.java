@@ -3,8 +3,14 @@ package com.example.mapofdenmark;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
+import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 public class Controller {
 
@@ -19,7 +25,8 @@ public class Controller {
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
     @FXML
     private ToggleButton themeToggleBtn;
-
+    @FXML
+    private Button fileBtn;
     public Controller(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
@@ -55,6 +62,7 @@ public class Controller {
 
     @FXML
     private void toggleTheme(){
+        // if the themebutton has been toggled on
         if (themeToggleBtn.isSelected()) {
             themeToggleBtn.getStyleClass().remove("root-light");
             themeToggleBtn.getStyleClass().add("root-dark");
@@ -64,5 +72,32 @@ public class Controller {
             themeToggleBtn.getStyleClass().add("root-light");
             System.out.println("Light theme");
         }
+    }
+    @FXML
+    private void readFile(){
+        System.out.println("Attempting to show read file dialog");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open .Obj or .OSM File");
+
+        // Set extension filters such that the user cannot choose undesird file types/extensions
+        FileChooser.ExtensionFilter osmFilter = new FileChooser.ExtensionFilter("OSM files (*.osm)", "*.osm");
+        FileChooser.ExtensionFilter objFilter = new FileChooser.ExtensionFilter("OBJ files (*.obj)", "*.obj");
+        fileChooser.getExtensionFilters().addAll(osmFilter, objFilter);
+
+        // This retrieves the Stage from this component's scene
+        Stage stage = (Stage) fileBtn.getScene().getWindow();
+        File file = fileChooser.showOpenDialog(stage);
+
+        if (file != null) {
+            String userFile = file.getPath();
+            System.out.println(file.getName());
+        } else  {
+            System.out.println("error"); // or something else
+        }
+
+    }
+    @FXML
+    private void placeInterest(){
+
     }
 }

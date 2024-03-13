@@ -15,12 +15,12 @@
 <AnchorPane prefHeight="692.0" prefWidth="1190.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.mapofdenmark.Controller">
    <children>
       <Pane fx:id="mapPane" layoutX="100.0" layoutY="54.0" prefHeight="638.0" prefWidth="1091.0" />
-      <VBox layoutY="54.0" prefHeight="638.0" prefWidth="100.0" style="-fx-background-color: #dcdde1;">
+      <VBox id="btnHub" fx:id="btnHub" layoutY="54.0" prefHeight="638.0" prefWidth="100.0" style="-fx-background-color: #dcdde1;">
          <children>
             <StackPane prefHeight="94.0" prefWidth="100.0">
                <children>
-                  <Button mnemonicParsing="false" prefHeight="94.0" prefWidth="100.0" visible="false" />
-                  <ImageView fitHeight="60.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true">
+                  <Button id="fileBtn" fx:id="fileBtn" mnemonicParsing="false" onAction="#readFile" prefHeight="94.0" prefWidth="100.0" />
+                  <ImageView fitHeight="60.0" fitWidth="54.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@GUI%20Icons/icons8-folder-512.png" />
                      </image>
@@ -29,8 +29,8 @@
             </StackPane>
             <StackPane prefHeight="94.0" prefWidth="100.0">
                <children>
-                  <Button mnemonicParsing="false" prefHeight="94.0" prefWidth="100.0" visible="false" />
-                  <ImageView fitHeight="60.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true">
+                  <Button mnemonicParsing="false" prefHeight="94.0" prefWidth="100.0" />
+                  <ImageView id="markerBtn" fitHeight="60.0" fitWidth="54.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@GUI%20Icons/icons8-place-marker-100.png" />
                      </image>
@@ -40,7 +40,7 @@
             <HBox prefHeight="375.0" prefWidth="100.0" />
             <StackPane prefHeight="94.0" prefWidth="100.0">
                <children>
-                  <ToggleButton fx:id="themeToggleBtn" onMouseClicked="#toggleTheme" mnemonicParsing="false" prefHeight="42.0" prefWidth="90.0" style="-fx-background-radius: 50;" stylesheets="@Togglebutton.css" text="Dark/Light" />
+                  <ToggleButton fx:id="themeToggleBtn" mnemonicParsing="false" onMouseClicked="#toggleTheme" prefHeight="42.0" prefWidth="90.0" style="-fx-background-radius: 50;" stylesheets="@Togglebutton.css" text="Dark/Light" />
                </children>
             </StackPane>
          </children>
