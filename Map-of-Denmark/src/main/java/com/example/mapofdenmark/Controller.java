@@ -5,12 +5,15 @@ import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import javafx.scene.control.Slider;
+import javafx.scene.image.ImageView;
 
 public class Controller {
 
@@ -27,6 +30,12 @@ public class Controller {
     private ToggleButton themeToggleBtn;
     @FXML
     private Button fileBtn;
+    @FXML
+    private Button markerBtn;
+    @FXML
+    private Slider zoomSlider;
+    @FXML
+    private ImageView sliderEmoji;
     public Controller(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
@@ -57,7 +66,14 @@ public class Controller {
     }
     @FXML
     private void initialize(){
+        // Sets the visuals of the theme toggle
         themeToggleBtn.getStyleClass().add("root-light");
+
+// Ensure the ImageView starts at the correct position corresponding to the slider's initial value
+        updateImageViewPosition(zoomSlider.getValue());
+
+        // Add a listener to the slider's value
+        zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()));
     }
 
     @FXML
@@ -98,6 +114,37 @@ public class Controller {
     }
     @FXML
     private void placeInterest(){
+        System.out.println("You clicked the interest button");
+    }
+    @FXML
+    private void updateImageViewPosition(double sliderValue){
+        // This portion changes the location of imageview
+        // Calculate the percentage position of the thumb on the slider
+        double thumbPositionPercentage = (sliderValue - zoomSlider.getMin()) / (zoomSlider.getMax() - zoomSlider.getMin());
 
+        // Adjust the formula to correctly map the value to the Y position
+        double sliderTrackHeight = zoomSlider.getPrefHeight(); // The full height of the slider
+
+        // Calculate the newY position for the ImageView
+        double newY = zoomSlider.getLayoutY() + sliderTrackHeight * (1 - thumbPositionPercentage) - sliderEmoji.getFitHeight() * thumbPositionPercentage;
+
+        sliderEmoji.setLayoutY(newY);
+
+        // This portion changes image the image itself
+        // Note this loads the image everytime so it may be faster to store all images in seperate image variables but may cost more memory
+        String imagePath;
+        if (sliderValue < 25) {
+            imagePath = "Sunflower Emoji.png";
+        } else if (sliderValue < 50) {
+            imagePath = "Bicycle Emoji.png";
+        } else if (sliderValue < 75) {
+            imagePath = "Airplane Emoji.png";
+        } else {
+            imagePath = "Earth Emoji.png";
+        }
+
+        // Load and set the new image
+        Image image = new Image(getClass().getResourceAsStream("/com/example/mapofdenmark/GUI Icons/" + imagePath));
+        sliderEmoji.setImage(image);
     }
 }
