@@ -107,7 +107,7 @@ public class Model implements Serializable {
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
-                if (name == "way") {
+                if (name == "way" && coast) {
                     ways.add(new Way(way));
                 }
             }

@@ -12,7 +12,7 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.stage.Stage;
 
 public class View {
-    Canvas canvas = new Canvas(1920, 1080);
+    Canvas canvas = new Canvas(1080, 720);
     GraphicsContext gc = canvas.getGraphicsContext2D();
     double x1 = 100;
     double y1 = 100;
