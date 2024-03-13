@@ -16,8 +16,9 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 
 public class Controller {
-
-    public Controller(){} // For some reason the code will not run without this line, so don't delete pls....
+    //JavaFX requires a non-parameter constructor to load and run the FXML file.
+    // So it needs to stay (even though it's empty)
+    public Controller(){}
 
     double lastX;
     double lastY;
