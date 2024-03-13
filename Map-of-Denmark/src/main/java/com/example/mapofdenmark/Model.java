@@ -63,6 +63,11 @@ public class Model implements Serializable {
         parseOSM(input);
     }
 
+    // Create function to handle each different object
+    // ParseOSM:
+    // ParseOSMWays:
+    // ParseOSMNodes:
+
     private void parseOSM(String filename) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         parseOSM(new FileInputStream(filename));
     }
