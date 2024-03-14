@@ -4,6 +4,8 @@ module com.example.mapofdenmark {
     requires java.xml;
 
 
-    opens com.example.mapofdenmark to javafx.fxml;
-    exports com.example.mapofdenmark;
+    opens com.telos.mapofdenmark to javafx.fxml;
+    exports com.telos.mapofdenmark;
+    exports com.telos.mapofdenmark.Objects;
+    opens com.telos.mapofdenmark.Objects to javafx.fxml;
 }

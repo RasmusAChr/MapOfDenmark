@@ -1,4 +1,4 @@
-package com.example.mapofdenmark;
+package com.telos.mapofdenmark.Objects;
 
 public class Node {
     double lat, lon;

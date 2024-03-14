@@ -1,7 +1,6 @@
-package com.example.mapofdenmark;
+package com.telos.mapofdenmark;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -14,7 +13,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
 import java.util.zip.ZipInputStream;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -22,11 +20,16 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
-import javafx.geometry.Point2D;
+import com.telos.mapofdenmark.Objects.*;
 
 public class Model implements Serializable {
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
+    List<Natural> firstLayer = new ArrayList<>(); // Natural but only islands <--- IMPORTANT https://wiki.openstreetmap.org/wiki/natural
+    List<Landuse> secondLayer = new ArrayList<>(); // Landuse https://wiki.openstreetmap.org/wiki/Land_use
+    List<Natural> thirdLayer = new ArrayList<>(); // https://wiki.openstreetmap.org/wiki/natural
+    List<Building> fourthLayer = new ArrayList<>(); // https://wiki.openstreetmap.org/wiki/Buildings
+
 
     double minlat, maxlat, minlon, maxlon;
 
@@ -45,9 +48,9 @@ public class Model implements Serializable {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
             parseOSM(filename);
-        } else {
+        } /*else {
             parseTXT(filename);
-        }
+        }*/
         save(filename+".obj");
     }
 
@@ -114,16 +117,16 @@ public class Model implements Serializable {
         }
     }
 
-    private void parseTXT(String filename) throws FileNotFoundException {
+    /*private void parseTXT(String filename) throws FileNotFoundException {
         File f = new File(filename);
         try (Scanner s = new Scanner(f)) {
             while (s.hasNext()) {
                 list.add(new Line(s.nextLine()));
             }
         }
-    }
+    }*/
 
-    public void add(Point2D p1, Point2D p2) {
+    /*public void add(Point2D p1, Point2D p2) {
         list.add(new Line(p1, p2));
-    }
+    }*/
 }

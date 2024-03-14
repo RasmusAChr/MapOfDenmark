@@ -1,4 +1,4 @@
-package com.example.mapofdenmark;
+package com.telos.mapofdenmark.Objects;
 
 import java.io.Serializable;
 
@@ -6,6 +6,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 
 public class Line implements Serializable {
+    // THIS CLASS SHOULD PROBABLY NEVER BE USED
     double x1, y1, x2, y2;
 
     public Line(String line) {

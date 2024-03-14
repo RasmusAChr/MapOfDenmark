@@ -1,4 +1,4 @@
-package com.example.mapofdenmark;
+package com.telos.mapofdenmark;
 
 
 import javafx.geometry.Point2D;
@@ -16,7 +16,7 @@ public class Controller {
             if (e.isPrimaryButtonDown()) {
                 Point2D lastmodel = view.mousetoModel(lastX, lastY);
                 Point2D newmodel = view.mousetoModel(e.getX(), e.getY());
-                model.add(lastmodel, newmodel);
+                /*model.add(lastmodel, newmodel);*/
                 view.redraw();
             } else {
                 double dx = e.getX() - lastX;
