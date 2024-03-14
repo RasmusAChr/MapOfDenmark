@@ -6,7 +6,7 @@ plugins {
   id 'org.beryx.jlink' version '2.25.0'
 }
 
-group 'com.example'
+group 'com.telos'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -25,8 +25,8 @@ tasks.withType(JavaCompile) {
 }
 
 application {
-  mainModule = 'com.example.mapofdenmark'
-  mainClass = 'com.example.mapofdenmark.HelloApplication'
+  mainModule = 'com.telos.mapofdenmark'
+  mainClass = 'com.telos.mapofdenmark.App'
 }
 
 javafx {

@@ -1,4 +1,4 @@
-package com.example.mapofdenmark;
+package com.telos.mapofdenmark;
 
 import java.io.Serializable;
 

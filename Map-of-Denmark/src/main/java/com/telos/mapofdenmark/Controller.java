@@ -1,4 +1,4 @@
-package com.example.mapofdenmark;
+package com.telos.mapofdenmark;
 
 
 import javafx.geometry.Point2D;
