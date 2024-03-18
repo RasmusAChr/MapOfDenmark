@@ -10,9 +10,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipInputStream;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -29,6 +27,27 @@ public class Model implements Serializable {
     List<Landuse> secondLayer = new ArrayList<>(); // Landuse https://wiki.openstreetmap.org/wiki/Land_use
     List<Natural> thirdLayer = new ArrayList<>(); // https://wiki.openstreetmap.org/wiki/natural
     List<Building> fourthLayer = new ArrayList<>(); // https://wiki.openstreetmap.org/wiki/Buildings
+
+    // Sets to determine which Nodes we want to create
+    Set<Long> adressNodeRef = new HashSet<>();
+    Set<Long> buildingNodeRef = new HashSet<>();
+    Set<Long> highwayNodeRef = new HashSet<>();
+    Set<Long> placeNodeRef = new HashSet<>();
+    Set<Long> landuseNodeRef = new HashSet<>();
+    Set<Long> naturalNodeRef = new HashSet<>();
+
+    // Sets to determine which Ways we want to create
+    Set<String> buildingWayRef = new HashSet<>();
+    Set<String> highwayWayRef = new HashSet<>();
+    Set<String> placeWayRef = new HashSet<>();
+    Set<String> landuseWayRef = new HashSet<>();
+    Set<String> naturalWayRef = new HashSet<>();
+
+    // Sets to determine which Relations we want to create
+    Set<String> buildingRelationRef = new HashSet<>();
+    Set<String> placeRelationRef = new HashSet<>();
+    Set<String> landuseRelationRef = new HashSet<>();
+    Set<String> naturalRelationRef = new HashSet<>();
 
 
     double minlat, maxlat, minlon, maxlon;
@@ -72,7 +91,8 @@ public class Model implements Serializable {
     // ParseOSMNodes:
 
     private void parseOSM(String filename) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
-        parseOSM(new FileInputStream(filename));
+        FileInputStream inputStream = new FileInputStream(filename);
+        parseOSM(inputStream);
     }
 
     private void parseOSM(InputStream inputStream) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
@@ -110,7 +130,7 @@ public class Model implements Serializable {
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
-                if (name == "way" && coast) {
+                if (name == "way") {
                     ways.add(new Way(way));
                 }
             }

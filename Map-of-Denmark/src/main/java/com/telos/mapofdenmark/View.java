@@ -55,6 +55,16 @@ public class View {
         for (var line : model.list) {
             line.draw(gc);
         }
+
+        // Draw
+        // - First layer / Background islands
+        // - Second layer / Landuses
+        // - Third layer / Naturals
+        // - Fourth layer Buildings
+        // - Small roads /
+        // - Medium roads / Secondary, tertiary
+        // - Big roads / Motorway, trunk, primary
+
         for (var way : model.ways) {
             way.draw(gc);
         }
