@@ -8,7 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
@@ -33,7 +33,9 @@ public class View {
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
     public View(Model model, Stage primaryStage) throws IOException {
         this.model = model;
-        primaryStage.setTitle("Draw Lines");
+        primaryStage.setTitle("Map of Denmark");
+        Image image = new Image(getClass().getResourceAsStream("/com/telos/mapofdenmark/235861.png"));
+        primaryStage.getIcons().add(image);
         //Loads the GUI from the FXML file
         Parent root = FXMLLoader.load(getClass().getResource("GUI.fxml"));
         Controller controller = new Controller(model, this);
