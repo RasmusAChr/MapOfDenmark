@@ -1,18 +1,24 @@
 package com.telos.mapofdenmark;
 
 
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class View {
-    Canvas canvas = new Canvas(1920, 1080);
+    Canvas canvas = new Canvas(1091.0, 638.0);
     GraphicsContext gc = canvas.getGraphicsContext2D();
     double x1 = 100;
     double y1 = 100;
@@ -23,11 +29,22 @@ public class View {
 
     Model model;
 
-    public View(Model model, Stage primaryStage) {
+    @FXML
+    private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
+    public View(Model model, Stage primaryStage) throws IOException {
         this.model = model;
         primaryStage.setTitle("Draw Lines");
-        BorderPane pane = new BorderPane(canvas);
-        Scene scene = new Scene(pane);
+        //Loads the GUI from the FXML file
+        Parent root = FXMLLoader.load(getClass().getResource("GUI.fxml"));
+        Controller controller = new Controller(model, this);
+
+        Scene scene = new Scene(root);
+        //Looks for the node in the scene graph hiearchy by the ID #mapPane.
+        //It then returns and assigns the Pane from the GUI, and keeps a reference to it
+        mapPane = (Pane) scene.lookup("#mapPane");
+        mapPane.getChildren().add(canvas); //Adds the canvas to the mapPane
+
+        //Scene scene = new Scene(pane);
         primaryStage.setScene(scene);
         primaryStage.show();
         redraw();

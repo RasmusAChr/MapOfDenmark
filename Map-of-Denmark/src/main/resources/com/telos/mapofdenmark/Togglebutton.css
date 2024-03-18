@@ -1,0 +1,16 @@
+/* styles.css */
+.root-light {
+    -fx-background-color: #C0E6F6; /* Light theme background */
+}
+
+.root-dark {
+    -fx-background-color: #484848; /* Dark theme background */
+}
+
+.label-light {
+    -fx-text-fill: black; /* Black text for day */
+}
+
+.label-dark {
+    -fx-text-fill: white; /* White text for night */
+}
