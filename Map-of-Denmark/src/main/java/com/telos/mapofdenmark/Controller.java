@@ -145,7 +145,7 @@ public class Controller {
         }
 
         // Load and set the new image
-        Image image = new Image(getClass().getResourceAsStream("/com/example/mapofdenmark/GUI Icons/" + imagePath));
+        Image image = new Image(getClass().getResourceAsStream("/com/telos/mapofdenmark/GUI Icons/" + imagePath));
         sliderEmoji.setImage(image);
     }
 }
