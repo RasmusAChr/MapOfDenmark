@@ -15,6 +15,17 @@ public class Natural extends Way {
 
     @Override
     public void draw(GraphicsContext gc){
-        gc.setFill(Color.web("#bdbdbd"));
+        gc.setFill(fillColor());
+        super.draw(gc);
+        gc.fill();
+    }
+
+    private Color fillColor(){
+        if (type == "coastline"){
+            return Color.PURPLE;
+        }
+        else {
+            return Color.PINK;
+        }
     }
 }

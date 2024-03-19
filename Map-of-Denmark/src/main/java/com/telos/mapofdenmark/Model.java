@@ -13,42 +13,19 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.zip.ZipInputStream;
 
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.*;
 
 import com.telos.mapofdenmark.Objects.*;
 
 public class Model implements Serializable {
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
-    List<Natural> firstLayer = new ArrayList<>(); // Natural but only islands <--- IMPORTANT https://wiki.openstreetmap.org/wiki/natural
+    List<Natural> firstLayer = new ArrayList<>(); // Natural but only islands (background land) https://wiki.openstreetmap.org/wiki/natural
     List<Landuse> secondLayer = new ArrayList<>(); // Landuse https://wiki.openstreetmap.org/wiki/Land_use
     List<Natural> thirdLayer = new ArrayList<>(); // https://wiki.openstreetmap.org/wiki/natural
     List<Building> fourthLayer = new ArrayList<>(); // https://wiki.openstreetmap.org/wiki/Buildings
 
-    // Sets to determine which Nodes we want to create
-    Set<Long> adressNodeRef = new HashSet<>();
-    Set<Long> buildingNodeRef = new HashSet<>();
-    Set<Long> highwayNodeRef = new HashSet<>();
-    Set<Long> placeNodeRef = new HashSet<>();
-    Set<Long> landuseNodeRef = new HashSet<>();
-    Set<Long> naturalNodeRef = new HashSet<>();
-
-    // Sets to determine which Ways we want to create
-    Set<String> buildingWayRef = new HashSet<>();
-    Set<String> highwayWayRef = new HashSet<>();
-    Set<String> placeWayRef = new HashSet<>();
-    Set<String> landuseWayRef = new HashSet<>();
-    Set<String> naturalWayRef = new HashSet<>();
-
-    // Sets to determine which Relations we want to create
-    Set<String> buildingRelationRef = new HashSet<>();
-    Set<String> placeRelationRef = new HashSet<>();
-    Set<String> landuseRelationRef = new HashSet<>();
-    Set<String> naturalRelationRef = new HashSet<>();
-
+    String objectType;
 
     double minlat, maxlat, minlon, maxlon;
 
@@ -85,11 +62,6 @@ public class Model implements Serializable {
         parseOSM(input);
     }
 
-    // Create function to handle each different object
-    // ParseOSM:
-    // ParseOSMWays:
-    // ParseOSMNodes:
-
     private void parseOSM(String filename) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         FileInputStream inputStream = new FileInputStream(filename);
         parseOSM(inputStream);
@@ -105,10 +77,7 @@ public class Model implements Serializable {
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
                 var name = input.getLocalName();
                 if (name == "bounds") {
-                    minlat = Double.parseDouble(input.getAttributeValue(null, "minlat"));
-                    maxlat = Double.parseDouble(input.getAttributeValue(null, "maxlat"));
-                    minlon = Double.parseDouble(input.getAttributeValue(null, "minlon"));
-                    maxlon = Double.parseDouble(input.getAttributeValue(null, "maxlon"));
+                    parseBounds(input);
                 } else if (name == "node") {
                     var id = Long.parseLong(input.getAttributeValue(null, "id"));
                     var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
@@ -116,11 +85,13 @@ public class Model implements Serializable {
                     id2node.put(id, new Node(lat, lon));
                 } else if (name == "way") {
                     way.clear();
-                    coast = false;
+                    objectType = "";
+                    //coast = false;
                 } else if (name == "tag") {
                     var v = input.getAttributeValue(null, "v");
                     if (v.equals("coastline")) {
-                        coast = true;
+                        objectType = v;
+                        //coast = true;
                     }
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
@@ -129,12 +100,22 @@ public class Model implements Serializable {
                 }
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input.getLocalName();
-                // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name == "way") {
-                    ways.add(new Way(way));
+                    if (objectType.equals("coastline")) {
+                        firstLayer.add(new Natural(way, objectType));
+                    }
+
+                    //ways.add(new Way(way));
                 }
             }
         }
+    }
+
+    private void parseBounds(XMLStreamReader input){
+        minlat = Double.parseDouble(input.getAttributeValue(null, "minlat"));
+        maxlat = Double.parseDouble(input.getAttributeValue(null, "maxlat"));
+        minlon = Double.parseDouble(input.getAttributeValue(null, "minlon"));
+        maxlon = Double.parseDouble(input.getAttributeValue(null, "maxlon"));
     }
 
     /*private void parseTXT(String filename) throws FileNotFoundException {

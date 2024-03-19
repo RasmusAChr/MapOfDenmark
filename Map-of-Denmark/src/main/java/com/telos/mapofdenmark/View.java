@@ -65,7 +65,12 @@ public class View {
         // - Medium roads / Secondary, tertiary
         // - Big roads / Motorway, trunk, primary
 
-        for (var way : model.ways) {
+        //for (var way : model.ways) {
+            //way.draw(gc);
+        //}
+
+        // draw first layer
+        for (var way : model.firstLayer){
             way.draw(gc);
         }
     }
