@@ -25,8 +25,6 @@ public class Model implements Serializable {
     List<Natural> thirdLayer = new ArrayList<>(); // https://wiki.openstreetmap.org/wiki/natural
     List<Building> fourthLayer = new ArrayList<>(); // https://wiki.openstreetmap.org/wiki/Buildings
 
-    String objectType;
-
     double minlat, maxlat, minlon, maxlon;
 
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
@@ -71,7 +69,7 @@ public class Model implements Serializable {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream));
         var id2node = new HashMap<Long, Node>();
         var way = new ArrayList<Node>();
-        var coast = false;
+        String objectType = "";
         while (input.hasNext()) {
             var tagKind = input.next();
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
@@ -86,12 +84,10 @@ public class Model implements Serializable {
                 } else if (name == "way") {
                     way.clear();
                     objectType = "";
-                    //coast = false;
                 } else if (name == "tag") {
                     var v = input.getAttributeValue(null, "v");
                     if (v.equals("coastline")) {
                         objectType = v;
-                        //coast = true;
                     }
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
