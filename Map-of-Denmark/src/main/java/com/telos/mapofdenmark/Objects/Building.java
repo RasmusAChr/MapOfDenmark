@@ -6,10 +6,10 @@ import javafx.scene.paint.Color;
 import java.util.ArrayList;
 
 public class Building extends Way{
-    String buildingType;
+    //String buildingType;
     public Building(ArrayList<Node> way, String type){
-        super(way);
-        this.buildingType = type;
+        super(way, type);
+        //this.buildingType = type;
     }
 
     // Way.draw() get the outline and strokes it.

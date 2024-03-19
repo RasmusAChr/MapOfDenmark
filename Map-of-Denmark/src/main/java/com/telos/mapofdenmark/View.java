@@ -69,7 +69,12 @@ public class View {
             //way.draw(gc);
         //}
 
-        // draw first layer
+        // drawing and filling the coastline
+        for (var way : model.zeroLayer){
+            way.draw(gc);
+        }
+
+        // drawing and filling first layer
         for (var way : model.firstLayer){
             way.draw(gc);
         }

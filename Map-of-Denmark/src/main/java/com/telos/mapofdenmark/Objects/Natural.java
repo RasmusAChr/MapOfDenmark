@@ -7,12 +7,12 @@ import javafx.scene.paint.Color;
 import java.util.ArrayList;
 
 public class Natural extends Way {
-    String type;
+    //String type;
     ColorScheme cs = new ColorScheme();
 
     public Natural(ArrayList<Node> way, String type){
-        super(way);
-        this.type = type;
+        super(way, type);
+        //this.type = type;
     }
 
     @Override
@@ -23,11 +23,17 @@ public class Natural extends Way {
     }
 
     private Color fillColor(){
-        if (type == "coastline"){
-            return cs.getColor(type);
+        if (type.isEmpty()){
+            return cs.getDefaultColor();
         }
         else {
-            return Color.PINK;
+            try {
+                return cs.getColor(type);
+            }
+            catch (Exception e) {
+                return cs.getDefaultColor();
+            }
+
         }
     }
 }
