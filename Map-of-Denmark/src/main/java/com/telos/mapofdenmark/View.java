@@ -20,8 +20,8 @@ public class View {
     double y2 = 800;
 
     Affine trans = new Affine();
-
     Model model;
+    ColorScheme cs = new ColorScheme();
 
     public View(Model model, Stage primaryStage) {
         this.model = model;
@@ -48,7 +48,7 @@ public class View {
 
     void redraw() {
         gc.setTransform(new Affine());
-        gc.setFill(Color.WHITE);
+        gc.setFill(cs.getColor("water"));//(Color.WHITE);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
         gc.setLineWidth(1/Math.sqrt(trans.determinant()));

@@ -110,7 +110,7 @@ public class Model implements Serializable {
                     if (objectType.equals("coastline")) {
                         zeroLayer.add(new Natural(way, objectType));
                     }
-                    else if (wayKey.equals("natural") && !objectType.equals("coastline")){
+                    if (wayKey.equals("natural") && !objectType.equals("coastline")){
                         firstLayer.add(new Natural(way, objectType));
                     }
 

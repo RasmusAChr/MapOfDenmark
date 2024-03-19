@@ -30,8 +30,8 @@ public class ColorScheme implements Serializable{
         colors.put("grassland","#68bf60");
         colors.put("heath","#45ed7d");
         colors.put("moor","#45ed7d");
-        colors.put("scrub","#1fbf54");
-        colors.put("scrubbery","#1fbf54");
+        colors.put("scrub","#93ad6a");
+        colors.put("scrubbery","#93ad6a");
         colors.put("tree","#188f40");
         colors.put("tree_row","#188f40");
         colors.put("tree_stump","#5c2606");
@@ -41,7 +41,7 @@ public class ColorScheme implements Serializable{
         colors.put("beach","#f2db68");
         colors.put("blowhole","#f2db68");
         colors.put("cape","#f2db68");
-        colors.put("coastline", "#95de8e");
+        colors.put("coastline", "#ecf0ec"); //original:#ecf0ec pink:#ff73e8
         colors.put("crevasse","#68e2f2");
         colors.put("geyser","#acb4b5");
         colors.put("glacier","#68e2f2");
