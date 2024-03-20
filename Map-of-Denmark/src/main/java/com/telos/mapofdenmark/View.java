@@ -78,6 +78,16 @@ public class View {
         for (var way : model.firstLayer){
             way.draw(gc);
         }
+
+        // drawing and filling second layer
+        for (var way : model.secondLayer){
+            way.draw(gc);
+        }
+
+        // drawing and filling third layer
+        for (var way : model.thirdLayer){
+            way.draw(gc);
+        }
     }
 
     void pan(double dx, double dy) {

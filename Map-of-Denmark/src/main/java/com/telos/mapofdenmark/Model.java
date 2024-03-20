@@ -23,7 +23,12 @@ public class Model implements Serializable {
     List<Natural> zeroLayer = new ArrayList<>(); // coastline
     List<Natural> firstLayer = new ArrayList<>(); // Natural but only islands (background land) https://wiki.openstreetmap.org/wiki/natural
     List<Landuse> secondLayer = new ArrayList<>(); // Landuse https://wiki.openstreetmap.org/wiki/Land_use
-    List<Building> thirdLayer = new ArrayList<>(); // https://wiki.openstreetmap.org/wiki/Buildings
+    List<Leisure> thirdLayer = new ArrayList<>(); // Leisure https://wiki.openstreetmap.org/wiki/Leisure
+    List<Building> fourthLayer = new ArrayList<>(); // https://wiki.openstreetmap.org/wiki/Buildings
+    List<Highway> bigRoads = new ArrayList<>();
+    List<Highway> mediumRoads = new ArrayList<>();
+    List<Highway> smallRoads = new ArrayList<>();
+    List<Highway> walkingPaths = new ArrayList<>();
 
     double minlat, maxlat, minlon, maxlon;
 
@@ -69,8 +74,8 @@ public class Model implements Serializable {
         // Map for storing node id's for quick access when searching for node ref
         var id2node = new HashMap<Long, Node>();
         var way = new ArrayList<Node>();
-        var wayKey = "";
-        String objectType = "";
+        var wayTagKey = "";
+        var wayTagValue = "";
         // run this loop until there are no more lines in the .OSM file
         while (input.hasNext()) {
             var tagKind = input.next();
@@ -88,13 +93,16 @@ public class Model implements Serializable {
                     // If the input is a way, clear the list of way for the new way
                 } else if (name == "way") {
                     way.clear();
-                    objectType = "";
+                    wayTagKey = "";
+                    wayTagValue = "";
                 } else if (name == "tag") {
                     // set the tag value and tag key
                     var v = input.getAttributeValue(null, "v");
-                    wayKey = input.getAttributeValue(null, "k");
-                    if (wayKey.equals("natural")) {
-                        objectType = v;
+                    var k = input.getAttributeValue(null, "k");
+                    // If statement is necessary for the layers, otherwise tags like 'source', 'name' etc. will be used.
+                    if (k.equals("natural") || k.equals("landuse") || k.equals("leisure") || k.equals("building")) {
+                        wayTagKey = k;
+                        wayTagValue = v;
                     }
                     //If the input is a node, get the reference of the node and add it to the way list
                 } else if (name == "nd") {
@@ -106,13 +114,26 @@ public class Model implements Serializable {
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input.getLocalName();
                 if (name == "way") {
-
-                    if (objectType.equals("coastline")) {
-                        zeroLayer.add(new Natural(way, objectType));
+                    if (wayTagValue.equals("coastline")) {
+                        zeroLayer.add(new Natural(way, wayTagValue));
                     }
-                    if (wayKey.equals("natural") && !objectType.equals("coastline")){
-                        firstLayer.add(new Natural(way, objectType));
+                    else if (wayTagKey.equals("natural")) { // Måske vi ikke skulle lave et objekt for så mange forskellige ting ligesom TA sagde? - Rasmus
+                        firstLayer.add(new Natural(way, wayTagValue));
                     }
+                    // else if secondlayer (Landuse)
+                    else if (wayTagKey.equals("landuse") && !wayTagValue.equals("port")) {
+                        secondLayer.add(new Landuse(way, wayTagValue));
+                    }
+                    // else if thirdlayer (leisure)
+                    else if (wayTagKey.equals("leisure") && !wayTagValue.equals("marina") && !wayTagValue.equals("slipway")) {
+                        thirdLayer.add(new Leisure(way, wayTagValue));
+                        System.out.println(wayTagValue);
+                    }
+                    // else if fourthlayer (buildings)
+                    // else if bigRoad
+                    // else if mediumRoad
+                    // else if smallRoad
+                    // else if walkingPaths
 
                     //ways.add(new Way(way));
                 }

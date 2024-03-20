@@ -4,12 +4,11 @@ import com.telos.mapofdenmark.ColorScheme;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class Landuse extends Way{
+public class Leisure extends Way{
     ColorScheme cs = new ColorScheme();
-    public Landuse(ArrayList<Node> way, String type){
+    public Leisure(ArrayList<Node> way, String type){
         super(way, type);
     }
 

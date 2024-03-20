@@ -25,7 +25,9 @@ public class ColorScheme implements Serializable{
     // Scheme for all the colors
     public void defaultScheme(){
         colors.clear();
+        colors.put("default", "#ff0000");
 
+        // NATURALS
         colors.put("fell","#48a160");
         colors.put("grassland","#68bf60");
         colors.put("heath","#45ed7d");
@@ -52,9 +54,9 @@ public class ColorScheme implements Serializable{
         colors.put("shoal","#f2db68");
         colors.put("spring","#7daaff");
         colors.put("strait","#7daaff");
-        colors.put("water","#7a9ad6");
+        colors.put("water","#90c5ee");
         colors.put("wetland","#637796");
-        colors.put("bare_rock","#6f7070");
+        colors.put("bare_rock","#adadad");
         colors.put("arete","#6f7070");
         colors.put("blockfield","#6f7070");
         colors.put("cave_entrance","#6f7070");
@@ -72,6 +74,58 @@ public class ColorScheme implements Serializable{
         colors.put("sinkhole","#6f7070");
         colors.put("stone","#6f707");
         colors.put("volcano","#453724");
-        colors.put("default", "#ff00ae");
+
+        // Landuse
+
+        // Below is the exact value for all landuses:
+        // commercial
+        // construction
+        // education
+        // fairground
+        // industrial
+        // residential
+        // retail
+        // institutional
+        // aquaculture
+        // allotments
+        // farmland
+        // farmyard
+        // paddy
+        // animal_keeping
+        // flowerbed
+        colors.put("forest","#9dca8a");
+        // greenhouse_horticulture
+        colors.put("meadow", "#ceecb1");
+        // orchard
+        // plant_nursery
+        // vineyard
+        // basin
+        // salt_pond
+        // brownfield
+        colors.put("cemetery","#abccb0");
+        // depot
+        // garages
+        colors.put("grass","#68bf60");
+        // greenfield
+        // landfill
+        // military
+        // port ----------------- should not be drawn
+        // quarry
+        // railway
+        // recreation_ground
+        // religious
+        // village_green
+        // winter_sports
+
+        // Leisure
+
+        colors.put("garden","#d3efb6");
+        colors.put("playground","#dffce2");
+        //colors.put("slipway",""); ---------------- should not be drawn
+        //colors.put("marina",""); ----------------- should not be drawn
+
+
+
+
     }
 }
