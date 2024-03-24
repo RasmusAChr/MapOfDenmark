@@ -154,14 +154,19 @@ public class Controller {
     }
 
     @FXML
-    private String getTextInput(){
+    private void AddressParsing() {
+        // When lambda expressions are used it must be final, so we have to make it a string array and not just an array
         final String[] inputText = {""};
-
+        // We add a listener to observe changes in the text and save the oldValue and the newValue.
         searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
-            // Update the Label with the new input text
-            inputText[0] = newValue;
+
+            if(!oldValue.equals(newValue)){
+                // We give the inputText variable the newest change in the text
+                inputText[0] = newValue;
+                // Only used for seeing if the text actually updates
+                System.out.println(inputText[0]);
+            }
+
         });
-        System.out.println(inputText[0]);
-        return inputText[0];
     }
 }
