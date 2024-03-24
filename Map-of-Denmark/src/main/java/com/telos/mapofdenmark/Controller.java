@@ -4,6 +4,7 @@ package com.telos.mapofdenmark;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
@@ -37,6 +38,9 @@ public class Controller {
     private Slider zoomSlider;
     @FXML
     private ImageView sliderEmoji;
+
+    @FXML
+    private TextField searchBar;
     public Controller(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
@@ -147,5 +151,17 @@ public class Controller {
         // Load and set the new image
         Image image = new Image(getClass().getResourceAsStream("/com/telos/mapofdenmark/GUI Icons/" + imagePath));
         sliderEmoji.setImage(image);
+    }
+
+    @FXML
+    private String getTextInput(){
+        final String[] inputText = {""};
+
+        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Update the Label with the new input text
+            inputText[0] = newValue;
+        });
+        System.out.println(inputText[0]);
+        return inputText[0];
     }
 }
