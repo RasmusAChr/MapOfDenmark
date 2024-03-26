@@ -154,7 +154,7 @@ public class Controller {
     }
 
     @FXML
-    private void AddressParsing() {
+    private void addressParsing() {
         // When lambda expressions are used it must be final, so we have to make it a string array and not just an array
         final String[] inputText = {""};
         // We add a listener to observe changes in the text and save the oldValue and the newValue.

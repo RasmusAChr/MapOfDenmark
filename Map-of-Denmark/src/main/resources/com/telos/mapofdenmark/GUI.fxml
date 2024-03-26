@@ -46,7 +46,7 @@
          </children>
       </VBox>
       <HBox prefHeight="53.0" prefWidth="1190.0" style="-fx-background-color: #273c75;" />
-      <TextField fx:id="searchBar" layoutX="128.0" layoutY="78.0" onKeyTyped="#AddressParsing" prefHeight="54.0" prefWidth="334.0" style="-fx-background-radius: 50;" />
+      <TextField fx:id="searchBar" layoutX="128.0" layoutY="78.0" onKeyTyped="#addressParsing" prefHeight="54.0" prefWidth="334.0" style="-fx-background-radius: 50;" />
       <ImageView fitHeight="47.0" fitWidth="44.0" layoutX="411.0" layoutY="83.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@GUI%20Icons/icons8-search-500.png" />
