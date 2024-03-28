@@ -1,7 +1,9 @@
 package com.telos.mapofdenmark.TrieClasses;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The "Trie" data structure is a prefix tree data structure, that is able to find suggestions based on a prefix.
@@ -11,12 +13,12 @@ import java.util.List;
 public class Trie {
     TrieNode rootNode;
 
-    Trie(){
+    public Trie(){
         rootNode = new TrieNode(); // At initialization the trie will start with an empty root node
     }
 
     // Insert method inserts words into the trie
-    void insert(String inputWord) {
+    public void insert(String inputWord) {
         TrieNode currentNode = rootNode; // We start the traversal from the rootnode
 
         // We traverse through each character from the inputWord
@@ -31,7 +33,7 @@ public class Trie {
     }
 
 
-    List<String> getAddressSuggestions(String prefix, int limit){
+    public List<String> getAddressSuggestions(String prefix, int limit){
         List<String> addressSuggestions = new ArrayList<>(); // A list that stores the suggestions
         TrieNode currentNode = rootNode; // Start the traversal from the root node
 
@@ -52,10 +54,14 @@ public class Trie {
 
     // A recursive method that collects suggestions from the given node
     private void collectAddressSuggestions(TrieNode node, String prefix, List<String> addressSuggestions, int limit){
+        // Used to check if the suggestion already has been added
+        Set<String> uniqueSuggestions = new HashSet<>();
+
         // If the currentnode is the end of the word, that means the prefix formed so far represents a word found in the trie
         // If that is the case, we will add the word to the suggestion list
-        if(node.endOfWord){
+        if(node.endOfWord && !uniqueSuggestions.contains(prefix)){
             addressSuggestions.add(prefix);
+            uniqueSuggestions.add(prefix);
             if(addressSuggestions.size() >= limit){
                 return; // If the limit has been reached, we stop collecting anymore suggestions.
             }

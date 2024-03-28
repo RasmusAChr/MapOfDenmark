@@ -1,6 +1,7 @@
 package com.telos.mapofdenmark;
 
 
+import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
@@ -10,9 +11,12 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import java.io.File;
-import java.io.IOException;
+
+import java.io.*;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 
@@ -156,17 +160,57 @@ public class Controller {
     @FXML
     private void addressParsing() {
         // When lambda expressions are used it must be final, so we have to make it a string array and not just an array
-        final String[] inputText = {""};
+        //final String[] inputText = {""};
+
+        // Used keep track of previous suggestions so no duplication happens
+        List<String> previousSuggestions = new ArrayList<>();
+
+        Trie trie = loadCityNames();
         // We add a listener to observe changes in the text and save the oldValue and the newValue.
         searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
 
-            if(!oldValue.equals(newValue)){
-                // We give the inputText variable the newest change in the text
-                inputText[0] = newValue;
-                // Only used for seeing if the text actually updates
-                System.out.println(inputText[0]);
+            previousSuggestions.clear();
+
+            // Only proceed if the new value is not empty
+            if (!newValue.isEmpty()) {
+                // Get new suggestions based on the current text in the search bar
+                List<String> suggestionsList = trie.getAddressSuggestions(newValue.toLowerCase(), 4);
+
+                // Print and store new suggestions
+                for (String suggestion : suggestionsList) {
+                    if (!previousSuggestions.contains(suggestion)) {
+                        System.out.println(suggestion);
+                        previousSuggestions.add(suggestion);
+                    }
+                }
             }
+
+                // We give the inputText variable the newest change in the text
+                //inputText[0] = newValue;
+
+
+                // Only used for seeing if the text actually updates
+                //System.out.println(inputText[0]);
+
 
         });
     }
+
+    private Trie loadCityNames() {
+        Trie trie = new Trie();
+        String path = System.getProperty("user.dir"); // gets which directory the project is placed
+        String filename = path+"\\data\\citynames.txt";
+
+        try (BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"))) {
+            String line;
+            while ((line = bReader.readLine()) != null) {
+                trie.insert(line.trim().toLowerCase());
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return trie;
+    }
+
 }
