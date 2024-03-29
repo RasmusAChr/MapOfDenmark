@@ -15,6 +15,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import javafx.scene.image.ImageView;
 
@@ -84,7 +85,8 @@ public class Controller {
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()));
 
         // We add a listener to observe changes in the text and save the oldValue and the newValue.
-        Trie trie = loadCityNames();
+        Trie trie = deserializeTrie("data/trie.obj");
+
         searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
             addressParsing(trie, newValue);
         });
@@ -206,8 +208,36 @@ public class Controller {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-
+        serializeTrie(trie, "data/trie.obj");
         return trie;
     }
-
+    private void serializeTrie(Trie trie, String filepath) {
+        try (
+                FileOutputStream fileOut = new FileOutputStream(filepath); // Open a file output stream to the specified file.
+                ObjectOutputStream out = new ObjectOutputStream(fileOut) // Wrap the file output stream in an ObjectOutputStream.
+        ) {
+            out.writeObject(trie); // Serialize the Trie object and write it to the file.
+        } catch (IOException i) {
+            i.printStackTrace(); // Handle potential IO exceptions.
+        }
+        System.out.println("Created serializable file");
+    }
+    private Trie deserializeTrie(String filepath) {
+        Trie trie = null;
+        try (
+                FileInputStream fileIn = new FileInputStream(filepath); // Open a file input stream to the specified file.
+                ObjectInputStream in = new ObjectInputStream(fileIn) // Wrap the file input stream in an ObjectInputStream.
+        ) {
+            trie = (Trie) in.readObject(); // Deserialize the object read from the file and cast it to a Trie.
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace(); // Handle IO and class not found exceptions.
+        }
+        // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
+        if(!(trie == null))  {
+            System.out.println("Serializable file was found");
+            return trie; // Return the deserialized Trie object.
+        }
+        // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
+        else return trie = loadCityNames();
+    }
 }

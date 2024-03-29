@@ -1,5 +1,6 @@
 package com.telos.mapofdenmark.TrieClasses;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Set;
  * It contains methods such as "Insert" which inserts words into the trie, "getAddressSuggestions" which finds the node corresponding to the prefix
  * and lastly "collectAddressSuggestions" which is a recursive method to collect suggestions starting from a given node.
  */
-public class Trie {
+public class Trie implements Serializable {
     TrieNode rootNode;
 
     public Trie(){
