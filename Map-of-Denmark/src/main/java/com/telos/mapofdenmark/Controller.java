@@ -2,11 +2,10 @@ package com.telos.mapofdenmark;
 
 
 import com.telos.mapofdenmark.TrieClasses.Trie;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
@@ -17,7 +16,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 
 public class Controller {
@@ -42,7 +40,8 @@ public class Controller {
     private Slider zoomSlider;
     @FXML
     private ImageView sliderEmoji;
-
+    @FXML
+    private ListView<String> suggestionsBox; // The ListView to display suggestions
     @FXML
     private TextField searchBar;
     public Controller(Model inputModel, View inputView) {
@@ -165,6 +164,8 @@ public class Controller {
 
     @FXML
     private void addressParsing(Trie trie, String newValue) {
+        suggestionsBox.getItems().clear(); // Clear previous suggestions
+
         // Used keep track of previous suggestions so no duplication happens
         List<String> previousSuggestions = new ArrayList<>();
             previousSuggestions.clear();
@@ -173,7 +174,6 @@ public class Controller {
             if (!newValue.isEmpty()) {
                 // Get new suggestions based on the current text in the search bar
                 List<String> suggestionsList = trie.getAddressSuggestions(newValue.toLowerCase(), 4);
-
                 // Print and store new suggestions
                 for (String suggestion : suggestionsList) {
                     if (!previousSuggestions.contains(suggestion)) {
@@ -181,6 +181,15 @@ public class Controller {
                         previousSuggestions.add(suggestion);
                     }
                 }
+                // Logic for the suggestionsBox in UI
+                if (!suggestionsList.isEmpty()) {
+                    suggestionsBox.setVisible(true);
+                    suggestionsBox.setItems(FXCollections.observableArrayList(suggestionsList));
+                } else {
+                    suggestionsBox.setVisible(false);
+                }
+            } else {
+                suggestionsBox.setVisible(false);
             }
     }
 
