@@ -83,6 +83,12 @@ public class Controller {
 
         // Add a listener to the slider's value
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()));
+
+        // We add a listener to observe changes in the text and save the oldValue and the newValue.
+        Trie trie = loadCityNames();
+        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+            addressParsing(trie, newValue);
+        });
     }
 
     @FXML
@@ -158,17 +164,9 @@ public class Controller {
     }
 
     @FXML
-    private void addressParsing() {
-        // When lambda expressions are used it must be final, so we have to make it a string array and not just an array
-        //final String[] inputText = {""};
-
+    private void addressParsing(Trie trie, String newValue) {
         // Used keep track of previous suggestions so no duplication happens
         List<String> previousSuggestions = new ArrayList<>();
-
-        Trie trie = loadCityNames();
-        // We add a listener to observe changes in the text and save the oldValue and the newValue.
-        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
-
             previousSuggestions.clear();
 
             // Only proceed if the new value is not empty
@@ -184,16 +182,6 @@ public class Controller {
                     }
                 }
             }
-
-                // We give the inputText variable the newest change in the text
-                //inputText[0] = newValue;
-
-
-                // Only used for seeing if the text actually updates
-                //System.out.println(inputText[0]);
-
-
-        });
     }
 
     private Trie loadCityNames() {
