@@ -20,10 +20,11 @@ public class Trie implements Serializable {
 
     // Insert method inserts words into the trie
     public void insert(String inputWord) {
+        String input = inputWord.toLowerCase();
         TrieNode currentNode = rootNode; // We start the traversal from the rootnode
 
         // We traverse through each character from the inputWord
-        for (char character: inputWord.toCharArray()){
+        for (char character: input.toCharArray()){
             if(!currentNode.children.containsKey(character)){
                 currentNode.children.put(character, new TrieNode());
                 // We move to the next node
