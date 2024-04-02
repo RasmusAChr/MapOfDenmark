@@ -36,9 +36,15 @@ public class View {
         primaryStage.setTitle("Map of Denmark");
         Image image = new Image(getClass().getResourceAsStream("/com/telos/mapofdenmark/235861.png"));
         primaryStage.getIcons().add(image);
-        //Loads the GUI from the FXML file
-        Parent root = FXMLLoader.load(getClass().getResource("GUI.fxml"));
-        Controller controller = new Controller(model, this);
+
+        // creates a new FXML LOADER for the GUI file
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("GUI.fxml"));
+        // creates a root of the type parent to set scene
+        Parent root = loader.load();
+        // Creates the controller object from the GUI controller
+        Controller controller = loader.getController();
+        // intizalise the rest of the controller with the model and view to run commands on
+        controller.init(model,this);
 
         Scene scene = new Scene(root);
         //Looks for the node in the scene graph hiearchy by the ID #mapPane.

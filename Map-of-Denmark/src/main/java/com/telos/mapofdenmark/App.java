@@ -19,7 +19,7 @@ public class App extends Application {
         System.out.println(path);
         var model = Model.load(filename);
         var view = new View(model, primaryStage);
-        new Controller(model, view);
+        //new Controller(model, view);
     }
 
     public Object getGreeting() {

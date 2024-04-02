@@ -46,10 +46,12 @@ public class Controller {
     private ListView<String> suggestionsBox; // The ListView to display suggestions
     @FXML
     private TextField searchBar;
-    public Controller(Model inputModel, View inputView) {
+    private Trie trie;
+    public void init(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
-        // We add a listener to observe changes in the text and save the oldValue and the newValue.
+        this.trie = deserializeTrie("data/trie.obj");
+
         view.canvas.setOnMousePressed(e -> {
             lastX = e.getX();
             lastY = e.getY();
@@ -85,8 +87,6 @@ public class Controller {
 
         // Add a listener to the slider's value
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()));
-
-        Trie trie = deserializeTrie("data/trie.obj");
 
 //        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
 //            addressParsing(trie, newValue);
