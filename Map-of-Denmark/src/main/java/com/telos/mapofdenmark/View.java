@@ -1,8 +1,5 @@
 package com.telos.mapofdenmark;
 
-
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
@@ -53,9 +50,7 @@ public class View {
         Controller controller = loader.getController();
         // intizalise the rest of the controller with the model and view to run commands on
         controller.init(model,this);
-       // Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("GUI.fxml")));
-      //  Controller controller = loader.getController
-        // try empty constructor controller then an init field and see what happens.
+
         Scene scene = new Scene(root);
         //Looks for the node in the scene graph hiearchy by the ID #mapPane.
         //It then returns and assigns the Pane from the GUI, and keeps a reference to it
@@ -68,22 +63,13 @@ public class View {
         redraw();
         pan(-0.56*model.minlon, model.maxlat);
         zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
+        //Listens for changes done to the width then changes the canvas acordingly
+        primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> resizePanes(primaryStage.getWidth(), primaryStage.getHeight()));
+        //Listens for changes done to the Height then changes the canvas acordingly
+        primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> resizePanes(primaryStage.getWidth(), primaryStage.getHeight()));
 
-        primaryStage.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                resizePanes(primaryStage.getWidth(), primaryStage.getHeight());
-            }
-        });
-        /*
-        primaryStage.heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                resizePanes(primaryStage.getWidth(), primaryStage.getHeight());
-            }
-        });
 
-         */
+
     }
 
     void redraw() {
@@ -111,15 +97,9 @@ public class View {
         redraw();
     }
 
-    void resizecanvas(Controller controller){
-        canvas.setHeight(controller.getPanHeight());
-        canvas.setWidth(controller.getPanWidth());
-    }
-
     private void resizePanes(double resizedWidth, double resizedHeight){
         canvas.setWidth(resizedWidth);
         canvas.setHeight(resizedHeight);
-
         redraw();
     }
 

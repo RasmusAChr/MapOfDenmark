@@ -2,7 +2,6 @@ package com.telos.mapofdenmark;
 
 
 import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
@@ -10,8 +9,6 @@ import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 
@@ -19,6 +16,7 @@ public class Controller {
     //JavaFX requires a non-parameter constructor to load and run the FXML file.
     // So it needs to stay (even though it's empty)
     public Controller(){}
+
 
     double lastX;
     double lastY;
@@ -48,7 +46,6 @@ public class Controller {
         view.canvas.setOnMousePressed(e -> {
             lastX = e.getX();
             lastY = e.getY();
-            //view.resizecanvas(this); // change
         });
         view.canvas.setOnMouseDragged(e -> {
 
@@ -56,14 +53,15 @@ public class Controller {
                 double dy = e.getY() - lastY;
                 view.pan(dx, dy);
 
-
-
             lastX = e.getX();
             lastY = e.getY();
         });
         view.canvas.setOnScroll(e -> {
             double factor = e.getDeltaY();
             view.zoom(e.getX(), e.getY(), Math.pow(1.01, factor));
+            System.out.println(zoomSlider.getValue());
+            System.out.println();
+
 
         });
 
@@ -75,6 +73,7 @@ public class Controller {
 
 // Ensure the ImageView starts at the correct position corresponding to the slider's initial value
         updateImageViewPosition(zoomSlider.getValue());
+
 
         // Add a listener to the slider's value
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()));
@@ -117,6 +116,7 @@ public class Controller {
         if (file != null) {
             String userFile = file.getPath();
             System.out.println(file.getName());
+
         } else  {
             System.out.println("error"); // or something else
         }
@@ -138,15 +138,15 @@ public class Controller {
     private void updateImageViewPosition(double sliderValue){
         // This portion changes the location of imageview
         // Calculate the percentage position of the thumb on the slider
-        double thumbPositionPercentage = (sliderValue - zoomSlider.getMin()) / (zoomSlider.getMax() - zoomSlider.getMin());
+       // double thumbPositionPercentage = (sliderValue - zoomSlider.getMin()) / (zoomSlider.getMax() - zoomSlider.getMin());
 
         // Adjust the formula to correctly map the value to the Y position
-        double sliderTrackHeight = zoomSlider.getPrefHeight(); // The full height of the slider
+      //  double sliderTrackHeight = zoomSlider.getPrefHeight(); // The full height of the slider
 
         // Calculate the newY position for the ImageView
-        double newY = zoomSlider.getLayoutY() + sliderTrackHeight * (1 - thumbPositionPercentage) - sliderEmoji.getFitHeight() * thumbPositionPercentage;
+        //double newY = zoomSlider.getLayoutY() + sliderTrackHeight * (1 - thumbPositionPercentage) - sliderEmoji.getFitHeight() * thumbPositionPercentage;
 
-        sliderEmoji.setLayoutY(newY);
+       // sliderEmoji.setLayoutY(newY);
 
 
 
