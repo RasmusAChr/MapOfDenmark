@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -48,6 +49,7 @@ public class Controller {
     public Controller(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
+        // We add a listener to observe changes in the text and save the oldValue and the newValue.
         view.canvas.setOnMousePressed(e -> {
             lastX = e.getX();
             lastY = e.getY();
@@ -84,12 +86,18 @@ public class Controller {
         // Add a listener to the slider's value
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()));
 
-        // We add a listener to observe changes in the text and save the oldValue and the newValue.
         Trie trie = deserializeTrie("data/trie.obj");
 
-        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
-            addressParsing(trie, newValue);
+//        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+//            addressParsing(trie, newValue);
+//        });
+        searchBar.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                System.out.println(searchBar.getText());
+                addressParsing(trie, searchBar.getText());
+            }
         });
+
     }
 
     @FXML
@@ -234,10 +242,11 @@ public class Controller {
         }
         // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
         if(!(trie == null))  {
+
             System.out.println("Serializable file was found");
             return trie; // Return the deserialized Trie object.
         }
         // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
-        else return trie = loadCityNames();
+        else return loadCityNames();
     }
 }
