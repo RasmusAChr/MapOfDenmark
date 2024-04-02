@@ -69,13 +69,10 @@
                      </children>
                   </HBox>
                </top>
-               <right>
-                  <Slider fx:id="zoomSlider" orientation="VERTICAL" prefHeight="638.0" prefWidth="20.0" BorderPane.alignment="CENTER" />
-               </right>
                <center>
-                  <Pane fx:id="backgroundPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                  <Pane fx:id="backgroundPane" prefHeight="200.0" prefWidth="1018.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Pane fx:id="mapPane" blendMode="SRC_ATOP" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="638.0" prefWidth="1091.0" />
+                        <Pane fx:id="mapPane" blendMode="SRC_ATOP" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="638.0" prefWidth="1003.0" />
                         <TextField layoutX="22.0" layoutY="17.0" prefHeight="54.0" prefWidth="334.0" style="-fx-background-radius: 50;" />
                         <ImageView fitHeight="47.0" fitWidth="44.0" layoutX="294.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -85,6 +82,13 @@
                      </children>
                   </Pane>
                </center>
+               <right>
+                  <VBox prefHeight="638.0" prefWidth="36.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Slider fx:id="zoomSlider" orientation="VERTICAL" prefHeight="638.0" prefWidth="42.0" />
+                     </children>
+                  </VBox>
+               </right>
             </BorderPane>
          </children>
       </VBox>

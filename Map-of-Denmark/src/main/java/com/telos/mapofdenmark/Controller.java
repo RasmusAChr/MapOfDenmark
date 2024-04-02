@@ -48,7 +48,7 @@ public class Controller {
         view.canvas.setOnMousePressed(e -> {
             lastX = e.getX();
             lastY = e.getY();
-            view.resizecanvas(this); // change
+            //view.resizecanvas(this); // change
         });
         view.canvas.setOnMouseDragged(e -> {
 

@@ -1,6 +1,8 @@
 package com.telos.mapofdenmark;
 
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
@@ -34,6 +36,9 @@ public class View {
 
     @FXML
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
+    @FXML
+    private Pane backgroundPane;
+
     public View(Model model, Stage primaryStage) throws IOException {
         this.model = model;
         primaryStage.setTitle("Map of Denmark");
@@ -63,6 +68,22 @@ public class View {
         redraw();
         pan(-0.56*model.minlon, model.maxlat);
         zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
+
+        primaryStage.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                resizePanes(primaryStage.getWidth(), primaryStage.getHeight());
+            }
+        });
+        /*
+        primaryStage.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                resizePanes(primaryStage.getWidth(), primaryStage.getHeight());
+            }
+        });
+
+         */
     }
 
     void redraw() {
@@ -93,6 +114,13 @@ public class View {
     void resizecanvas(Controller controller){
         canvas.setHeight(controller.getPanHeight());
         canvas.setWidth(controller.getPanWidth());
+    }
+
+    private void resizePanes(double resizedWidth, double resizedHeight){
+        canvas.setWidth(resizedWidth);
+        canvas.setHeight(resizedHeight);
+
+        redraw();
     }
 
     void togglecolor(boolean a){
