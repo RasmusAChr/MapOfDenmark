@@ -1,4 +1,4 @@
-package com.telos.mapofdenmark.TrieClasses;
+package com.telos.mapofdenmark;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,9 +30,9 @@ public class TrieTests {
     @Test
     void testInsertAndSuggestSingleCity() {
         // Test inserting a single city and retrieving it
-        trie.insert("Lemmino");
-        suggestionList = trie.getAddressSuggestions("L",1);
-        assertEquals(suggestionList.get(0), "lemmino");
+        trie.insert("Åkirkeby");
+        suggestionList = trie.getAddressSuggestions("å",1);
+        assertEquals(suggestionList.get(0), "åkirkeby");
     }
 
     @Test
