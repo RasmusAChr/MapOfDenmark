@@ -45,18 +45,15 @@ public class Controller {
         view.canvas.setOnMousePressed(e -> {
             lastX = e.getX();
             lastY = e.getY();
+            view.resizecanvas(this); // change
         });
         view.canvas.setOnMouseDragged(e -> {
-            if (e.isPrimaryButtonDown()) {
-                Point2D lastmodel = view.mousetoModel(lastX, lastY);
-                Point2D newmodel = view.mousetoModel(e.getX(), e.getY());
-                model.add(lastmodel, newmodel);
-                view.redraw();
-            } else {
+
                 double dx = e.getX() - lastX;
                 double dy = e.getY() - lastY;
                 view.pan(dx, dy);
-            }
+
+
 
             lastX = e.getX();
             lastY = e.getY();
@@ -66,6 +63,7 @@ public class Controller {
             view.zoom(e.getX(), e.getY(), Math.pow(1.01, factor));
 
         });
+
     }
     @FXML
     private void initialize(){
@@ -124,6 +122,14 @@ public class Controller {
     @FXML
     private void placeInterest(){
         System.out.println("You clicked the interest button");
+    }
+    @FXML
+    public double getPanWidth(){
+       return mapPane.getWidth();
+    }
+    @FXML
+    public double getPanHeight(){
+        return mapPane.getHeight();
     }
     @FXML
     private void updateImageViewPosition(double sliderValue){

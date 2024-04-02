@@ -90,6 +90,11 @@ public class View {
         redraw();
     }
 
+    void resizecanvas(Controller controller){
+        canvas.setHeight(controller.getPanHeight());
+        canvas.setWidth(controller.getPanWidth());
+    }
+
     void togglecolor(boolean a){
         dark = a;
     }
