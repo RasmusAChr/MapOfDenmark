@@ -16,6 +16,7 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class View {
     Canvas canvas = new Canvas(1091.0, 638.0);
@@ -29,17 +30,27 @@ public class View {
 
     Model model;
 
+    boolean dark;
+
     @FXML
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
     public View(Model model, Stage primaryStage) throws IOException {
         this.model = model;
         primaryStage.setTitle("Map of Denmark");
-        Image image = new Image(getClass().getResourceAsStream("/com/telos/mapofdenmark/235861.png"));
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/telos/mapofdenmark/235861.png")));
         primaryStage.getIcons().add(image);
         //Loads the GUI from the FXML file
-        Parent root = FXMLLoader.load(getClass().getResource("GUI.fxml"));
-        Controller controller = new Controller(model, this);
-
+        // creates a new FXML LOADER for the GUI file
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("GUI.fxml"));
+        // creates a root of the type parent to set scene
+        Parent root = loader.load();
+        // Creates the controller object from the GUI controller
+        Controller controller = loader.getController();
+        // intizalise the rest of the controller with the model and view to run commands on
+        controller.init(model,this);
+       // Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("GUI.fxml")));
+      //  Controller controller = loader.getController
+        // try empty constructor controller then an init field and see what happens.
         Scene scene = new Scene(root);
         //Looks for the node in the scene graph hiearchy by the ID #mapPane.
         //It then returns and assigns the Pane from the GUI, and keeps a reference to it
@@ -56,7 +67,13 @@ public class View {
 
     void redraw() {
         gc.setTransform(new Affine());
-        gc.setFill(Color.WHITE);
+        if(dark) {
+            gc.setStroke(Color.WHITE);
+            gc.setFill(Color.LIGHTGRAY);
+        } else{
+            gc.setFill(Color.WHITE);
+            gc.setStroke(Color.BLACK);
+        }
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
         gc.setLineWidth(1/Math.sqrt(trans.determinant()));
@@ -71,6 +88,10 @@ public class View {
     void pan(double dx, double dy) {
         trans.prependTranslation(dx, dy);
         redraw();
+    }
+
+    void togglecolor(boolean a){
+        dark = a;
     }
 
     void zoom(double dx, double dy, double factor) {

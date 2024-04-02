@@ -37,7 +37,9 @@ public class Controller {
     private Slider zoomSlider;
     @FXML
     private ImageView sliderEmoji;
-    public Controller(Model inputModel, View inputView) {
+    @FXML
+    private boolean Dark;
+    public void init(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
         view.canvas.setOnMousePressed(e -> {
@@ -84,10 +86,16 @@ public class Controller {
             themeToggleBtn.getStyleClass().remove("root-light");
             themeToggleBtn.getStyleClass().add("root-dark");
             System.out.println("Dark theme");
+            Dark = true;
+            view.togglecolor(Dark);
+            view.redraw();
         } else {
             themeToggleBtn.getStyleClass().remove("root-dark");
             themeToggleBtn.getStyleClass().add("root-light");
             System.out.println("Light theme");
+            Dark = false;
+            view.togglecolor(Dark);
+            view.redraw();
         }
     }
     @FXML
@@ -130,6 +138,8 @@ public class Controller {
         double newY = zoomSlider.getLayoutY() + sliderTrackHeight * (1 - thumbPositionPercentage) - sliderEmoji.getFitHeight() * thumbPositionPercentage;
 
         sliderEmoji.setLayoutY(newY);
+
+
 
         // This portion changes image the image itself
         // Note this loads the image everytime so it may be faster to store all images in seperate image variables but may cost more memory
