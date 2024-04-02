@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
@@ -22,7 +23,7 @@
                      <children>
                         <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="94.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
                            <children>
-                              <Button id="fileBtn" fx:id="fileBtn" mnemonicParsing="false" onAction="#readFile" prefHeight="94.0" prefWidth="100.0" />
+                              <Button id="fileBtn" fx:id="fileBtn" alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#readFile" prefHeight="94.0" prefWidth="100.0" />
                               <ImageView fitHeight="60.0" fitWidth="54.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@GUI%20Icons/icons8-folder-512.png" />
@@ -32,7 +33,7 @@
                         </StackPane>
                         <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="94.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
                            <children>
-                              <Button fx:id="markerBtn" mnemonicParsing="false" onAction="#placeInterest" prefHeight="94.0" prefWidth="100.0" />
+                              <Button fx:id="markerBtn" alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#placeInterest" prefHeight="94.0" prefWidth="100.0" />
                               <ImageView fitHeight="60.0" fitWidth="54.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@GUI%20Icons/icons8-place-marker-100.png" />
@@ -40,7 +41,7 @@
                               </ImageView>
                            </children>
                         </StackPane>
-                        <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="375.0" prefWidth="100.0" VBox.vgrow="ALWAYS" />
+                        <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="375.0" prefWidth="100.0" VBox.vgrow="ALWAYS" />
                         <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="94.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
                            <children>
                               <ToggleButton fx:id="themeToggleBtn" mnemonicParsing="false" onMouseClicked="#toggleTheme" prefHeight="42.0" prefWidth="90.0" style="-fx-background-radius: 50;" stylesheets="@Togglebutton.css" text="Dark/Light" />
@@ -52,7 +53,7 @@
                <top>
                   <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="53.0" prefWidth="1190.0" style="-fx-background-color: #273c75;" BorderPane.alignment="CENTER">
                      <children>
-                        <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                        <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                            <children>
                               <TextField prefHeight="54.0" prefWidth="334.0" style="-fx-background-radius: 50;" HBox.hgrow="ALWAYS" />
                               <ImageView fitHeight="47.0" fitWidth="44.0" pickOnBounds="true" preserveRatio="true">
@@ -62,19 +63,26 @@
                               </ImageView>
                            </children>
                         </HBox>
-                        <ImageView fx:id="sliderEmoji" fitHeight="47.0" fitWidth="44.0">
-                           <image>
-                              <Image url="@GUI%20Icons/icons8-search-500.png" />
-                           </image>
-                        </ImageView>
+                        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                           <children>
+                              <ImageView fx:id="sliderEmoji" fitHeight="47.0" fitWidth="44.0">
+                                 <image>
+                                    <Image url="@GUI%20Icons/icons8-search-500.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </HBox>
                      </children>
                   </HBox>
                </top>
                <right>
-                  <Slider fx:id="zoomSlider" orientation="VERTICAL" prefHeight="529.0" prefWidth="110.0" BorderPane.alignment="CENTER" />
+                  <Slider fx:id="zoomSlider" orientation="VERTICAL" prefHeight="638.0" prefWidth="20.0" BorderPane.alignment="CENTER" />
                </right>
                <center>
-                  <Pane fx:id="mapPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="638.0" prefWidth="1091.0" BorderPane.alignment="CENTER" />
+                  <Pane fx:id="mapPane" blendMode="SRC_ATOP" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="638.0" prefWidth="1091.0" BorderPane.alignment="CENTER_RIGHT" />
                </center>
             </BorderPane>
          </children>
