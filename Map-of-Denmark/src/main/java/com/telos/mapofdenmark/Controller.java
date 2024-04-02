@@ -28,6 +28,9 @@ public class Controller {
     @FXML
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
     @FXML
+    private Pane backgroundPane;
+
+    @FXML
     private ToggleButton themeToggleBtn;
     @FXML
     private Button fileBtn;
@@ -125,11 +128,11 @@ public class Controller {
     }
     @FXML
     public double getPanWidth(){
-       return mapPane.getWidth();
+       return backgroundPane.getWidth();
     }
     @FXML
     public double getPanHeight(){
-        return mapPane.getHeight();
+        return backgroundPane.getHeight();
     }
     @FXML
     private void updateImageViewPosition(double sliderValue){
