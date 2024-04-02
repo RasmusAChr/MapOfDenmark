@@ -92,7 +92,7 @@ public class Controller {
 //            addressParsing(trie, newValue);
 //        });
         searchBar.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar.getText().isEmpty())) {
                 System.out.println(searchBar.getText());
                 addressParsing(trie, searchBar.getText());
             }
