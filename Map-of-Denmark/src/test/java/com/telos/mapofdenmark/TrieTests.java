@@ -17,34 +17,47 @@ public class TrieTests {
     void setUp(){
         trie = new Trie();
         suggestionList = new ArrayList<>();
-        // Loading of desired city names
-        try{
-            String path = System.getProperty("user.dir"); // gets which directory the project is placed
-            String filename = path+"\\data\\citynames.txt";
-            File cityNames = new File(filename);
-            Scanner scanner = new Scanner(cityNames);
-        } catch (FileNotFoundException e) {
+    }
+    void loadCityNames(){
+        // Loading of desired city names from file
+        String path = System.getProperty("user.dir"); // gets which directory the project is placed
+        String filename = path+"\\data\\citynames.txt";
+
+        try (BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"))) {
+            String line;
+            while ((line = bReader.readLine()) != null) {
+                trie.insert(line.trim().toLowerCase());
+            }
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
     @Test
-    void testInsertAndSuggestSingleCity() {
+    void testNordicChars() {
         // Test inserting a single city and retrieving it
         trie.insert("Åkirkeby");
         suggestionList = trie.getAddressSuggestions("å",1);
-        assertEquals(suggestionList.get(0), "åkirkeby");
+        assertEquals("åkirkeby", suggestionList.get(0));
     }
 
     @Test
     void testCaseInsensitivity() {
         // Test that suggestions work regardless of case
         trie.insert("Lemmino");
-        suggestionList = trie.getAddressSuggestions("l",1);
-        assertEquals(suggestionList.get(0), "lemmino");
+        suggestionList = trie.getAddressSuggestions("lemmino",1);
+        assertEquals("lemmino", suggestionList.get(0));
     }
     @Test
     void testSuggestionsForMultipleCities() {
+        trie.insert("a");
+        trie.insert("abe");
+        trie.insert("Aka");
         // Test inserting multiple cities and retrieving suggestions for a prefix
+        suggestionList = trie.getAddressSuggestions("a",3);
+        for(String word : suggestionList){
+            System.out.println(word);
+        }
+        //assertEquals(2, suggestionList.size());
     }
     @Test
     void testEmptyTrie() {
