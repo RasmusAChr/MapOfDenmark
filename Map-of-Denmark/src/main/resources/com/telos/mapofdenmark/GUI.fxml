@@ -20,7 +20,7 @@
                <left>
                   <VBox id="btnHub" fx:id="btnHub" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="638.0" prefWidth="100.0" style="-fx-background-color: #dcdde1;" BorderPane.alignment="CENTER">
                      <children>
-                        <StackPane prefHeight="94.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+                        <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="94.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
                            <children>
                               <Button id="fileBtn" fx:id="fileBtn" mnemonicParsing="false" onAction="#readFile" prefHeight="94.0" prefWidth="100.0" />
                               <ImageView fitHeight="60.0" fitWidth="54.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
@@ -30,7 +30,7 @@
                               </ImageView>
                            </children>
                         </StackPane>
-                        <StackPane prefHeight="94.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+                        <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="94.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
                            <children>
                               <Button fx:id="markerBtn" mnemonicParsing="false" onAction="#placeInterest" prefHeight="94.0" prefWidth="100.0" />
                               <ImageView fitHeight="60.0" fitWidth="54.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
