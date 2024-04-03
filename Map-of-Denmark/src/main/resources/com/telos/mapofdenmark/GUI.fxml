@@ -83,7 +83,7 @@
                <right>
                   <VBox prefHeight="638.0" prefWidth="36.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Slider fx:id="zoomSlider" orientation="VERTICAL" prefHeight="638.0" prefWidth="42.0" />
+                        <Slider fx:id="zoomSlider" orientation="VERTICAL" prefHeight="638.0" prefWidth="42.0" VBox.vgrow="ALWAYS" />
                      </children>
                   </VBox>
                </right>
