@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +73,7 @@ public class Model implements Serializable {
     }
 
     private void parseOSM(InputStream inputStream) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
-        var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream));
+        var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         var id2node = new HashMap<Long, Node>();
         var way = new ArrayList<Node>();
         var coast = false;

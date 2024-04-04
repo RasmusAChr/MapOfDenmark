@@ -14,6 +14,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,6 +102,7 @@ public class Controller {
                 System.out.println(searchBar.getText());
                 addressParsing(trie, searchBar.getText());
             }
+            //testEncodingWithUI();
         });
 
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) ->{
@@ -287,4 +289,11 @@ public class Controller {
         // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
         else return loadCityNames();
     }
+
+    @FXML
+    private void testEncodingWithUI() {
+        // Directly set a test string to verify UTF-8 characters are displayed correctly
+        suggestionsBox.getItems().add("Åkirkeby");
+    }
+
 }
