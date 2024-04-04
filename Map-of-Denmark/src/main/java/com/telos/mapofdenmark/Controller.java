@@ -101,14 +101,14 @@ public class Controller {
         if (themeToggleBtn.isSelected()) {
             themeToggleBtn.getStyleClass().remove("root-light");
             themeToggleBtn.getStyleClass().add("root-dark");
-            System.out.println("Dark theme");
             Dark = true;
+            view.togglecolor(Dark);
             view.redraw();
         } else {
             themeToggleBtn.getStyleClass().remove("root-dark");
             themeToggleBtn.getStyleClass().add("root-light");
             Dark = false;
-            view.togglecolor(Dark);
+
             view.redraw();
         }
     }
