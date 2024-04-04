@@ -22,13 +22,15 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import com.telos.mapofdenmark.TrieClasses.Address;
 import javafx.geometry.Point2D;
-
 public class Model implements Serializable {
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
 
     double minlat, maxlat, minlon, maxlon;
+    List<Address> addressList;
+    Address address;
 
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
@@ -41,6 +43,8 @@ public class Model implements Serializable {
 
 
     public Model(String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
+        this.addressList = new ArrayList<>();
+        this.address = new Address();
         if (filename.endsWith(".osm.zip")) {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
@@ -86,6 +90,7 @@ public class Model implements Serializable {
                     var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
                     var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
                     id2node.put(id, new Node(lat, lon));
+//                    address = new Address(); // Reset for new node
                 } else if (name == "way") {
                     way.clear();
                     coast = false;
@@ -93,6 +98,14 @@ public class Model implements Serializable {
                     var v = input.getAttributeValue(null, "v");
                     if (v.equals("coastline")) {
                         coast = true;
+                    }
+                    var k = input.getAttributeValue(null, "k");
+                    if (k.startsWith("addr:")){
+                        // Lazy initialization of address
+                        if (address == null) {
+                            address = new Address();
+                        }
+                        parseAddressFromOSM(v, k);
                     }
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
@@ -104,6 +117,10 @@ public class Model implements Serializable {
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name == "way") {
                     ways.add(new Way(way));
+                }
+                if (address != null && !address.isEmpty()) {
+                    addressList.add(address);
+                    address = null; // Reset for the next address
                 }
             }
         }
@@ -117,8 +134,32 @@ public class Model implements Serializable {
             }
         }
     }
+    public void parseAddressFromOSM(String v, String k){
+        // Assuming you have a Trie instance called 'trie'
+//        trie.insert(fullAddress);
+//        adressList.add(fullAdress);
+        if(address.getStreet().equals(null) || address.getStreet().isEmpty()) {
+            if (k.contains("street")) {
+                address.setStreet(v);
+            } else if (k.contains("housenumber")) {
+                address.setHouseNumber(v);
+            } else if (k.contains("city")) {
+                address.setCity(v);
+            } else if (k.contains("municipality")) {
+                address.setMunicipality(v);
+            } else if (k.contains("country")) {
+                address.setCountry(v);
+            }
+        }
+    }
 
     public void add(Point2D p1, Point2D p2) {
         list.add(new Line(p1, p2));
     }
+
+    public List<Address> getAddressList() {
+        return addressList;
+    }
 }
+
+

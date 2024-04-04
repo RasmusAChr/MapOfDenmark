@@ -1,6 +1,7 @@
 package com.telos.mapofdenmark;
 
 
+import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -205,16 +206,19 @@ public class Controller {
 
     private Trie loadCityNames() {
         Trie trie = new Trie();
-        String path = System.getProperty("user.dir"); // gets which directory the project is placed
-        String filename = path+"\\data\\citynames.txt";
-
-        try (BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"))) {
-            String line;
-            while ((line = bReader.readLine()) != null) {
-                trie.insert(line.trim().toLowerCase());
-            }
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+//        String path = System.getProperty("user.dir"); // gets which directory the project is placed
+//        String filename = path+"\\data\\citynames.txt";
+//
+//        try (BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"))) {
+//            String line;
+//            while ((line = bReader.readLine()) != null) {
+//                trie.insert(line.trim().toLowerCase());
+//            }
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        }
+        for(Address address : model.getAddressList()){
+            trie.insert(address.getFullAdress());
         }
         serializeTrie(trie, "data/trie.obj");
         return trie;
@@ -238,7 +242,7 @@ public class Controller {
         ) {
             trie = (Trie) in.readObject(); // Deserialize the object read from the file and cast it to a Trie.
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace(); // Handle IO and class not found exceptions.
+            System.out.println(e.getMessage());
         }
         // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
         if(!(trie == null))  {

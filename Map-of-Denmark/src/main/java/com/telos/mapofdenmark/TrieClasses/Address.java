@@ -1,13 +1,15 @@
 package com.telos.mapofdenmark.TrieClasses;
 
-public class Adress {
+import java.io.Serializable;
+
+public class Address implements Serializable {
     String street;
     String houseNumber;
     String city;
     String municipality;
     String country;
     //Lupin 32 27xx Smørum Egedal Danmark
-    public Adress(){
+    public Address() {
         this.street = "";
         this.houseNumber = "";
         this.city = "";
@@ -37,7 +39,7 @@ public class Adress {
     public String getFullAdress(){
         return street+" "+houseNumber+" "+city+" "+municipality+" "+country;
     }
-        public Adress(String street, String houseNumber, String city, String municipality, String country){
+        public Address(String street, String houseNumber, String city, String municipality, String country){
         this.street = street;
         this.houseNumber = street;
         this.city = city;
@@ -51,5 +53,12 @@ public class Adress {
 
     public String getCity() {
         return city;
+    }
+    public boolean isEmpty() {
+        return (street == null || street.isEmpty()) &&
+                (houseNumber == null || houseNumber.isEmpty()) &&
+                (city == null || city.isEmpty()) &&
+                (municipality == null || municipality.isEmpty()) &&
+                (country == null || country.isEmpty());
     }
 }
