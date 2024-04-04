@@ -167,9 +167,9 @@ public class Controller {
         // This portion changes image the image itself
         // Note this loads the image everytime so it may be faster to store all images in seperate image variables but may cost more memory
         String imagePath;
-        if (sliderValue > 75.0){
+        if (sliderValue > 85.0){
             imagePath = "Sunflower Emoji.png";
-        } else if (sliderValue > 50.0) {
+        } else if (sliderValue > 60.0) {
             imagePath = "Bicycle Emoji.png";
         } else if (sliderValue > 25.0) {
             imagePath = "Airplane Emoji.png";
