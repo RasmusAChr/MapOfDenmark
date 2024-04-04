@@ -28,6 +28,8 @@ public class View {
     Affine trans = new Affine();
 
     Model model;
+    ColorScheme cs = new ColorScheme();
+    LineThickness lt = new LineThickness();
 
     boolean dark;
 

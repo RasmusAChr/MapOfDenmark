@@ -8,6 +8,8 @@ import javafx.scene.canvas.GraphicsContext;
 public class Line implements Serializable {
     double x1, y1, x2, y2;
 
+    LineThickness lt = new LineThickness();
+
     public Line(String line) {
         String[] coord = line.split(" ");
         x1 = Double.parseDouble(coord[1]);
@@ -28,6 +30,10 @@ public class Line implements Serializable {
         gc.moveTo(x1, y1);
         gc.lineTo(x2, y2);
         gc.stroke();
+    }
+
+    public void setLineSize(int a) {
+
     }
 
 }
