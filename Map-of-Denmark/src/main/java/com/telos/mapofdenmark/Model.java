@@ -119,9 +119,11 @@ public class Model implements Serializable {
                 if (name == "way") {
                     ways.add(new Way(way));
                 }
-                if (address != null && !address.isEmpty()) {
-                    addressList.add(address);
-                    address = null; // Reset for the next address
+                if(name.equals("node")){
+                    if (address != null && !address.getStreet().isBlank()) {
+                        addressList.add(address);
+                        address = null; // Reset for the next address
+                    }
                 }
             }
         }

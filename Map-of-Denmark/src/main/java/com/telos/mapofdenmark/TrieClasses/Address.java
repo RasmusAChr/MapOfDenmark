@@ -54,11 +54,11 @@ public class Address implements Serializable {
     public String getCity() {
         return city;
     }
-    public boolean isEmpty() {
-        return (street == null || street.isEmpty()) &&
-                (houseNumber == null || houseNumber.isEmpty()) &&
-                (city == null || city.isEmpty()) &&
-                (municipality == null || municipality.isEmpty()) &&
-                (country == null || country.isEmpty());
-    }
+//    public boolean isEmpty() {
+//        return (street == null || street.isEmpty()) &&
+//                (houseNumber == null || houseNumber.isEmpty()) &&
+//                (city == null || city.isEmpty()) &&
+//                (municipality == null || municipality.isEmpty()) &&
+//                (country == null || country.isEmpty());
+//    }
 }
