@@ -56,17 +56,18 @@ public class Controller {
             lastX = e.getX();
             lastY = e.getY();
         });
-        view.canvas.setOnScroll(e -> {
+      /*  view.canvas.setOnScroll(e -> {
             double factor = e.getDeltaY();
             view.zoom(e.getX(), e.getY(), Math.pow(1.01, factor));
             
 
 
-        });
+        }); */
 
     }
     @FXML
     private void initialize(){
+        zoomSlider.setValue(50.0);
         // Sets the visuals of the theme toggle
         themeToggleBtn.getStyleClass().add("root-light");
 
@@ -75,7 +76,23 @@ public class Controller {
 
 
         // Add a listener to the slider's value
+
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()));
+        zoomSlider.valueProperty().addListener((obs, oldVal, newVal) ->{
+            double deltaFactor = newVal.doubleValue() - oldVal.doubleValue(); // Calculate delta factor
+
+            // Calculate zoom direction based on deltaFactor sign
+            int zoomDirection = deltaFactor > 0 ? 1 : -1;
+
+            // Take absolute value of deltaFactor
+            deltaFactor = Math.abs(deltaFactor);
+
+            double dy = view.canvas.getHeight() / 2;
+            double dx = view.canvas.getWidth() / 2;
+
+            // Apply zoom
+            view.zoom(dx, dy, Math.pow(1.07, zoomDirection * deltaFactor));
+          });
     }
 
     @FXML
@@ -86,12 +103,10 @@ public class Controller {
             themeToggleBtn.getStyleClass().add("root-dark");
             System.out.println("Dark theme");
             Dark = true;
-            view.togglecolor(Dark);
             view.redraw();
         } else {
             themeToggleBtn.getStyleClass().remove("root-dark");
             themeToggleBtn.getStyleClass().add("root-light");
-            System.out.println("Light theme");
             Dark = false;
             view.togglecolor(Dark);
             view.redraw();
@@ -152,11 +167,11 @@ public class Controller {
         // This portion changes image the image itself
         // Note this loads the image everytime so it may be faster to store all images in seperate image variables but may cost more memory
         String imagePath;
-        if (sliderValue < 25) {
+        if (sliderValue > 75.0){
             imagePath = "Sunflower Emoji.png";
-        } else if (sliderValue < 50) {
+        } else if (sliderValue > 50.0) {
             imagePath = "Bicycle Emoji.png";
-        } else if (sliderValue < 75) {
+        } else if (sliderValue > 25.0) {
             imagePath = "Airplane Emoji.png";
         } else {
             imagePath = "Earth Emoji.png";
