@@ -59,8 +59,7 @@ public class Controller {
         view.canvas.setOnScroll(e -> {
             double factor = e.getDeltaY();
             view.zoom(e.getX(), e.getY(), Math.pow(1.01, factor));
-            System.out.println(zoomSlider.getValue());
-            System.out.println();
+            
 
 
         });
