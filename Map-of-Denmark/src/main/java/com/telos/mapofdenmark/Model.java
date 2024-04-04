@@ -22,7 +22,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
-import com.telos.mapofdenmark.TrieClasses.Adress;
 import javafx.geometry.Point2D;
 
 public class Model implements Serializable {
@@ -95,10 +94,6 @@ public class Model implements Serializable {
                     if (v.equals("coastline")) {
                         coast = true;
                     }
-                    // Logic for gathering adresses from .OSM
-                    var k = input.getAttributeValue(null, "k");
-                    if (k.startsWith("addr:")) addToAdressList(v,k);
-
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
                     var node = id2node.get(ref);
@@ -120,21 +115,6 @@ public class Model implements Serializable {
             while (s.hasNext()) {
                 list.add(new Line(s.nextLine()));
             }
-        }
-    }
-
-    private void addAdressToTrie(String v, String k){
-        Adress adress = new Adress(); // problematic line as it creates a new adress before completing the previous
-        if(k.contains("street")){
-            adress.setStreet(v);
-        } else if (k.contains("houseNumber")) {
-            adress.setHouseNumber(v);
-        } else if (k.contains("city")) {
-            adress.setCity(v);
-        } else if (k.contains("municipality")) {
-            adress.setMunicipality(v);
-        } else if (k.contains("country")) {
-            adress.setCountry(v);
         }
     }
 

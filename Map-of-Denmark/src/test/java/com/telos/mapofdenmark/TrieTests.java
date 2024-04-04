@@ -2,19 +2,20 @@ package com.telos.mapofdenmark;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.telos.mapofdenmark.TrieClasses.CharTrie;
+import com.telos.mapofdenmark.TrieClasses.Trie;
 import org.junit.jupiter.api.*;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
-public class CharTrieTests {
-    private CharTrie charTrie;
+public class TrieTests {
+    private Trie trie;
     private List<String> suggestionList;
     @BeforeEach
     void setUp(){
-        charTrie = new CharTrie();
+        trie = new Trie();
         suggestionList = new ArrayList<>();
     }
     void loadCityNames(){
@@ -25,7 +26,7 @@ public class CharTrieTests {
         try (BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"))) {
             String line;
             while ((line = bReader.readLine()) != null) {
-                charTrie.insert(line.trim().toLowerCase());
+                trie.insert(line.trim().toLowerCase());
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -34,25 +35,25 @@ public class CharTrieTests {
     @Test
     void testNordicChars() {
         // Test inserting a single city and retrieving it
-        charTrie.insert("Åkirkeby");
-        suggestionList = charTrie.getAddressSuggestions("å",1);
+        trie.insert("Åkirkeby");
+        suggestionList = trie.getAddressSuggestions("å",1);
         assertEquals("åkirkeby", suggestionList.get(0));
     }
 
     @Test
     void testCaseInsensitivity() {
         // Test that suggestions work regardless of case
-        charTrie.insert("Lemmino");
-        suggestionList = charTrie.getAddressSuggestions("lemmino",1);
+        trie.insert("Lemmino");
+        suggestionList = trie.getAddressSuggestions("lemmino",1);
         assertEquals("lemmino", suggestionList.get(0));
     }
     @Test
     void testSuggestionsForMultipleCities() {
-        charTrie.insert("a");
-        charTrie.insert("abe");
-        charTrie.insert("Aka");
+        trie.insert("a");
+        trie.insert("abe");
+        trie.insert("Aka");
         // Test inserting multiple cities and retrieving suggestions for a prefix
-        suggestionList = charTrie.getAddressSuggestions("a",3);
+        suggestionList = trie.getAddressSuggestions("a",3);
         for(String word : suggestionList){
             System.out.println(word);
         }

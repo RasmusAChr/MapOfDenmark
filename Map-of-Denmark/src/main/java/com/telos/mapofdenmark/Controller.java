@@ -1,7 +1,7 @@
 package com.telos.mapofdenmark;
 
 
-import com.telos.mapofdenmark.TrieClasses.CharTrie;
+import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
@@ -13,8 +13,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import javafx.scene.image.ImageView;
 
@@ -44,11 +46,11 @@ public class Controller {
     private ListView<String> suggestionsBox; // The ListView to display suggestions
     @FXML
     private TextField searchBar;
-    private CharTrie charTrie;
+    private Trie trie;
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
-        this.charTrie = deserializeTrie("data/trie.obj");
+        this.trie = deserializeTrie("data/trie.obj");
 
         view.canvas.setOnMousePressed(e -> {
             lastX = e.getX();
@@ -92,7 +94,7 @@ public class Controller {
         searchBar.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar.getText().isEmpty())) {
                 System.out.println(searchBar.getText());
-                addressParsing(charTrie, searchBar.getText());
+                addressParsing(trie, searchBar.getText());
             }
         });
 
@@ -171,7 +173,7 @@ public class Controller {
     }
 
     @FXML
-    private void addressParsing(CharTrie charTrie, String newValue) {
+    private void addressParsing(Trie trie, String newValue) {
         suggestionsBox.getItems().clear(); // Clear previous suggestions
 
         // Used keep track of previous suggestions so no duplication happens
@@ -181,7 +183,7 @@ public class Controller {
             // Only proceed if the new value is not empty
             if (!newValue.isEmpty()) {
                 // Get new suggestions based on the current text in the search bar
-                List<String> suggestionsList = charTrie.getAddressSuggestions(newValue.toLowerCase(), 4);
+                List<String> suggestionsList = trie.getAddressSuggestions(newValue.toLowerCase(), 4);
                 // Print and store new suggestions
                 for (String suggestion : suggestionsList) {
                     if (!previousSuggestions.contains(suggestion)) {
@@ -201,48 +203,48 @@ public class Controller {
             }
     }
 
-    private CharTrie loadCityNames() {
-        CharTrie charTrie = new CharTrie();
+    private Trie loadCityNames() {
+        Trie trie = new Trie();
         String path = System.getProperty("user.dir"); // gets which directory the project is placed
         String filename = path+"\\data\\citynames.txt";
 
         try (BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"))) {
             String line;
             while ((line = bReader.readLine()) != null) {
-                charTrie.insert(line.trim().toLowerCase());
+                trie.insert(line.trim().toLowerCase());
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-        serializeTrie(charTrie, "data/trie.obj");
-        return charTrie;
+        serializeTrie(trie, "data/trie.obj");
+        return trie;
     }
-    private void serializeTrie(CharTrie charTrie, String filepath) {
+    private void serializeTrie(Trie trie, String filepath) {
         try (
                 FileOutputStream fileOut = new FileOutputStream(filepath); // Open a file output stream to the specified file.
                 ObjectOutputStream out = new ObjectOutputStream(fileOut) // Wrap the file output stream in an ObjectOutputStream.
         ) {
-            out.writeObject(charTrie); // Serialize the Trie object and write it to the file.
+            out.writeObject(trie); // Serialize the Trie object and write it to the file.
         } catch (IOException i) {
             i.printStackTrace(); // Handle potential IO exceptions.
         }
         System.out.println("Created serializable file");
     }
-    private CharTrie deserializeTrie(String filepath) {
-        CharTrie charTrie = null;
+    private Trie deserializeTrie(String filepath) {
+        Trie trie = null;
         try (
                 FileInputStream fileIn = new FileInputStream(filepath); // Open a file input stream to the specified file.
                 ObjectInputStream in = new ObjectInputStream(fileIn) // Wrap the file input stream in an ObjectInputStream.
         ) {
-            charTrie = (CharTrie) in.readObject(); // Deserialize the object read from the file and cast it to a Trie.
+            trie = (Trie) in.readObject(); // Deserialize the object read from the file and cast it to a Trie.
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace(); // Handle IO and class not found exceptions.
         }
         // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
-        if(!(charTrie == null))  {
+        if(!(trie == null))  {
 
             System.out.println("Serializable file was found");
-            return charTrie; // Return the deserialized Trie object.
+            return trie; // Return the deserialized Trie object.
         }
         // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
         else return loadCityNames();
