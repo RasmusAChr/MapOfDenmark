@@ -30,7 +30,7 @@ public class Controller {
     double lastY;
     private Model model;
     private View view;
-
+    private Trie trie;
     @FXML
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
     @FXML
@@ -48,12 +48,10 @@ public class Controller {
     private ImageView sliderEmoji;
     @FXML
     private boolean Dark;
-    public void init(Model inputModel, View inputView) {
     @FXML
     private ListView<String> suggestionsBox; // The ListView to display suggestions
     @FXML
     private TextField searchBar;
-    private Trie trie;
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
