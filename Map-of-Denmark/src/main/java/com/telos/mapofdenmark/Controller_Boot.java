@@ -55,7 +55,7 @@ public class Controller_Boot {
 
         } else  {
             System.out.println("error"); // or something else
-            userFile = path + "\\data\\kbh.osm";
+            userFile = path + "\\data\\kbh.osm.obj";
         }
         chosen = true;
         view.setPath(userFile);
