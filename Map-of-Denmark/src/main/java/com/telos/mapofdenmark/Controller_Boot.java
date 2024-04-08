@@ -14,6 +14,7 @@ public class Controller_Boot {
     public Controller_Boot(){}
 
     public String userFile;
+    public String path;
     private Stage primaryStage;
 
     public View_Boot view;
@@ -26,9 +27,12 @@ public class Controller_Boot {
     @FXML
     private Button btn_no;
 
+
     public void init(View_Boot view, Stage primaryStage){
         this.view = view;
         this.primaryStage = primaryStage;
+        this.path = System.getProperty("user.dir"); // gets which directory the project is placed
+        this.userFile = path + "\\data\\kbh.osm.obj";
     }
 
 
@@ -47,15 +51,14 @@ public class Controller_Boot {
         // This retrieves the Stage from this component's scene
         Stage stage = (Stage) btn_YES.getScene().getWindow();
         File file = fileChooser.showOpenDialog(stage);
-        String path = System.getProperty("user.dir"); // gets which directory the project is placed
 
         if (file != null) {
             userFile = file.getPath();
 
 
         } else  {
-            System.out.println("error"); // or something else
-            userFile = path + "\\data\\kbh.osm.obj";
+            System.out.println("Error: File not selected or found."); // or something else
+            // Using default file
         }
         chosen = true;
         view.setPath(userFile);
@@ -65,8 +68,7 @@ public class Controller_Boot {
     }
     @FXML
     private void default_path() throws XMLStreamException, IOException, ClassNotFoundException {
-        String path = System.getProperty("user.dir"); // gets which directory the project is placed
-        userFile = path + "\\data\\kbh.osm";
+        // Using default file
         chosen = true;
         view.setPath(userFile);
         view.setChosen(chosen);
