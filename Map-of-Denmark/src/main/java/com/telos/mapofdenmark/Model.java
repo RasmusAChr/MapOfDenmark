@@ -12,10 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.zip.ZipInputStream;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -31,6 +28,8 @@ public class Model implements Serializable {
 
     double minlat, maxlat, minlon, maxlon;
     List<Address> addressList;
+    Map<String, Node> addressIdMap;
+
     Address address;
 
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
@@ -46,6 +45,7 @@ public class Model implements Serializable {
     public Model(String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
         this.addressList = new ArrayList<>();
         this.address = new Address();
+        this.addressIdMap = new HashMap<>();
         if (filename.endsWith(".osm.zip")) {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
@@ -77,6 +77,7 @@ public class Model implements Serializable {
         var id2node = new HashMap<Long, Node>();
         var way = new ArrayList<Node>();
         var coast = false;
+        long addressId = 0;
         while (input.hasNext()) {
             var tagKind = input.next();
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
@@ -91,6 +92,7 @@ public class Model implements Serializable {
                     var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
                     var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
                     id2node.put(id, new Node(lat, lon));
+                    addressId = id;
 //                    address = new Address(); // Reset for new node
                 } else if (name == "way") {
                     way.clear();
@@ -122,6 +124,9 @@ public class Model implements Serializable {
                 if(name.equals("node")){
                     if (address != null && !address.getStreet().isBlank()) {
                         addressList.add(address);
+                        System.out.println(addressId);
+                        addressIdMap.put(address.getFullAdress().toLowerCase(), id2node.get(addressId));
+                        addressId = 0;
                         address = null; // Reset for the next address
                     }
                 }
@@ -163,6 +168,11 @@ public class Model implements Serializable {
     public List<Address> getAddressList() {
         return addressList;
     }
+
+    public Map<String, Node> getAddressIdMap() {
+        return addressIdMap;
+    }
 }
+
 
 

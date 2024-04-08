@@ -102,7 +102,7 @@ public class Controller {
                 System.out.println(searchBar.getText());
                 addressParsing(trie, searchBar.getText());
             }
-            //testEncodingWithUI();
+            testEncodingWithUI();
         });
 
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) ->{
@@ -294,6 +294,9 @@ public class Controller {
     private void testEncodingWithUI() {
         // Directly set a test string to verify UTF-8 characters are displayed correctly
         suggestionsBox.getItems().add("Åkirkeby");
+        String input = searchBar.getText();
+        Node node = model.getAddressIdMap().get(input);
+        suggestionsBox.getItems().add("Lat is: " + node.getLat() + " Lon is: " + node.getLon());
     }
 
 }
