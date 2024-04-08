@@ -29,10 +29,10 @@ public class ColorScheme implements Serializable{
     // Scheme for all the colors
     public void defaultScheme(){
         colors.clear();
-        colors.put("default", "#ff0000");
+        colors.put("default", "#FFFFFF");
 
         //Roads
-        colors.put("highway", "#ff0000");
+        colors.put("highway", "#0000FF");
 
         // NATURALS
         colors.put("fell","#48a160");

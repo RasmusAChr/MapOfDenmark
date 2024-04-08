@@ -107,12 +107,13 @@ public class Model implements Serializable {
                 var name = input.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name == "way") {
+
                     if (roadtype == "highway") {
-                        System.out.println("high");
                         ways.add(new Road(way, roadtype));
                     } else {
                         ways.add(new Way(way));
                     }
+
                 }
             }
         }

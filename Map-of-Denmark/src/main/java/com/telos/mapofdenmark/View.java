@@ -85,12 +85,13 @@ public class View {
         }
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
-        gc.setLineWidth(1/Math.sqrt(trans.determinant()));
+        double zoomValue = 1/Math.sqrt(trans.determinant());
+        gc.setLineWidth(zoomValue);
         for (var line : model.list) {
             line.draw(gc);
         }
         for (var way : model.ways) {
-            way.draw(gc);
+            way.draw(gc, zoomValue);
         }
     }
 

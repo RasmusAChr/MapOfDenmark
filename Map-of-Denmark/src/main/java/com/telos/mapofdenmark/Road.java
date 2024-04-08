@@ -16,14 +16,16 @@ public class Road extends Way{
     }
 
     @Override
-    public void draw(GraphicsContext gc) {
+    public void draw(GraphicsContext gc, double zoom) {
         if(lt.findKey(roadType)) {
             gc.setStroke(cs.getColor(roadType));
-            gc.setLineWidth(lt.getWidth(roadType));
+            double zoomValue = lt.getWidth(roadType) + zoom;
+            System.out.println(zoomValue);
+            super.draw(gc, zoomValue);
+        } else {
+            super.draw(gc, zoom);
         }
-
-        super.draw(gc);
-        //gc.setStroke(Color.BLACK);
-        gc.setLineWidth(10);
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(2);
     }
 }
