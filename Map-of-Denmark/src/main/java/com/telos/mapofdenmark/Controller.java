@@ -124,7 +124,7 @@ public class Controller {
 
     @FXML
     private void toggleTheme(){
-        // if the themebutton has been toggled on
+        // if the themebutton has been toggled on. determines wheter do display in dark or light mode.
         if (themeToggleBtn.isSelected()) {
             themeToggleBtn.getStyleClass().remove("root-light");
             themeToggleBtn.getStyleClass().add("root-dark");
