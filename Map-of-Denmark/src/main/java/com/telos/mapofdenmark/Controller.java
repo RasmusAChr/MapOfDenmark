@@ -1,15 +1,25 @@
 package com.telos.mapofdenmark;
 
 
+import com.telos.mapofdenmark.TrieClasses.Address;
+import com.telos.mapofdenmark.TrieClasses.Trie;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ToggleButton;
+import javafx.geometry.Point2D;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import java.io.File;
-import javafx.scene.control.Slider;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
 import javafx.scene.image.ImageView;
 
 public class Controller {
@@ -17,12 +27,11 @@ public class Controller {
     // So it needs to stay (even though it's empty)
     public Controller(){}
 
-
     double lastX;
     double lastY;
     private Model model;
     private View view;
-
+    private Trie trie;
     @FXML
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
     @FXML
@@ -40,9 +49,15 @@ public class Controller {
     private ImageView sliderEmoji;
     @FXML
     private boolean Dark;
+    @FXML
+    private ListView<String> suggestionsBox; // The ListView to display suggestions
+    @FXML
+    private TextField searchBar;
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
+        this.trie = deserializeTrie("data/trie.obj");
+
         view.canvas.setOnMousePressed(e -> {
             lastX = e.getX();
             lastY = e.getY();
@@ -56,17 +71,18 @@ public class Controller {
             lastX = e.getX();
             lastY = e.getY();
         });
-        view.canvas.setOnScroll(e -> {
+      /*  view.canvas.setOnScroll(e -> {
             double factor = e.getDeltaY();
             view.zoom(e.getX(), e.getY(), Math.pow(1.01, factor));
-            
 
 
-        });
+
+        }); */
 
     }
     @FXML
     private void initialize(){
+        zoomSlider.setValue(50.0);
         // Sets the visuals of the theme toggle
         themeToggleBtn.getStyleClass().add("root-light");
 
@@ -75,23 +91,49 @@ public class Controller {
 
 
         // Add a listener to the slider's value
+
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()));
+
+//        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+//            addressParsing(trie, newValue);
+//        });
+        searchBar.setOnKeyPressed(event -> {
+            if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar.getText().isEmpty())) {
+                System.out.println(searchBar.getText());
+                addressParsing(trie, searchBar.getText());
+            }
+            //testEncodingWithUI();
+        });
+
+        zoomSlider.valueProperty().addListener((obs, oldVal, newVal) ->{
+            double deltaFactor = newVal.doubleValue() - oldVal.doubleValue(); // Calculate delta factor
+
+            // Calculate zoom direction based on deltaFactor sign
+            int zoomDirection = deltaFactor > 0 ? 1 : -1;
+
+            // Take absolute value of deltaFactor
+            deltaFactor = Math.abs(deltaFactor);
+
+            double dy = view.canvas.getHeight() / 2;
+            double dx = view.canvas.getWidth() / 2;
+
+            // Apply zoom
+            view.zoom(dx, dy, Math.pow(1.07, zoomDirection * deltaFactor));
+          });
     }
 
     @FXML
     private void toggleTheme(){
-        // if the themebutton has been toggled on
+        // if the themebutton has been toggled on. determines wheter do display in dark or light mode.
         if (themeToggleBtn.isSelected()) {
             themeToggleBtn.getStyleClass().remove("root-light");
             themeToggleBtn.getStyleClass().add("root-dark");
-            System.out.println("Dark theme");
             Dark = true;
             view.togglecolor(Dark);
             view.redraw();
         } else {
             themeToggleBtn.getStyleClass().remove("root-dark");
             themeToggleBtn.getStyleClass().add("root-light");
-            System.out.println("Light theme");
             Dark = false;
             view.togglecolor(Dark);
             view.redraw();
@@ -152,11 +194,11 @@ public class Controller {
         // This portion changes image the image itself
         // Note this loads the image everytime so it may be faster to store all images in seperate image variables but may cost more memory
         String imagePath;
-        if (sliderValue < 25) {
+        if (sliderValue > 85.0){
             imagePath = "Sunflower Emoji.png";
-        } else if (sliderValue < 50) {
+        } else if (sliderValue > 60.0) {
             imagePath = "Bicycle Emoji.png";
-        } else if (sliderValue < 75) {
+        } else if (sliderValue > 25.0) {
             imagePath = "Airplane Emoji.png";
         } else {
             imagePath = "Earth Emoji.png";
@@ -166,4 +208,92 @@ public class Controller {
         Image image = new Image(getClass().getResourceAsStream("/com/telos/mapofdenmark/GUI Icons/" + imagePath));
         sliderEmoji.setImage(image);
     }
+
+    @FXML
+    private void addressParsing(Trie trie, String newValue) {
+        suggestionsBox.getItems().clear(); // Clear previous suggestions
+
+        // Used keep track of previous suggestions so no duplication happens
+        List<String> previousSuggestions = new ArrayList<>();
+            previousSuggestions.clear();
+
+            // Only proceed if the new value is not empty
+            if (!newValue.isEmpty()) {
+                // Get new suggestions based on the current text in the search bar
+                List<String> suggestionsList = trie.getAddressSuggestions(newValue.toLowerCase(), 4);
+                // Print and store new suggestions
+                for (String suggestion : suggestionsList) {
+                    if (!previousSuggestions.contains(suggestion)) {
+                        System.out.println(suggestion);
+                        previousSuggestions.add(suggestion);
+                    }
+                }
+                // Logic for the suggestionsBox in UI
+                if (!suggestionsList.isEmpty()) {
+                    suggestionsBox.setVisible(true);
+                    suggestionsBox.setItems(FXCollections.observableArrayList(suggestionsList));
+                } else {
+                    suggestionsBox.setVisible(false);
+                }
+            } else {
+                suggestionsBox.setVisible(false);
+            }
+    }
+
+    private Trie loadCityNames() {
+        Trie trie = new Trie();
+//        String path = System.getProperty("user.dir"); // gets which directory the project is placed
+//        String filename = path+"\\data\\citynames.txt";
+//
+//        try (BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"))) {
+//            String line;
+//            while ((line = bReader.readLine()) != null) {
+//                trie.insert(line.trim().toLowerCase());
+//            }
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        }
+        for(Address address : model.getAddressList()){
+            trie.insert(address.getFullAdress());
+        }
+        serializeTrie(trie, "data/trie.obj");
+        return trie;
+    }
+    private void serializeTrie(Trie trie, String filepath) {
+        try (
+                FileOutputStream fileOut = new FileOutputStream(filepath); // Open a file output stream to the specified file.
+                ObjectOutputStream out = new ObjectOutputStream(fileOut) // Wrap the file output stream in an ObjectOutputStream.
+        ) {
+            out.writeObject(trie); // Serialize the Trie object and write it to the file.
+        } catch (IOException i) {
+            i.printStackTrace(); // Handle potential IO exceptions.
+        }
+        System.out.println("Created serializable file");
+    }
+    private Trie deserializeTrie(String filepath) {
+        Trie trie = null;
+        try (
+                FileInputStream fileIn = new FileInputStream(filepath); // Open a file input stream to the specified file.
+                ObjectInputStream in = new ObjectInputStream(fileIn) // Wrap the file input stream in an ObjectInputStream.
+        ) {
+            trie = (Trie) in.readObject(); // Deserialize the object read from the file and cast it to a Trie.
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
+        if(!(trie == null))  {
+
+            System.out.println("Serializable file was found");
+            return trie; // Return the deserialized Trie object.
+        }
+        // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
+        else return loadCityNames();
+    }
+
+    @FXML
+    private void testEncodingWithUI() {
+        // Directly set a test string to verify UTF-8 characters are displayed correctly
+        suggestionsBox.getItems().add("Åkirkeby");
+    }
+
 }

@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
@@ -13,7 +14,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.telos.mapofdenmark.Controller">
+<HBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.telos.mapofdenmark.Controller">
    <children>
       <VBox HBox.hgrow="ALWAYS">
          <children>
@@ -66,7 +67,7 @@
                   <Pane fx:id="backgroundPane" prefHeight="200.0" prefWidth="1018.0" BorderPane.alignment="CENTER">
                      <children>
                         <Pane fx:id="mapPane" blendMode="SRC_ATOP" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="638.0" prefWidth="1003.0" />
-                        <TextField layoutX="22.0" layoutY="17.0" prefHeight="54.0" prefWidth="334.0" style="-fx-background-radius: 50;" />
+                        <TextField fx:id="searchBar" layoutX="22.0" layoutY="17.0" prefHeight="54.0" prefWidth="334.0" style="-fx-background-radius: 50;" />
                         <ImageView fx:id="sliderEmoji" fitHeight="47.0" fitWidth="44.0" layoutX="400.0" layoutY="22.0" preserveRatio="true">
                            <image>
                               <Image url="@GUI%20Icons/icons8-search-500.png" />
@@ -77,6 +78,7 @@
                               <Image url="@GUI%20Icons/icons8-search-500.png" />
                            </image>
                         </ImageView>
+                        <ListView fx:id="suggestionsBox" layoutX="24.0" layoutY="77.0" prefHeight="291.0" prefWidth="331.0" visible="false" />
                      </children>
                   </Pane>
                </center>
