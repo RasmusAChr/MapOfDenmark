@@ -66,7 +66,7 @@ public class Controller_Boot {
     @FXML
     private void default_path() throws XMLStreamException, IOException, ClassNotFoundException {
         String path = System.getProperty("user.dir"); // gets which directory the project is placed
-        userFile = path + "\\data\\kbh.osm";
+        userFile = path + "\\data\\kbh.osm.obj";
         chosen = true;
         view.setPath(userFile);
         view.setChosen(chosen);
