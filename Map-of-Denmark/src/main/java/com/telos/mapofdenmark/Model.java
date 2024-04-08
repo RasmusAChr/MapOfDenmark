@@ -21,11 +21,12 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import com.telos.mapofdenmark.TrieClasses.Address;
+import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.geometry.Point2D;
 public class Model implements Serializable {
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
-
+    private Trie trie;
     double minlat, maxlat, minlon, maxlon;
     List<Address> addressList;
     Map<String, Node> addressIdMap;
@@ -54,6 +55,7 @@ public class Model implements Serializable {
             parseTXT(filename);
         }
         save(filename+".obj");
+        this.trie = deserializeTrie("data/.obj");
     }
 
     void save(String filename) throws FileNotFoundException, IOException {
@@ -171,6 +173,60 @@ public class Model implements Serializable {
 
     public Map<String, Node> getAddressIdMap() {
         return addressIdMap;
+    }
+    private Trie loadCityNames() {
+        Trie trie = new Trie();
+//        String path = System.getProperty("user.dir"); // gets which directory the project is placed
+//        String filename = path+"\\data\\citynames.txt";
+//
+//        try (BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"))) {
+//            String line;
+//            while ((line = bReader.readLine()) != null) {
+//                trie.insert(line.trim().toLowerCase());
+//            }
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        }
+        for(Address address : addressList){
+            trie.insert(address.getFullAdress());
+        }
+        serializeTrie(trie, "data/trie.obj");
+        return trie;
+    }
+
+    private void serializeTrie(Trie trie, String filepath) {
+        try (
+                FileOutputStream fileOut = new FileOutputStream(filepath); // Open a file output stream to the specified file.
+                ObjectOutputStream out = new ObjectOutputStream(fileOut) // Wrap the file output stream in an ObjectOutputStream.
+        ) {
+            out.writeObject(trie); // Serialize the Trie object and write it to the file.
+        } catch (IOException i) {
+            i.printStackTrace(); // Handle potential IO exceptions.
+        }
+        System.out.println("Created serializable file");
+    }
+    private Trie deserializeTrie(String filepath) {
+        Trie trie = null;
+        try (
+                FileInputStream fileIn = new FileInputStream(filepath); // Open a file input stream to the specified file.
+                ObjectInputStream in = new ObjectInputStream(fileIn) // Wrap the file input stream in an ObjectInputStream.
+        ) {
+            trie = (Trie) in.readObject(); // Deserialize the object read from the file and cast it to a Trie.
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
+        if(!(trie == null))  {
+
+            System.out.println("Serializable file was found");
+            return trie; // Return the deserialized Trie object.
+        }
+        // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
+        else return loadCityNames();
+    }
+    public List<String> getSuggestionList(String input){
+        return trie.getAddressSuggestions(input.toLowerCase(), 4);
+
     }
 }
 
