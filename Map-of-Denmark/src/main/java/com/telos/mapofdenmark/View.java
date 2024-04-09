@@ -25,6 +25,8 @@ public class View {
     double x2 = 200;
     double y2 = 800;
 
+    double slider_value;
+
     Affine trans = new Affine();
 
     Model model;
@@ -126,4 +128,9 @@ public class View {
         }
 
     }
+    public void Current_Slider_value(double value){
+        slider_value = value;
+        System.out.println(slider_value);
+    }
+
 }

@@ -104,7 +104,6 @@ public class Model implements Serializable {
                     if (k.equals("highway")) {
                         roadtype = "highway";
                     }
-                    var k = input.getAttributeValue(null, "k");
                     if (k.startsWith("addr:")){
                         // Lazy initialization of address
                         if (address == null) {
