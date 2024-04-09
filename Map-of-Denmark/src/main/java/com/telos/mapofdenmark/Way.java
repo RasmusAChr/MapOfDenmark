@@ -17,8 +17,8 @@ public class Way implements Serializable {
         }
     }
 
-    public void draw(GraphicsContext gc, double zoom) {
-        gc.setLineWidth(zoom);
+    public void draw(GraphicsContext gc, double zoom, boolean darkMode) {
+        //gc.setLineWidth(zoom);
         gc.beginPath();
         gc.moveTo(coords[0], coords[1]);
         for (int i = 2 ; i < coords.length ; i += 2) {

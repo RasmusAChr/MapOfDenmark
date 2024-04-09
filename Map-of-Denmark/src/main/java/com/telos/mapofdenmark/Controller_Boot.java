@@ -4,7 +4,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;

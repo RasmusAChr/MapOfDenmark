@@ -73,7 +73,6 @@ public class View {
         primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> resizePanes(primaryStage.getWidth(), primaryStage.getHeight()));
 
 
-
     }
 
     void redraw() {
@@ -87,13 +86,13 @@ public class View {
         }
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
-        double zoomValue = 1/Math.sqrt(trans.determinant());
-        gc.setLineWidth(zoomValue);
+       // double zoomValue = 1/Math.sqrt(trans.determinant());
+        gc.setLineWidth(0.000005);
         for (var line : model.list) {
             line.draw(gc);
         }
         for (var way : model.ways) {
-            way.draw(gc, zoomValue);
+            way.draw(gc, slider_value, dark);
         }
     }
 
@@ -130,7 +129,6 @@ public class View {
     }
     public void Current_Slider_value(double value){
         slider_value = value;
-        System.out.println(slider_value);
     }
 
 }

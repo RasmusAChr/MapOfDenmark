@@ -5,20 +5,16 @@ import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+
 
 import javafx.scene.image.ImageView;
 
@@ -53,6 +49,7 @@ public class Controller {
     private ListView<String> suggestionsBox; // The ListView to display suggestions
     @FXML
     private TextField searchBar;
+
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
@@ -71,14 +68,6 @@ public class Controller {
             lastX = e.getX();
             lastY = e.getY();
         });
-      /*  view.canvas.setOnScroll(e -> {
-            double factor = e.getDeltaY();
-            view.zoom(e.getX(), e.getY(), Math.pow(1.01, factor));
-
-
-
-        }); */
-
     }
     @FXML
     private void initialize(){
@@ -88,15 +77,14 @@ public class Controller {
 
 // Ensure the ImageView starts at the correct position corresponding to the slider's initial value
         updateImageViewPosition(zoomSlider.getValue());
-
-
         // Add a listener to the slider's value
-
-        zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()));
-
+        zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()
+        ));
 //        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
 //            addressParsing(trie, newValue);
 //        });
+       // zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> ));
+
         searchBar.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar.getText().isEmpty())) {
                 System.out.println(searchBar.getText());
@@ -119,6 +107,7 @@ public class Controller {
 
             // Apply zoom
             view.zoom(dx, dy, Math.pow(1.07, zoomDirection * deltaFactor));
+            view.Current_Slider_value(newVal.doubleValue());
           });
     }
 
@@ -207,7 +196,7 @@ public class Controller {
         // Load and set the new image
         Image image = new Image(getClass().getResourceAsStream("/com/telos/mapofdenmark/GUI Icons/" + imagePath));
         sliderEmoji.setImage(image);
-        view.Current_Slider_value(sliderValue);
+
     }
 
     @FXML

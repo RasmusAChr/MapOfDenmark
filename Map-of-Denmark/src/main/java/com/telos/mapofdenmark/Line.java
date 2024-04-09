@@ -1,7 +1,6 @@
 package com.telos.mapofdenmark;
 
 import java.io.Serializable;
-
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 

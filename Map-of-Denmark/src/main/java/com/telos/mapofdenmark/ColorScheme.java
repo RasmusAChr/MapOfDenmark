@@ -1,21 +1,27 @@
 package com.telos.mapofdenmark;
 import javafx.scene.paint.Color;
-
 import java.io.Serializable;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class ColorScheme implements Serializable{
     Map<String, String> colors;
-    Map<String, Integer> width;
+    Map<String, String> darkColors;
     public ColorScheme(){
         colors = new HashMap<>();
+        darkColors = new HashMap<>();
         defaultScheme();
+
     }
 
-    public Color getColor(String type){
-        String hex = colors.get(type);
+    public Color getColor(String type, boolean dark){
+        String hex = null;
+       if(!dark){
+           hex = colors.get(type);
+       }
+       else {
+           hex = darkColors.get(type);
+       }
         return Color.web(hex);
     }
 
@@ -23,16 +29,17 @@ public class ColorScheme implements Serializable{
         return colors.containsKey(b);
     }
 
-    public Color getDefaultColor(){
-        return Color.web(colors.get("default"));
+    public Color getDefaultColor(boolean dark){
+        if(dark) return Color.web("#d3d3d3");
+        return Color.web("#FFFFFF");
     }
     // Scheme for all the colors
     public void defaultScheme(){
         colors.clear();
-        colors.put("default", "#FFFFFF");
 
         //Roads
         colors.put("highway", "#0000FF");
+        darkColors.put("highway", "#FFFFFF");
 
         // NATURALS
         colors.put("fell","#48a160");
@@ -131,4 +138,5 @@ public class ColorScheme implements Serializable{
         //colors.put("marina",""); ----------------- should not be drawn
 
     }
+
 }

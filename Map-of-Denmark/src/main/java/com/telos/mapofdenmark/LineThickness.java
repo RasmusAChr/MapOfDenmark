@@ -21,11 +21,10 @@ public class LineThickness implements Serializable {
     public void defaultScheme() {
         linewidth.clear();
         linewidth.put("default", 0.000005);
-        linewidth.put("highway", 0.00001);
+        linewidth.put("highway", 0.0001);
     }
 
     public boolean findKey(String a) {
         return linewidth.containsKey(a);
     }
-
 }
