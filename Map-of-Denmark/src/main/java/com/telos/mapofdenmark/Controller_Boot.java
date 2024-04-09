@@ -13,6 +13,8 @@ public class Controller_Boot {
 
     public Controller_Boot(){}
 
+    public String userFilename;
+
     public String userFile;
     public String path;
     private Stage primaryStage;
@@ -52,9 +54,10 @@ public class Controller_Boot {
         Stage stage = (Stage) btn_YES.getScene().getWindow();
         File file = fileChooser.showOpenDialog(stage);
 
+
         if (file != null) {
             userFile = file.getPath();
-
+            userFilename = file.getName();
 
         } else  {
             System.out.println("Error: File not selected or found."); // or something else
@@ -79,5 +82,8 @@ public class Controller_Boot {
         var model = Model.load(path);
         var view = new View(model, primaryStage);
     }
-
+    public String FileName(){
+        if (userFilename == null) return "KBH";
+        else return userFilename;
+    }
 }
