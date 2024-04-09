@@ -1,4 +1,4 @@
-module com.example.mapofdenmark {
+module com.telos.mapofdenmark {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.xml;
