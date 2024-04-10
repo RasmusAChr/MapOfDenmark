@@ -74,6 +74,15 @@ public class BST<Key extends Comparable<Key>, Value>
         //x.N = size(x.left) + size(x.right) + 1; // Changes the overall size of the BST
         return x;
     }
+    public Key max() {
+        // Finds the greatest key in the BST
+        return max(root).key;
+    }
+    public Node max(Node x) {
+        // Recursive method to find the node with the greatest key
+        if (x.right == null) return x;
+        return max(x.right);
+    }
     public void delete(Key key) {
         // Deletes a node with a given key from the BST
         root = delete(root, key);
