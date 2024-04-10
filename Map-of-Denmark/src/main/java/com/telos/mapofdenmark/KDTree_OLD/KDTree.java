@@ -1,10 +1,8 @@
-package com.telos.mapofdenmark.KDTree;
-
-import java.util.Queue;
+package com.telos.mapofdenmark.KDTree_OLD;
 
 //Code taken from 398-399 in Algorithms FOURTH EDITION by Sedgewick and Wayne
 //Modeled after a BST (Binary Search Tree)
-public class KDNode<Value> {
+public class KDTree<Value> {
     private static final int K = 2; // Number of dimensions, set to 2 for 2D space
 
     private class KDNode {
