@@ -56,6 +56,8 @@ public class Model implements Serializable {
         save(filename+".obj");
     }
 
+
+
     void save(String filename) throws FileNotFoundException, IOException {
         try (var out = new ObjectOutputStream(new FileOutputStream(filename))) {
             out.writeObject(this);
@@ -163,6 +165,23 @@ public class Model implements Serializable {
     public List<Address> getAddressList() {
         return addressList;
     }
+
+
+    public double getMinlat(){
+        return minlat;
+    }
+    public double getMaxlat(){
+        return maxlat;
+    }
+    public double getMinlon(){
+        return minlon;
+    }
+    public double getMaxlon(){
+        return maxlon;
+    }
+
+
+
 }
 
 

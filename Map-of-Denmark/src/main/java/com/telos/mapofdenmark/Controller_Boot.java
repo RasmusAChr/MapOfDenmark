@@ -81,6 +81,8 @@ public class Controller_Boot {
     private void runMap(Stage primaryStage,String path) throws XMLStreamException, IOException, ClassNotFoundException {
         var model = Model.load(path);
         var view = new View(model, primaryStage);
+        view.setMapBounds(model.getMinlon(), model.getMaxlon(), model.getMinlat(), model.getMaxlat());
+
     }
     public String FileName(){
         if (userFilename == null) return "KBH";
