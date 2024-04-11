@@ -13,4 +13,8 @@ public class DirectedEdge {
     public int from(){return V;}
     public int to(){return W;}
     public double weight(){return weight;}
+
+    public String toString(){
+        return "from: " + from() + ", to: " + to() + ", weight: " + weight();
+    }
 }
