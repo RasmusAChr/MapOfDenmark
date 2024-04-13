@@ -31,11 +31,6 @@ public class View {
 
     boolean dark;
 
-    double mapMinLon;
-    double mapMaxLon;
-    double mapMinLat;
-    double mapMaxLat;
-
     @FXML
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
     @FXML
@@ -76,13 +71,6 @@ public class View {
 
 
 
-    }
-
-    public void setMapBounds(double mapMinLon, double mapMaxLon, double mapMinLat, double mapMaxLat){
-        this.mapMinLon = mapMinLon;
-        this.mapMaxLon = mapMaxLon;
-        this.mapMinLat = mapMinLat;
-        this.mapMaxLat = mapMaxLat;
     }
 
     void redraw() {
@@ -138,30 +126,6 @@ public class View {
     }
 
 
-    // Converts canvas coordinates to geo coordinates or vice versa, depending on true/false
-    public Point2D convertToCoordinates(Point2D pointFromCanvas, Boolean toGeoCoord){
-        try{
-            // Transforms coordinates from canvas to geo coordinates using inbuilt functionality
-            if(toGeoCoord){
-                Point2D geoCoordPoint = trans.inverseTransform(pointFromCanvas);
 
-                // Calculations to make sure the coordinates are within the bounds
-                double geoLon = Math.max(mapMinLon, Math.min(mapMaxLon, geoCoordPoint.getX()));
-                double geoLat = Math.max(mapMinLat, Math.min(mapMaxLat, geoCoordPoint.getY()));
-                return new Point2D(geoLon, geoLat);
-            }
-            // Vice versa
-            else{
-                double reverseLon = Math.max(mapMinLon, Math.min(mapMaxLon, pointFromCanvas.getX()));
-                double reverseLat = Math.max(mapMinLat, Math.min(mapMaxLat, pointFromCanvas.getY()));
-
-                Point2D canvasPoint = new Point2D(reverseLon, reverseLat);
-                return trans.transform(canvasPoint);
-            }
-        }catch(NonInvertibleTransformException e){
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
 
 }
