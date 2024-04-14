@@ -267,7 +267,7 @@ public class Model implements Serializable {
         // iterate depth to ensure that a new axis is sorted for
         depth++;
 
-        // Recursively population call
+        // Recursive population call
         // Left Recursive Call, Handles the elements before the median index by only providing from the start of the list to one less than the median index
         // The subList does not include the end of the range in the list is provides
         populateKDTree(kdTree, nodes.subList(0, medianIndex), depth);
