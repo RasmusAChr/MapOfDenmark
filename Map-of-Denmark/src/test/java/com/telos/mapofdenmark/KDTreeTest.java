@@ -3,15 +3,15 @@ package com.telos.mapofdenmark;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import com.telos.mapofdenmark.KDTreeClasses.BST;
+import com.telos.mapofdenmark.KDTreeClasses.KDTree;
 
 class KDTreeTest {
 
-    private BST tree;
+    private KDTree tree;
 
     @BeforeEach
     void setUp() {
-        tree = new BST();
+        tree = new KDTree();
     }
 
     @Test

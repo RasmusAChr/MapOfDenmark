@@ -1,9 +1,8 @@
 package com.telos.mapofdenmark.KDTreeClasses;
 
-import java.util.*;
 // Inspiration to KDTree from https://www.geeksforgeeks.org/search-and-insertion-in-k-dimensional-tree/
 // We also utilized code from chapter 3 in Algorithms 4 by Wayne and Sedgewick ch 3.2
-public class BST<Key extends Comparable<Key>, Value>
+public class KDTree<Key extends Comparable<Key>, Value>
 {
     private Node root; // root of BST
     private class Node {
