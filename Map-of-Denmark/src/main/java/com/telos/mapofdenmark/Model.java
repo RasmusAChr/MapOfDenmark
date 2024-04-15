@@ -14,23 +14,25 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.ZipInputStream;
-
+import java.util.Comparator;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import com.telos.mapofdenmark.KDTreeClasses.KDTree;
 import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.geometry.Point2D;
 public class Model implements Serializable {
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
+    List<Node> nodeList = new ArrayList<>();
     private Trie trie;
     double minlat, maxlat, minlon, maxlon;
     List<Address> addressList;
     Map<String, Node> addressIdMap;
-
+    KDTree kdTree;
     Address address;
 
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
@@ -56,6 +58,8 @@ public class Model implements Serializable {
         }
         save(filename+".obj");
         this.trie = deserializeTrie("data/.obj");
+        this.kdTree = new KDTree();
+
     }
 
     void save(String filename) throws FileNotFoundException, IOException {
@@ -93,7 +97,9 @@ public class Model implements Serializable {
                     var id = Long.parseLong(input.getAttributeValue(null, "id"));
                     var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
                     var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
-                    id2node.put(id, new Node(lat, lon));
+                    Node tempNode = new Node(lat, lon);
+                    id2node.put(id, tempNode);
+                    nodeList.add(tempNode);
                     addressId = id;
 //                    address = new Address(); // Reset for new node
                 } else if (name == "way") {
@@ -121,7 +127,14 @@ public class Model implements Serializable {
                 var name = input.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name == "way") {
-                    ways.add(new Way(way));
+//                    ways.add(new Way(way));
+                    Way newWay = new Way(way);
+                    ways.add(newWay);
+                    // Ensuring that every node has a ref to the way it is apart of
+                    for (Node node : way) {
+                        node.setWay(newWay); // Set the way reference in each node
+                    }
+                    way.clear();
                 }
                 if(name.equals("node")){
                     if (address != null && !address.getStreet().isBlank()) {
@@ -228,6 +241,40 @@ public class Model implements Serializable {
         return trie.getAddressSuggestions(input.toLowerCase(), 4);
 
     }
+    public void populateKDTree(){
+        populateKDTree(kdTree, nodeList, 0);
+    }
+    private static void populateKDTree(KDTree kdTree, List<Node> nodeList, int depth) {
+        List<Node> nodes = nodeList;
+        int axis = depth % 2;
+        // if the axis is 0, compare the x value long else compare lat
+        if(axis == 0){
+            // Sort based on the x-axis
+            nodes.sort(Comparator.comparingDouble(n -> n.lon));
+
+        } else {
+            // Sort based on the y-axis
+            nodes.sort(Comparator.comparingDouble(n -> n.lat));
+        }
+
+        // Find median index
+        int medianIndex = nodes.size() / 2;
+        Node medianNode = nodes.get(medianIndex);
+
+        // Insert median nodes into KDTree
+        kdTree.put(medianNode.getLon(), medianNode.getLat(), medianNode);
+
+        // iterate depth to ensure that a new axis is sorted for
+        depth++;
+
+        // Recursive population call
+        // Left Recursive Call, Handles the elements before the median index by only providing from the start of the list to one less than the median index
+        // The subList does not include the end of the range in the list is provides
+        populateKDTree(kdTree, nodes.subList(0, medianIndex), depth);
+        // Right Recursive Call, Handles the elements after the median index by only providing from the median index+1 (avoids duplicates) to the end of the list
+        populateKDTree(kdTree, nodes.subList(medianIndex+1, nodes.size()), depth);
+    }
+
 }
 
 
