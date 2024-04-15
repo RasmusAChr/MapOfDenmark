@@ -3,6 +3,7 @@ package com.telos.mapofdenmark;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -42,6 +43,7 @@ public class View {
 
     public View(Model model, Stage primaryStage) throws IOException {
         this.model = model;
+
         primaryStage.setTitle("Map of Denmark");
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/telos/mapofdenmark/235861.png")));
         primaryStage.getIcons().add(image);
@@ -130,5 +132,21 @@ public class View {
     public void Current_Slider_value(double value){
         slider_value = value;
     }
+
+
+    public Rectangle2D getCanvasCoordAsGeoCoord(){
+        // Gets the canvas coordinates for top left coordinate and bottom right coordinate
+        Point2D mapPaneTopLeft = mapPane.sceneToLocal(canvas.localToScene(x1,y1));
+        Point2D mapPaneBottomRight = mapPane.sceneToLocal(canvas.localToScene(x2,y2));
+
+        // Converts top left and bottom right coordinates to geo coordinates using the model's method
+        Point2D geoTopLeft = model.convertToCoordinates(mapPaneTopLeft, true, trans);
+        Point2D geoBottomRight = model.convertToCoordinates(mapPaneBottomRight, true, trans);
+
+        // Creates a Rectangle2D object with the geo coordinates
+        return new Rectangle2D(geoTopLeft.getX(), geoTopLeft.getY(),geoBottomRight.getX() - geoTopLeft.getX(), geoBottomRight.getY() - geoTopLeft.getY());
+    }
+
+
 
 }

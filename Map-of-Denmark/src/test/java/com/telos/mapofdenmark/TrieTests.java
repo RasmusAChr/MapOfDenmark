@@ -63,4 +63,9 @@ public class TrieTests {
     void testEmptyTrie() {
         // Check querying an empty Trie
     }
+
+    @Test
+    void testCorrectId(){
+
+    }
 }
