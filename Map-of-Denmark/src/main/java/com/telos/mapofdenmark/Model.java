@@ -53,7 +53,7 @@ public class Model implements Serializable {
     public Model(String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
         this.addressList = new ArrayList<>();
         this.address = new Address();
-        this.addressIdMap = new HashMap<>();
+        this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
         if (filename.endsWith(".osm.zip")) {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
