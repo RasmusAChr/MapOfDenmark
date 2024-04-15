@@ -248,7 +248,6 @@ public class Controller {
         Node node = model.getAddressIdMap().get(input);
         try {
             suggestionsBox.getItems().add("Lat is: " + node.getLat() + " Lon is: " + node.getLon());
-
         } catch (NullPointerException E) {}
     }
 
