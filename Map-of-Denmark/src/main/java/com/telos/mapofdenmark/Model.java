@@ -24,7 +24,12 @@ import com.telos.mapofdenmark.KDTreeClasses.KDTree;
 import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.geometry.Point2D;
+import javafx.scene.transform.Affine;
+import javafx.scene.transform.NonInvertibleTransformException;
+
 public class Model implements Serializable {
+    private static final long serialVersionUID = 9300313068198046L;
+
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
@@ -61,6 +66,8 @@ public class Model implements Serializable {
         this.kdTree = new KDTree();
 
     }
+
+
 
     void save(String filename) throws FileNotFoundException, IOException {
         try (var out = new ObjectOutputStream(new FileOutputStream(filename))) {
@@ -275,7 +282,37 @@ public class Model implements Serializable {
         populateKDTree(kdTree, nodes.subList(medianIndex+1, nodes.size()), depth);
     }
 
-}
 
+
+
+
+    // Converts canvas coordinates to geo coordinates or vice versa, depending on true/false
+    public Point2D convertToCoordinates(Point2D pointFromCanvas, Boolean toGeoCoord, Affine trans){
+        try{
+            // Transforms coordinates from canvas to geo coordinates using inbuilt functionality
+            if(toGeoCoord){
+                Point2D geoCoordPoint = trans.inverseTransform(pointFromCanvas);
+
+                // Calculations to make sure the coordinates are within the bounds
+                double geoLon = Math.max(minlon, Math.min(maxlon, geoCoordPoint.getX()));
+                double geoLat = Math.max(minlat, Math.min(maxlat, geoCoordPoint.getY()));
+                return new Point2D(geoLon, geoLat);
+            }
+            // Vice versa
+            else{
+                double reverseLon = Math.max(minlon, Math.min(maxlon, pointFromCanvas.getX()));
+                double reverseLat = Math.max(minlat, Math.min(maxlat, pointFromCanvas.getY()));
+
+                Point2D canvasPoint = new Point2D(reverseLon, reverseLat);
+                return trans.transform(canvasPoint);
+            }
+        }catch(NonInvertibleTransformException e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+
+}
 
 
