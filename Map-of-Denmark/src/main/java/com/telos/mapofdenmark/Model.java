@@ -144,13 +144,14 @@ public class Model implements Serializable {
                     for (Node node : way) {
                         node.setWay(newWay); // Set the way reference in each node
                     }
-                    way.clear();
+
 
                     if (roadtype == "highway") {
                         ways.add(new Road(way, roadtype));
                     } else {
                         ways.add(new Way(way));
                     }
+                    way.clear();
 
                 }
                 if(name.equals("node")){
