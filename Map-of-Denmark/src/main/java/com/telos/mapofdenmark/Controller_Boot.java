@@ -34,7 +34,7 @@ public class Controller_Boot {
         this.view = view;
         this.primaryStage = primaryStage;
         this.path = System.getProperty("user.dir"); // gets which directory the project is placed
-        this.userFile = path + "\\data\\kbh.osm";
+        this.userFile = path + "\\data\\kbh.osm.obj";
     }
 
 
