@@ -51,7 +51,14 @@ class KDTreeTest {
     }
     @Test
     void testBalancingOnTree(){
-
+        List<Node> listOfNodes = new ArrayList<>();
+        for(int i = 0 ; i < 10 ; i++){
+            listOfNodes.add(new Node(i,i));
+        }
+        tree.populate(listOfNodes);
+        tree.levelOrderTraverse();
     }
+
+
 }
 

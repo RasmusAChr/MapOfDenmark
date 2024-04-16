@@ -167,7 +167,7 @@ public class KDTree
         inOrderTraverse(x.right);
     }
 
-    public void levelOrder() {
+    public void levelOrderTraverse() {
         Queue<KDNode> queue = new LinkedList<>();
         queue.add(root);
         while (!queue.isEmpty()) {
