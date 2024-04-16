@@ -19,7 +19,6 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-
 import com.telos.mapofdenmark.KDTreeClasses.KDTree;
 import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
@@ -64,7 +63,7 @@ public class Model implements Serializable {
         save(filename+".obj");
         this.trie = deserializeTrie("data/.obj");
         this.kdTree = new KDTree();
-
+        kdTree.populate(nodeList);
     }
 
 
@@ -248,10 +247,17 @@ public class Model implements Serializable {
         return trie.getAddressSuggestions(input.toLowerCase(), 4);
 
     }
-    public void populateKDTree(){
-        populateKDTree(kdTree, nodeList, 0);
-    }
-    private static void populateKDTree(KDTree kdTree, List<Node> nodeList, int depth) {
+
+    // Method to populate a kdtree and making it balanced with data from an array
+//    public void populateKDTree(){
+////        populateKDTree(kdtree, nodelist, 0);
+//        kdTree.populate(kdTree, nodeList);
+//    }
+
+    // Helper method which makes recursive calls to itself.
+    /*private static void populateKDTree(KDTree kdTree, List<Node> nodeList, int depth) {
+        if (nodeList.isEmpty()) return;  // Ensure no operations on an empty list
+
         List<Node> nodes = nodeList;
         int axis = depth % 2;
         // if the axis is 0, compare the x value long else compare lat
@@ -277,10 +283,10 @@ public class Model implements Serializable {
         // Recursive population call
         // Left Recursive Call, Handles the elements before the median index by only providing from the start of the list to one less than the median index
         // The subList does not include the end of the range in the list is provides
-        populateKDTree(kdTree, nodes.subList(0, medianIndex), depth);
+        if (medianIndex > 0)  populateKDTree(kdTree, nodes.subList(0, medianIndex), depth);
         // Right Recursive Call, Handles the elements after the median index by only providing from the median index+1 (avoids duplicates) to the end of the list
-        populateKDTree(kdTree, nodes.subList(medianIndex+1, nodes.size()), depth);
-    }
+        if (medianIndex + 1 < nodeList.size()) populateKDTree(kdTree, nodes.subList(medianIndex+1, nodes.size()), depth);
+    }*/
 
 
 

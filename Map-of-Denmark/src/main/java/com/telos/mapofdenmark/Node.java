@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 
 public class Node implements Serializable {
-    double lat, lon;
+    public double lat, lon;
     Way way;
 
     public Node(double lat, double lon) {
