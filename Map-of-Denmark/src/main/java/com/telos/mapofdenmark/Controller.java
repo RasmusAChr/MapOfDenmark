@@ -1,6 +1,8 @@
 package com.telos.mapofdenmark;
 
 
+import com.telos.mapofdenmark.Shortest_Route.EdgeWeightedDigraph;
+import com.telos.mapofdenmark.Shortest_Route.SP;
 import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.collections.FXCollections;
@@ -108,6 +110,19 @@ public class Controller {
             view.zoom(dx, dy, Math.pow(1.07, zoomDirection * deltaFactor));
             view.Current_Slider_value(newVal.doubleValue());
           });
+    }
+    @FXML
+    private void StartSearch(){
+        // input address
+
+        model.StartDijstra();
+    }
+
+    @FXML
+    private void StopSearch(){
+        // input address
+        model.getDijkstraPath();
+                // Returns int or notes?
     }
 
     @FXML

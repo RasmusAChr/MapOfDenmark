@@ -21,6 +21,10 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import com.telos.mapofdenmark.KDTreeClasses.KDTree;
+import com.telos.mapofdenmark.Shortest_Route.Bag;
+import com.telos.mapofdenmark.Shortest_Route.DirectedEdge;
+import com.telos.mapofdenmark.Shortest_Route.EdgeWeightedDigraph;
+import com.telos.mapofdenmark.Shortest_Route.SP;
 import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.geometry.Point2D;
@@ -33,12 +37,16 @@ public class Model implements Serializable {
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
+    SP Dijkstra = null;
     private Trie trie;
     double minlat, maxlat, minlon, maxlon;
     List<Address> addressList;
     Map<String, Node> addressIdMap;
     KDTree kdTree;
     Address address;
+    EdgeWeightedDigraph EWD;
+    Bag<DirectedEdge> EWD_Temp;
+    HashMap<Node, Integer> DigraphNodeToIndex;
 
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
@@ -64,6 +72,8 @@ public class Model implements Serializable {
         save(filename+".obj");
         this.trie = deserializeTrie("data/.obj");
         this.kdTree = new KDTree();
+        this.EWD_Temp = new Bag<>();
+        this.DigraphNodeToIndex = new HashMap<>();
 
     }
 
@@ -92,6 +102,10 @@ public class Model implements Serializable {
         var coast = false;
         long addressId = 0;
         String roadtype = "";
+        boolean addingRoad = false;
+        String addingsRoadV = "";
+        boolean addingsRoadDirection = false;
+        int addingRoadSpeed = 0;
         while (input.hasNext()) {
 
             var tagKind = input.next();
@@ -114,12 +128,18 @@ public class Model implements Serializable {
                 } else if (name == "way") {
                     way.clear();
                     roadtype = "";
+                    addingRoad = false;
+                    addingsRoadV = "";
+                    addingRoadSpeed = 0;
+                    addingsRoadDirection = false;
                     coast = false;
                 } else if (name == "tag") {
                     var v = input.getAttributeValue(null, "v");
                     var k = input.getAttributeValue(null, "k");
                     if (k.equals("highway")) {
                         roadtype = "highway";
+                        addingRoad = true;
+                        addingsRoadV = v;
                     }
                     if (k.startsWith("addr:")){
                         // Lazy initialization of address
@@ -127,6 +147,12 @@ public class Model implements Serializable {
                             address = new Address();
                         }
                         parseAddressFromOSM(v, k);
+                    }
+                    if (k.equals("maxspeed")) {
+                        addingRoadSpeed = Integer.parseInt(v);
+                    }
+                    if (k.equals("oneway") && v.equals("yes")) {
+                        addingsRoadDirection = true;
                     }
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
@@ -141,6 +167,9 @@ public class Model implements Serializable {
                         ways.add(new Road(way, roadtype));
                     } else {
                         ways.add(new Way(way));
+                    }
+                    if (addingRoad) {
+                        EdgeweightedDigraphModifier(addingsRoadV, addingRoadSpeed, way, addingsRoadDirection);
                     }
 //                    ways.add(new Way(way));
                     //Way newWay = new Way(way);
@@ -164,7 +193,34 @@ public class Model implements Serializable {
             }
         }
     }
+    private void EdgeweightedDigraphModifier(String roadType, int maxSpeed, ArrayList<Node> way, boolean roadDirection) {
+        if (roadDirection) {
+            if (roadType.equals("tertiary")) {
 
+                Node nodeFrom = way.get(0);
+                DigraphNodeToIndex.put(nodeFrom, 0);
+                for (int i = 1; i < way.size(); i++) {
+                    // Distance is the distance between the latitude ang longitude pair
+                    //input lat 1 lat 2 and lon 1 lon 2
+                    Node nodeto = way.get(i);
+                    double weight = distance(nodeFrom.lat, nodeto.lat, nodeFrom.lon, nodeto.lon) / maxSpeed;
+                    EWD_Temp.add(new DirectedEdge(i-1, i, weight));
+                    DigraphNodeToIndex.put(nodeto, i);
+                }
+
+            } else {
+
+            }
+
+        } else {
+            if (roadType.equals("tertiary")) {
+
+            } else {
+
+            }
+        }
+
+    }
     private void parseTXT(String filename) throws FileNotFoundException {
         File f = new File(filename);
         try (Scanner s = new Scanner(f)) {
@@ -190,6 +246,25 @@ public class Model implements Serializable {
                 address.setCountry(v);
             }
         }
+    }
+    // credit James K polk from StackOwerflow
+    private static double distance(double lat1, double lat2, double lon1,
+                                  double lon2) {
+
+        final int R = 6371; // Radius of the earth
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+        double height = 0.0;
+
+        distance = Math.pow(distance, 2) + Math.pow(height, 2);
+
+        return Math.sqrt(distance);
     }
 
     public void add(Point2D p1, Point2D p2) {
@@ -291,10 +366,17 @@ public class Model implements Serializable {
         populateKDTree(kdTree, nodes.subList(medianIndex+1, nodes.size()), depth);
     }
 
+    // Dijkstra implementation
+    public void StartDijstra(Address startaddress){
+        this.Dijkstra = new SP(this.EWD,DigraphNodeToIndex.get(addressIdMap.get(startaddress))); // this starts the dijkstra search from the index that refferes to a node
+    }
 
-
-
-
+    public List<Node> getDijkstraPath(Address Endaddress) {
+       // List<Node> path = new ArrayList<>(); // this is everything that needs to be drawed for the path
+        Dijkstra.pathTo(DigraphNodeToIndex.get(addressIdMap.get(Endaddress))); // index
+        // Needs to return nodes
+        return null; // Returns drawing path
+    }
     // Converts canvas coordinates to geo coordinates or vice versa, depending on true/false
     public Point2D convertToCoordinates(Point2D pointFromCanvas, Boolean toGeoCoord, Affine trans){
         try{
@@ -320,6 +402,7 @@ public class Model implements Serializable {
             return null;
         }
     }
+
 
 
 }
