@@ -115,13 +115,13 @@ public class Controller {
     private void StartSearch(){
         // input address
 
-        model.StartDijstra();
+        //model.StartDijstra();
     }
 
     @FXML
     private void StopSearch(){
         // input address
-        model.getDijkstraPath();
+        //model.getDijkstraPath();
                 // Returns int or notes?
     }
 
