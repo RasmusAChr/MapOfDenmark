@@ -137,19 +137,17 @@ public class Model implements Serializable {
                 var name = input.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name == "way") {
-//                    ways.add(new Way(way));
-                    Way newWay = new Way(way);
-                    ways.add(newWay);
-                    // Ensuring that every node has a ref to the way it is apart of
-                    for (Node node : way) {
-                        node.setWay(newWay); // Set the way reference in each node
-                    }
-
-
                     if (roadtype == "highway") {
                         ways.add(new Road(way, roadtype));
                     } else {
                         ways.add(new Way(way));
+                    }
+//                    ways.add(new Way(way));
+                    //Way newWay = new Way(way);
+                    //ways.add(newWay);
+                    // Ensuring that every node has a ref to the way it is apart of
+                    for (Node node : way) {
+                        node.setWay(new Way(way)); // Set the way reference in each node
                     }
                     way.clear();
 
