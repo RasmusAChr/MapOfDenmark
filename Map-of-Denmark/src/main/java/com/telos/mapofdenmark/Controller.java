@@ -5,20 +5,16 @@ import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+
 
 import javafx.scene.image.ImageView;
 
@@ -53,10 +49,10 @@ public class Controller {
     private ListView<String> suggestionsBox; // The ListView to display suggestions
     @FXML
     private TextField searchBar;
+
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
-        this.trie = deserializeTrie("data/trie.obj");
 
         view.canvas.setOnMousePressed(e -> {
             lastX = e.getX();
@@ -71,14 +67,6 @@ public class Controller {
             lastX = e.getX();
             lastY = e.getY();
         });
-      /*  view.canvas.setOnScroll(e -> {
-            double factor = e.getDeltaY();
-            view.zoom(e.getX(), e.getY(), Math.pow(1.01, factor));
-
-
-
-        }); */
-
     }
     @FXML
     private void initialize(){
@@ -88,21 +76,20 @@ public class Controller {
 
 // Ensure the ImageView starts at the correct position corresponding to the slider's initial value
         updateImageViewPosition(zoomSlider.getValue());
-
-
         // Add a listener to the slider's value
-
-        zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()));
-
+        zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()
+        ));
 //        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
 //            addressParsing(trie, newValue);
 //        });
+       // zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> ));
+
         searchBar.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar.getText().isEmpty())) {
                 System.out.println(searchBar.getText());
                 addressParsing(trie, searchBar.getText());
             }
-            //testEncodingWithUI();
+            testEncodingWithUI();
         });
 
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) ->{
@@ -119,6 +106,7 @@ public class Controller {
 
             // Apply zoom
             view.zoom(dx, dy, Math.pow(1.07, zoomDirection * deltaFactor));
+            view.Current_Slider_value(newVal.doubleValue());
           });
     }
 
@@ -207,6 +195,7 @@ public class Controller {
         // Load and set the new image
         Image image = new Image(getClass().getResourceAsStream("/com/telos/mapofdenmark/GUI Icons/" + imagePath));
         sliderEmoji.setImage(image);
+
     }
 
     @FXML
@@ -215,12 +204,12 @@ public class Controller {
 
         // Used keep track of previous suggestions so no duplication happens
         List<String> previousSuggestions = new ArrayList<>();
-            previousSuggestions.clear();
+        previousSuggestions.clear();
 
             // Only proceed if the new value is not empty
             if (!newValue.isEmpty()) {
                 // Get new suggestions based on the current text in the search bar
-                List<String> suggestionsList = trie.getAddressSuggestions(newValue.toLowerCase(), 4);
+                List<String> suggestionsList = model.getSuggestionList(newValue);
                 // Print and store new suggestions
                 for (String suggestion : suggestionsList) {
                     if (!previousSuggestions.contains(suggestion)) {
@@ -240,60 +229,16 @@ public class Controller {
             }
     }
 
-    private Trie loadCityNames() {
-        Trie trie = new Trie();
-//        String path = System.getProperty("user.dir"); // gets which directory the project is placed
-//        String filename = path+"\\data\\citynames.txt";
-//
-//        try (BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"))) {
-//            String line;
-//            while ((line = bReader.readLine()) != null) {
-//                trie.insert(line.trim().toLowerCase());
-//            }
-//        } catch (IOException e) {
-//            System.out.println(e.getMessage());
-//        }
-        for(Address address : model.getAddressList()){
-            trie.insert(address.getFullAdress());
-        }
-        serializeTrie(trie, "data/trie.obj");
-        return trie;
-    }
-    private void serializeTrie(Trie trie, String filepath) {
-        try (
-                FileOutputStream fileOut = new FileOutputStream(filepath); // Open a file output stream to the specified file.
-                ObjectOutputStream out = new ObjectOutputStream(fileOut) // Wrap the file output stream in an ObjectOutputStream.
-        ) {
-            out.writeObject(trie); // Serialize the Trie object and write it to the file.
-        } catch (IOException i) {
-            i.printStackTrace(); // Handle potential IO exceptions.
-        }
-        System.out.println("Created serializable file");
-    }
-    private Trie deserializeTrie(String filepath) {
-        Trie trie = null;
-        try (
-                FileInputStream fileIn = new FileInputStream(filepath); // Open a file input stream to the specified file.
-                ObjectInputStream in = new ObjectInputStream(fileIn) // Wrap the file input stream in an ObjectInputStream.
-        ) {
-            trie = (Trie) in.readObject(); // Deserialize the object read from the file and cast it to a Trie.
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
-        // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
-        if(!(trie == null))  {
-
-            System.out.println("Serializable file was found");
-            return trie; // Return the deserialized Trie object.
-        }
-        // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
-        else return loadCityNames();
-    }
 
     @FXML
     private void testEncodingWithUI() {
         // Directly set a test string to verify UTF-8 characters are displayed correctly
-        suggestionsBox.getItems().add("Åkirkeby");
+        //suggestionsBox.getItems().add("Åkirkeby");
+        String input = searchBar.getText();
+        Node node = model.getAddressIdMap().get(input);
+        try {
+            suggestionsBox.getItems().add("Lat is: " + node.getLat() + " Lon is: " + node.getLon());
+        } catch (NullPointerException E) {}
     }
 
 }

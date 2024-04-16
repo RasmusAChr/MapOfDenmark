@@ -4,7 +4,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +33,7 @@ public class Controller_Boot {
         this.view = view;
         this.primaryStage = primaryStage;
         this.path = System.getProperty("user.dir"); // gets which directory the project is placed
-        this.userFile = path + "\\data\\kbh.osm.obj";
+        this.userFile = path + "\\data\\kbh.osm";
     }
 
 
@@ -81,6 +80,7 @@ public class Controller_Boot {
     private void runMap(Stage primaryStage,String path) throws XMLStreamException, IOException, ClassNotFoundException {
         var model = Model.load(path);
         var view = new View(model, primaryStage);
+
     }
     public String FileName(){
         if (userFilename == null) return "KBH";
