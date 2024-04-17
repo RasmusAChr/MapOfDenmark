@@ -47,6 +47,8 @@ public class Model implements Serializable {
     EdgeWeightedDigraph EWD;
     Bag<DirectedEdge> EWD_Temp;
     HashMap<Node, Integer> DigraphNodeToIndex;
+    HashMap<Integer, Node> IndexToNode;
+
 
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
@@ -74,7 +76,7 @@ public class Model implements Serializable {
         this.kdTree = new KDTree();
         this.EWD_Temp = new Bag<>();
         this.DigraphNodeToIndex = new HashMap<>();
-
+        this.IndexToNode = new HashMap<>();
     }
 
 
@@ -198,7 +200,7 @@ public class Model implements Serializable {
             if (roadType.equals("tertiary")) {
 
                 Node nodeFrom = way.get(0);
-                DigraphNodeToIndex.put(nodeFrom, 0);
+                DigraphNodeToIndex.put(nodeFrom, 0); //? is all from 0? for all values in the hashmap
                 for (int i = 1; i < way.size(); i++) {
                     // Distance is the distance between the latitude ang longitude pair
                     //input lat 1 lat 2 and lon 1 lon 2
@@ -206,6 +208,7 @@ public class Model implements Serializable {
                     double weight = distance(nodeFrom.lat, nodeto.lat, nodeFrom.lon, nodeto.lon) / maxSpeed;
                     EWD_Temp.add(new DirectedEdge(i-1, i, weight));
                     DigraphNodeToIndex.put(nodeto, i);
+                    IndexToNode.put(i, nodeto);
                 }
 
             } else {
@@ -221,6 +224,18 @@ public class Model implements Serializable {
         }
 
     }
+    // Dijkstra implementation
+    public void StartDijstra(Address startaddress){
+        this.Dijkstra = new SP(this.EWD,DigraphNodeToIndex.get(addressIdMap.get(startaddress))); // this starts the dijkstra search from the index that refferes to a node
+    }
+
+    public List<Node> getDijkstraPath(Address Endaddress) {
+        // List<Node> path = new ArrayList<>(); // this is everything that needs to be drawed for the path
+        Dijkstra.pathTo(DigraphNodeToIndex.get(addressIdMap.get(Endaddress))); // index
+        // Needs to return nodes
+        return null; // Returns drawing path
+    }
+
     private void parseTXT(String filename) throws FileNotFoundException {
         File f = new File(filename);
         try (Scanner s = new Scanner(f)) {
@@ -366,17 +381,7 @@ public class Model implements Serializable {
         populateKDTree(kdTree, nodes.subList(medianIndex+1, nodes.size()), depth);
     }
 
-    // Dijkstra implementation
-    public void StartDijstra(Address startaddress){
-        this.Dijkstra = new SP(this.EWD,DigraphNodeToIndex.get(addressIdMap.get(startaddress))); // this starts the dijkstra search from the index that refferes to a node
-    }
 
-    public List<Node> getDijkstraPath(Address Endaddress) {
-       // List<Node> path = new ArrayList<>(); // this is everything that needs to be drawed for the path
-        Dijkstra.pathTo(DigraphNodeToIndex.get(addressIdMap.get(Endaddress))); // index
-        // Needs to return nodes
-        return null; // Returns drawing path
-    }
     // Converts canvas coordinates to geo coordinates or vice versa, depending on true/false
     public Point2D convertToCoordinates(Point2D pointFromCanvas, Boolean toGeoCoord, Affine trans){
         try{
