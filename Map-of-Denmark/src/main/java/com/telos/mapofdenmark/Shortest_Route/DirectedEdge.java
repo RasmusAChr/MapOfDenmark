@@ -1,7 +1,9 @@
 package com.telos.mapofdenmark.Shortest_Route;
 //Class aquired from slides from algo
 
-public class DirectedEdge {
+import java.io.Serializable;
+
+public class DirectedEdge implements Serializable {
     private final int V,W;
     private final double weight;
     public DirectedEdge(int V, int W, double weight) {

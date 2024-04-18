@@ -117,7 +117,7 @@ public class Controller {
     private void StartSearch(){
         String input = searchBar.getText();
         Node node = model.getAddressIdMap().get(input);
-        model.StartDijstra(node);
+        model.StartDijkstra(node);
     }
 
     @FXML

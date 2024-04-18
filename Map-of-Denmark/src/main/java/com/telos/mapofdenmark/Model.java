@@ -49,6 +49,7 @@ public class Model implements Serializable {
     HashMap<Node, Integer> DigraphNodeToIndex;
     HashMap<Integer, Node> IndexToNode;
     int roadCount;
+    ArrayList<ArrayList<DirectedEdge>> roadTemp;
 
 
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
@@ -62,6 +63,7 @@ public class Model implements Serializable {
 
 
     public Model(String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
+        this.roadTemp = new ArrayList<>();
         this.EWD_Temp = new Bag<>();
         this.DigraphNodeToIndex = new HashMap<>();
         this.IndexToNode = new HashMap<>();
@@ -199,34 +201,39 @@ public class Model implements Serializable {
         }
     }
     private void EdgeweightedDigraphModifier(String roadType, int maxSpeed, ArrayList<Node> way, boolean roadDirection) {
+        System.out.println(roadCount + " This is the current RoadCount");
+        System.out.println(roadTemp.size() + " This is the current value of roadTemp");
+
         if (roadDirection) {
             if (roadType.equals("tertiary")) {
-                ArrayList<ArrayList<DirectedEdge>> roadTemp = new ArrayList<>();
                 Node nodeFrom = way.get(0);
                 if (!DigraphNodeToIndex.containsKey(nodeFrom)) {
                     roadTemp.add(new ArrayList<>());
-                    DigraphNodeToIndex.put(nodeFrom, roadCount++);
+                    //roadCount++;
+                    DigraphNodeToIndex.put(nodeFrom, roadCount);
                     IndexToNode.put(roadCount, nodeFrom);
+                    roadCount++;
                 }
                 for (int i = 1; i < way.size(); i++) {
                     // Distance is the distance between the latitude ang longitude pair
                     // Input lat 1 lat 2 and lon 1 lon 2
                     Node nodeTo = way.get(i);
                     if (!DigraphNodeToIndex.containsKey(nodeTo)) {
-                        //roadTemp.add(new ArrayList<>());
-                        DigraphNodeToIndex.put(nodeTo, roadCount + i);
-                        IndexToNode.put(roadCount + i, nodeTo);
+                        roadTemp.add(new ArrayList<>());
+                        DigraphNodeToIndex.put(nodeTo, roadCount);
+                        IndexToNode.put(roadCount, nodeTo);
                         int roadFromIndex = DigraphNodeToIndex.get(nodeFrom);
                         double weight = distance(nodeFrom.lat, nodeTo.lat, nodeFrom.lon, nodeTo.lon) / maxSpeed;
-                        roadTemp.add(DigraphNodeToIndex.get(nodeFrom), new ArrayList<>(Arrays.asList(new DirectedEdge(roadFromIndex, roadCount +i, weight))));
+                        roadTemp.add(new ArrayList<>(List.of(new DirectedEdge(roadFromIndex, roadCount, weight))));
+                        roadCount++;
                     } else {
                         double weight = distance(nodeFrom.lat, nodeTo.lat, nodeFrom.lon, nodeTo.lon) / maxSpeed;
                         int roadFromIndex = DigraphNodeToIndex.get(nodeFrom);
-                        roadTemp.get(roadFromIndex).add(new DirectedEdge(roadFromIndex, roadCount + i, weight));
+                        int roadToIndex = DigraphNodeToIndex.get(nodeTo);
+                        roadTemp.get(roadFromIndex).add(new DirectedEdge(roadFromIndex, roadToIndex, weight));
                     }
                     nodeFrom = nodeTo;
                 }
-                roadCount += way.size();
 
             } else {
 
@@ -242,8 +249,8 @@ public class Model implements Serializable {
 
     }
     // Dijkstra implementation
-    public void StartDijstra(Node startaddress){
-        this.Dijkstra = new SP(this.EWD,DigraphNodeToIndex.get(startaddress)); // this starts the dijkstra search from the index that refferes to a node
+    public void StartDijkstra(Node startaddress){
+        this.Dijkstra = new SP(this.EWD,this.DigraphNodeToIndex.get(startaddress)); // this starts the dijkstra search from the index that refferes to a node
     }
 
     /**

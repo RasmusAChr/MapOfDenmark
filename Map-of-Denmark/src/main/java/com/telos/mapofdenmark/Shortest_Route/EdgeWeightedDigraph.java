@@ -1,14 +1,23 @@
 package com.telos.mapofdenmark.Shortest_Route;
 
+import java.util.ArrayList;
+
 public class EdgeWeightedDigraph {
     private final int V;
     private final Bag<DirectedEdge>[] adj;
 
-    public EdgeWeightedDigraph(int V){
+    public EdgeWeightedDigraph(int V, ArrayList<ArrayList<DirectedEdge>> roads){
         this.V = V;
         adj = (Bag<DirectedEdge>[]) new Bag[V];
-        for (int v = 0; v < V; v++)
-            adj[v] = new Bag<DirectedEdge>();
+
+        int i = 0;
+        for (ArrayList<DirectedEdge> road : roads) {
+            adj[i] = new Bag<>();
+            for (DirectedEdge e : road) {
+                adj[i].add(e);
+            }
+            i++;
+        }
     }
     public void addEdge(DirectedEdge e)
     {
