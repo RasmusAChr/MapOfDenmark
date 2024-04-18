@@ -176,7 +176,7 @@ public class Model implements Serializable {
                         ways.add(new Way(way));
                     }
                     if (addingRoad) {
-                        EdgeweightedDigraphModifier(addingsRoadV, addingRoadSpeed, way, addingsRoadDirection);
+                       // EdgeweightedDigraphModifier(addingsRoadV, addingRoadSpeed, way, addingsRoadDirection);
                     }
 //                    ways.add(new Way(way));
                     //Way newWay = new Way(way);
