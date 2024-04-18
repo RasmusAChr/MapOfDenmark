@@ -51,6 +51,8 @@ public class Controller {
     private ListView<String> suggestionsBox; // The ListView to display suggestions
     @FXML
     private TextField searchBar;
+    @FXML
+    private TextField searchBar1;
 
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
@@ -120,16 +122,17 @@ public class Controller {
 
     @FXML
     private void StartSearch(){
-        System.out.println("StartSearch");
-      // model.StartDijstra(searchBar.getText());
+        String input = searchBar.getText();
+        Node node = model.getAddressIdMap().get(input);
+        model.StartDijstra(node);
     }
 
     @FXML
     private void StopSearch(){
-        System.out.println("EndSearch");
-        // input address
-        //model.getDijkstraPath();
-                // Returns int or notes?
+        String input = searchBar1.getText();
+        Node node = model.getAddressIdMap().get(input);
+        model.getDijkstraPath(node);
+
     }
 
     @FXML

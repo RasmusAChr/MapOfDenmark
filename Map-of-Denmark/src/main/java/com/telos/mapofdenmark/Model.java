@@ -48,6 +48,7 @@ public class Model implements Serializable {
     Bag<DirectedEdge> EWD_Temp;
     HashMap<Node, Integer> DigraphNodeToIndex;
     HashMap<Integer, Node> IndexToNode;
+    int roadCount;
 
 
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
@@ -61,6 +62,10 @@ public class Model implements Serializable {
 
 
     public Model(String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
+        this.EWD_Temp = new Bag<>();
+        this.DigraphNodeToIndex = new HashMap<>();
+        this.IndexToNode = new HashMap<>();
+        this.roadCount = 0;
         this.addressList = new ArrayList<>();
         this.address = new Address();
         this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
@@ -74,9 +79,7 @@ public class Model implements Serializable {
         save(filename+".obj");
         this.trie = deserializeTrie("data/.obj");
         this.kdTree = new KDTree();
-        this.EWD_Temp = new Bag<>();
-        this.DigraphNodeToIndex = new HashMap<>();
-        this.IndexToNode = new HashMap<>();
+
     }
 
 
@@ -198,18 +201,32 @@ public class Model implements Serializable {
   /*  private void EdgeweightedDigraphModifier(String roadType, int maxSpeed, ArrayList<Node> way, boolean roadDirection) {
         if (roadDirection) {
             if (roadType.equals("tertiary")) {
-
+                ArrayList<ArrayList<DirectedEdge>> roadTemp = new ArrayList<>();
                 Node nodeFrom = way.get(0);
-                DigraphNodeToIndex.put(nodeFrom, 0); //? is all from 0? for all values in the hashmap
+                if (!DigraphNodeToIndex.containsKey(nodeFrom)) {
+                    roadTemp.add(new ArrayList<>());
+                    DigraphNodeToIndex.put(nodeFrom, roadCount++);
+                    IndexToNode.put(roadCount, nodeFrom);
+                }
                 for (int i = 1; i < way.size(); i++) {
                     // Distance is the distance between the latitude ang longitude pair
-                    //input lat 1 lat 2 and lon 1 lon 2
-                    Node nodeto = way.get(i);
-                    double weight = distance(nodeFrom.lat, nodeto.lat, nodeFrom.lon, nodeto.lon) / maxSpeed;
-                    EWD_Temp.add(new DirectedEdge(i-1, i, weight));
-                    DigraphNodeToIndex.put(nodeto, i);
-                    IndexToNode.put(i, nodeto);
+                    // Input lat 1 lat 2 and lon 1 lon 2
+                    Node nodeTo = way.get(i);
+                    if (!DigraphNodeToIndex.containsKey(nodeTo)) {
+                        //roadTemp.add(new ArrayList<>());
+                        DigraphNodeToIndex.put(nodeTo, roadCount + i);
+                        IndexToNode.put(roadCount + i, nodeTo);
+                        int roadFromIndex = DigraphNodeToIndex.get(nodeFrom);
+                        double weight = distance(nodeFrom.lat, nodeTo.lat, nodeFrom.lon, nodeTo.lon) / maxSpeed;
+                        roadTemp.add(DigraphNodeToIndex.get(nodeFrom), new ArrayList<>(Arrays.asList(new DirectedEdge(roadFromIndex, roadCount +i, weight))));
+                    } else {
+                        double weight = distance(nodeFrom.lat, nodeTo.lat, nodeFrom.lon, nodeTo.lon) / maxSpeed;
+                        int roadFromIndex = DigraphNodeToIndex.get(nodeFrom);
+                        roadTemp.get(roadFromIndex).add(new DirectedEdge(roadFromIndex, roadCount + i, weight));
+                    }
+                    nodeFrom = nodeTo;
                 }
+                roadCount += way.size();
 
             } else {
 
@@ -225,15 +242,35 @@ public class Model implements Serializable {
 
     }*/
     // Dijkstra implementation
-    public void StartDijstra(Address startaddress){
-        this.Dijkstra = new SP(this.EWD,DigraphNodeToIndex.get(addressIdMap.get(startaddress))); // this starts the dijkstra search from the index that refferes to a node
+    public void StartDijstra(Node startaddress){
+        this.Dijkstra = new SP(this.EWD,DigraphNodeToIndex.get(startaddress)); // this starts the dijkstra search from the index that refferes to a node
     }
 
-    public List<Node> getDijkstraPath(Address Endaddress) {
-        // List<Node> path = new ArrayList<>(); // this is everything that needs to be drawed for the path
-        Dijkstra.pathTo(DigraphNodeToIndex.get(addressIdMap.get(Endaddress))); // index
-        // Needs to return nodes
-        return null; // Returns drawing path
+    /**
+     * Since it iterates backwards from the end goal to the front that won't matter since the distance/ drawn area will be the same
+     * This will then create a Hashset to check if the node has already been added since it is constant time O(1)
+     * where looking it up in the list would have been linear time O(n) which in turn would have taken longer depending on the size of the path.
+     * Therefore, we chose to use a Hashset for more optimal timing.
+     * This will then return the paths ass nodes in an arraylist goning for index 0 being the final node up to the first node at n place in the array.
+     * This will make it easier to draw since we know have a new Way of those nodes to be drawn.
+     *
+     * @param Endaddress The end addres for Dijkstras algorithm
+     * @return Returns a list of nodes in order from start to finish
+     */
+    public List<Node> getDijkstraPath(Node Endaddress) {
+         List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
+         HashSet<Node> NodeAdded = new HashSet<Node>();
+
+         for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(Endaddress))) {
+             if (!NodeAdded.contains(IndexToNode.get(i.to()))) { // adds the two points because it iterates backwards
+                 NodeAdded.add(IndexToNode.get(i.to()));
+                 path.add(IndexToNode.get(i.to()));
+             } else if (!NodeAdded.contains(IndexToNode.get(i.from()))) {
+                 NodeAdded.add(IndexToNode.get(i.from()));
+                 path.add(IndexToNode.get(i.from()));
+             }
+         }
+        return path;
     }
 
     private void parseTXT(String filename) throws FileNotFoundException {
