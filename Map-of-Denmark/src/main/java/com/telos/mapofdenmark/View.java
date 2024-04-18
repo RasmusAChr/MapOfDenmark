@@ -28,7 +28,6 @@ public class View {
     double y1 = 100;
     double x2 = 200;
     double y2 = 800;
-
     Affine trans = new Affine();
 
     Model model;
@@ -69,8 +68,8 @@ public class View {
         primaryStage.setScene(scene);
         primaryStage.show();
         redraw();
-        pan(-0.56*model.minlon, model.maxlat);
-        zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
+        //pan(-0.56*model.minlon, model.maxlat);
+        //zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
         //Listens for changes done to the width then changes the canvas acordingly
         primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> resizePanes(primaryStage.getWidth(), primaryStage.getHeight()));
         //Listens for changes done to the Height then changes the canvas acordingly
@@ -170,12 +169,15 @@ public class View {
 //        Queue<Node> nodes = model.kdTree.rangeSearch(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
 //        System.out.println("Bounds getMinX: " + bounds.getMinX() + " Bounds getMaxX: " + bounds.getMaxX() + " Bounds getMinY: " + bounds.getMinY()+ " Bounds getMaxY: " + bounds.getMaxY());
 //        return nodes;
-
+        Boolean isZero = false;
         Rectangle2D bounds = getCanvasCoordAsGeoCoord();
         Queue<Node> nodes = model.kdTree.rangeSearch(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
         System.out.println("Bounds: " + bounds);
         System.out.println("Size of KDTree: " + model.kdTree.size());
         System.out.println("Nodes returned: " + nodes.size());
+        if(nodes.size()<=1){
+            isZero = true;
+        }
         return nodes;
     }
 

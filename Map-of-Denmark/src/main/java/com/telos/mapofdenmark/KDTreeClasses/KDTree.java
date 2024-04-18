@@ -225,6 +225,7 @@ public class KDTree
 
     public Queue<Node> rangeSearch(double xMin, double xMax, double yMin, double yMax)
     {
+        System.out.println("Range Searching for these param: xMin:"+xMin+" xMax:"+xMax+" yMin:"+yMin+" yMax:"+yMax);
         Queue<Node> queue = new LinkedList<>();
         rangeSearch(root, queue, xMin, xMax, yMin, yMax, 0);
         return queue;
@@ -232,11 +233,12 @@ public class KDTree
 
     private void rangeSearch(KDNode x, Queue<Node> queue, double xMin, double xMax, double yMin, double yMax, int depth)
     {
-        int axis = depth % 2;
         if (x == null) return;
+
+        int axis = depth % 2;
         double cmplo; //CompareToLow
         double cmphi; //CompareToHigh
-        // if the axis is 0, compare the x value long else compare lat
+        // if the axis is 0, compare the x value long else comp     are lat
         if(axis == 0){
             // Sort based on the x-axis
              cmplo = Double.compare(xMin,x.x);
