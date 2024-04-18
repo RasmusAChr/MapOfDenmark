@@ -14,9 +14,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.stage.Stage;
+import com.telos.mapofdenmark.Node;
 
+import javax.swing.text.Position;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Queue;
 
 public class View {
     Canvas canvas = new Canvas(1091.0, 638.0);
@@ -39,7 +42,6 @@ public class View {
 
     public View(Model model, Stage primaryStage) throws IOException {
         this.model = model;
-
         primaryStage.setTitle("Map of Denmark");
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/telos/mapofdenmark/235861.png")));
         primaryStage.getIcons().add(image);
@@ -52,6 +54,7 @@ public class View {
         Controller controller = loader.getController();
         // intizalise the rest of the controller with the model and view to run commands on
         controller.init(model,this);
+        setupAffine(canvas.getWidth(), canvas.getHeight(), model.getMinlon(), model.getMaxlon(),model.getMinlat(), model.getMaxlat());
 
         Scene scene = new Scene(root);
         //Looks for the node in the scene graph hiearchy by the ID #mapPane.
@@ -86,12 +89,28 @@ public class View {
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
         gc.setLineWidth(1/Math.sqrt(trans.determinant()));
-        for (var line : model.list) {
+        /*for (var line : model.list) {
             line.draw(gc);
         }
+
         for (var way : model.ways) {
             way.draw(gc);
+        }*/
+
+        for (Object nodeSpatial : getNodesFromSpatial()) {
+            Node node = (Node) nodeSpatial;
+            if (node.getWay() != null) {
+                node.getWay().draw(gc);
+            }
+            //node.getWay().draw(gc);
         }
+        System.out.println("Redrawing, number of ways: " + getNodesFromSpatial().size()); // Debug the count of ways
+
+//        for (Node node : model.kdTree.rangeSearch(minlon, maxlon, minlat, maxlat)) {
+//            Point2D point = model.convertToCoordinates(new Point2D(node.getLon(), node.getLat()), false, trans);
+//            gc.lineTo(point.getX(), point.getY());
+//            System.out.println("Drawing node at: " + point.getX() + ", " + point.getY());
+//        }
     }
 
     void pan(double dx, double dy) {
@@ -123,22 +142,88 @@ public class View {
             // TODO Auto-generated catch block
             throw new RuntimeException(e);
         }
-
     }
 
     public Rectangle2D getCanvasCoordAsGeoCoord(){
-        // Gets the canvas coordinates for top left coordinate and bottom right coordinate
-        Point2D mapPaneTopLeft = mapPane.sceneToLocal(canvas.localToScene(x1,y1));
-        Point2D mapPaneBottomRight = mapPane.sceneToLocal(canvas.localToScene(x2,y2));
+//        // Gets the canvas coordinates for top left coordinate and bottom right coordinate
+//        Point2D mapPaneTopLeft = mapPane.sceneToLocal(canvas.localToScene(x1,y1));
+//        Point2D mapPaneBottomRight = mapPane.sceneToLocal(canvas.localToScene(x2,y2));
+//
+//        // Converts top left and bottom right coordinates to geo coordinates using the model's method
+//        Point2D geoTopLeft = model.convertToCoordinates(mapPaneTopLeft, true, trans);
+//        Point2D geoBottomRight = model.convertToCoordinates(mapPaneBottomRight, true, trans);
+//
+//        //System.out.println("Canvas to Geo Coordinates x1 and y1: " + model.convertToCoordinates(mapPaneTopLeft, true, trans));
+//        //System.out.println("Canvas to Geo Coordinates x2 and y2: " + model.convertToCoordinates(mapPaneBottomRight, true, trans));
+//
+//        // Creates a Rectangle2D object with the geo coordinates
+//        return new Rectangle2D(geoTopLeft.getX(), geoTopLeft.getY(),(geoBottomRight.getX() - geoTopLeft.getX()), (geoBottomRight.getY() - geoTopLeft.getY()));
 
-        // Converts top left and bottom right coordinates to geo coordinates using the model's method
+        Point2D mapPaneTopLeft = mapPane.sceneToLocal(canvas.localToScene(x1, y1));
+        Point2D mapPaneBottomRight = mapPane.sceneToLocal(canvas.localToScene(x2, y2));
+
         Point2D geoTopLeft = model.convertToCoordinates(mapPaneTopLeft, true, trans);
         Point2D geoBottomRight = model.convertToCoordinates(mapPaneBottomRight, true, trans);
 
-        // Creates a Rectangle2D object with the geo coordinates
-        return new Rectangle2D(geoTopLeft.getX(), geoTopLeft.getY(),geoBottomRight.getX() - geoTopLeft.getX(), geoBottomRight.getY() - geoTopLeft.getY());
+        double minX = Math.min(geoTopLeft.getX(), geoBottomRight.getX());
+        double minY = Math.min(geoTopLeft.getY(), geoBottomRight.getY());
+        double width = Math.abs(geoBottomRight.getX() - geoTopLeft.getX());
+        double height = Math.abs(geoBottomRight.getY() - geoTopLeft.getY());
+
+        System.out.println("Geo Coordinates - TopLeft: " + geoTopLeft + ", BottomRight: " + geoBottomRight);
+        System.out.println("Calculated Rectangle - MinX: " + minX + ", MinY: " + minY + ", Width: " + width + ", Height: " + height);
+
+        return new Rectangle2D(minX, minY, width, height);
     }
 
+    public Queue<Node> getNodesFromSpatial(){
+        /*System.out.println("MinX: " + getCanvasCoordAsGeoCoord().getMinX());
+        System.out.println("MinY: " + getCanvasCoordAsGeoCoord().getMinY());
+        System.out.println("Width: " + getCanvasCoordAsGeoCoord().getWidth());
+        System.out.println("Height: " + getCanvasCoordAsGeoCoord().getHeight());*/
+        Rectangle2D bounds = getCanvasCoordAsGeoCoord();
+        Queue<Node> nodes = model.kdTree.rangeSearch(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
+        return nodes;
+        /*return model.kdTree.rangeSearch(getCanvasCoordAsGeoCoord().getMinX(),
+                                        getCanvasCoordAsGeoCoord().getWidth(),
+                                        getCanvasCoordAsGeoCoord().getMinY(),
+                                        getCanvasCoordAsGeoCoord().getHeight());
+        //return model.kdTree.rangeSearch(0,40,0,40);
+         */
+    }
 
+    public void setupAffine(double width, double height, double minLon, double maxLon, double minLat, double maxLat){
+//        double scaleX = width/ (maxLon - minLon);
+//        double scaleY = height / (maxLat - minLat);
+//        trans = new Affine();
+//        trans.appendScale(scaleX, -scaleY);
+//        trans.appendTranslation(-minLon * scaleX, -minLat * scaleY);
+//        System.out.println("Affine Transform Set: " + trans);
+
+        double scaleX = width / (maxLon - minLon);
+        double scaleY = height / (maxLat - minLat);
+
+        Point2D mapCenter = calculateCenter(model.getMinlon(), model.getMaxlon(),model.getMinlat(), model.getMaxlat());
+
+        double translateX = width / 2 - mapCenter.getX() * scaleX;
+        double translateY = width / 2 - mapCenter.getY() * scaleY;
+
+        // Reset transformations for testing without extreme offsets
+        trans = new Affine();
+        trans.appendScale(scaleX, -scaleY); // Negate scaleY to flip Y-axis
+        trans.appendTranslation(-minLon * scaleX, -maxLat * scaleY);
+        System.out.println("Affine Transform Set: " + trans);
+        Position position;
+    }
+
+    public Point2D calculateCenter(double minLon, double maxLon, double minLat, double maxLat){
+        // Calculates center for latitude
+        double centerLat = (minLat + maxLat) / 2;
+
+        // Calculates center for longitude
+        double centerLon = (minLon + maxLon) / 2;
+
+        return new Point2D(centerLat, centerLon);
+    }
 
 }

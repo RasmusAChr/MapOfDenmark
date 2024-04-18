@@ -145,7 +145,7 @@ public class Model implements Serializable {
                 if(name.equals("node")){
                     if (address != null && !address.getStreet().isBlank()) {
                         addressList.add(address);
-                        System.out.println(addressId);
+                        //System.out.println(addressId);
                         addressIdMap.put(address.getFullAdress().toLowerCase(), id2node.get(addressId));
                         addressId = 0;
                         address = null; // Reset for the next address
@@ -288,10 +288,6 @@ public class Model implements Serializable {
         if (medianIndex + 1 < nodeList.size()) populateKDTree(kdTree, nodes.subList(medianIndex+1, nodes.size()), depth);
     }*/
 
-
-
-
-
     // Converts canvas coordinates to geo coordinates or vice versa, depending on true/false
     public Point2D convertToCoordinates(Point2D pointFromCanvas, Boolean toGeoCoord, Affine trans){
         try{
@@ -300,22 +296,48 @@ public class Model implements Serializable {
                 Point2D geoCoordPoint = trans.inverseTransform(pointFromCanvas);
 
                 // Calculations to make sure the coordinates are within the bounds
-                double geoLon = Math.max(minlon, Math.min(maxlon, geoCoordPoint.getX()));
-                double geoLat = Math.max(minlat, Math.min(maxlat, geoCoordPoint.getY()));
-                return new Point2D(geoLon, geoLat);
+                //double geoLon = Math.max(minlon, Math.min(maxlon, geoCoordPoint.getX()));
+                //double geoLat = Math.max(minlat, Math.min(maxlat, geoCoordPoint.getY()));
+
+                //return new Point2D(geoLon, geoLat);
+                return new Point2D(geoCoordPoint.getX(), geoCoordPoint.getY());
             }
             // Vice versa
             else{
-                double reverseLon = Math.max(minlon, Math.min(maxlon, pointFromCanvas.getX()));
-                double reverseLat = Math.max(minlat, Math.min(maxlat, pointFromCanvas.getY()));
+                //double reverseLon = Math.max(minlon, Math.min(maxlon, pointFromCanvas.getX()));
+                //double reverseLat = Math.max(minlat, Math.min(maxlat, pointFromCanvas.getY()));
 
-                Point2D canvasPoint = new Point2D(reverseLon, reverseLat);
+                //Point2D canvasPoint = new Point2D(reverseLon, reverseLat);
+                Point2D canvasPoint = new Point2D(pointFromCanvas.getX(), pointFromCanvas.getY());
                 return trans.transform(canvasPoint);
             }
+
+//            if (toGeoCoord) {
+//                Point2D geoCoordPoint = trans.inverseTransform(pointFromCanvas);
+//                System.out.println("Converting canvas to geo: " + geoCoordPoint.toString());
+//                return geoCoordPoint;
+//            } else {
+//                Point2D canvasPoint = trans.transform(pointFromCanvas);
+//                System.out.println("Converting geo to canvas: " + canvasPoint.toString());
+//                return canvasPoint;
+//            }
         }catch(NonInvertibleTransformException e){
             System.out.println(e.getMessage());
             return null;
         }
+    }
+
+    public double getMinlon(){
+        return minlon;
+    }
+    public double getMaxlon(){
+        return maxlon;
+    }
+    public double getMinlat(){
+        return minlat;
+    }
+    public double getMaxlat(){
+        return maxlat;
     }
 
 

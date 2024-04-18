@@ -12,7 +12,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
+import java.util.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -69,6 +69,7 @@ public class Controller {
 
             lastX = e.getX();
             lastY = e.getY();
+
         });
       /*  view.canvas.setOnScroll(e -> {
             double factor = e.getDeltaY();

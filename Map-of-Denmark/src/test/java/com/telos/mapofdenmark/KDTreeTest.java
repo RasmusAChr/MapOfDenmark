@@ -58,7 +58,14 @@ class KDTreeTest {
         tree.populate(listOfNodes);
         tree.levelOrderTraverse();
     }
-
-
+    @Test
+    void testRangeSearch(){
+        List<Node> listOfNodes = new ArrayList<>();
+        for(int i = 0 ; i < 10 ; i++){
+            listOfNodes.add(new Node(i,i));
+        }
+        tree.populate(listOfNodes);
+        assertEquals(3, tree.rangeSearch(0,2,0,2).size());
+    }
 }
 

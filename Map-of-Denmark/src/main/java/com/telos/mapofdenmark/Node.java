@@ -24,4 +24,7 @@ public class Node implements Serializable {
         this.way = way;
     }
 
+    public Way getWay() {
+        return this.way;
+    }
 }

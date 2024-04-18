@@ -222,4 +222,34 @@ public class KDTree
         // Right Recursive Call, Handles the elements after the median index by only providing from the median index+1 (avoids duplicates) to the end of the list
         if (medianIndex + 1 < nodelist.size()) populateKDTree(nodelist.subList(medianIndex+1, nodelist.size()), depth);
     }
+
+    public Queue<Node> rangeSearch(double xMin, double xMax, double yMin, double yMax)
+    {
+        Queue<Node> queue = new LinkedList<>();
+        rangeSearch(root, queue, xMin, xMax, yMin, yMax, 0);
+        return queue;
+    }
+
+    private void rangeSearch(KDNode x, Queue<Node> queue, double xMin, double xMax, double yMin, double yMax, int depth)
+    {
+        int axis = depth % 2;
+        if (x == null) return;
+        double cmplo; //CompareToLow
+        double cmphi; //CompareToHigh
+        // if the axis is 0, compare the x value long else compare lat
+        if(axis == 0){
+            // Sort based on the x-axis
+             cmplo = Double.compare(xMin,x.x);
+             cmphi = Double.compare(xMax,x.x);
+
+        } else {
+            // Sort based on the y-axis
+             cmplo = Double.compare(yMin,x.y);
+             cmphi = Double.compare(yMax,x.y);
+        }
+        if (cmplo < 0) rangeSearch(x.left, queue, xMin, xMax, yMin, yMax, depth+1);
+        if (cmplo <= 0 && cmphi >= 0) queue.add(x.val);
+        if (cmphi > 0) rangeSearch(x.right, queue, xMin, xMax, yMin, yMax, depth+1);
+    }
+
 }
