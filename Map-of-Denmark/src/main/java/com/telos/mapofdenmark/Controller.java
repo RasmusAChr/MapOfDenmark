@@ -113,9 +113,7 @@ public class Controller {
     }
     @FXML
     private void StartSearch(){
-        // input address
-
-        //model.StartDijstra();
+       model.StartDijstra(searchBar.getText());
     }
 
     @FXML
