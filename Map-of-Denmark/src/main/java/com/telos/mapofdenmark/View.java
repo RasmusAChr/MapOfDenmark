@@ -211,7 +211,7 @@ public class View {
         // Reset transformations for testing without extreme offsets
         trans = new Affine();
         trans.appendScale(scaleX, -scaleY); // Negate scaleY to flip Y-axis
-        trans.appendTranslation(-minLon * scaleX, -maxLat * scaleY);
+        trans.appendTranslation(-mapCenter.getX() * scaleX, -mapCenter.getY() * scaleY);
         System.out.println("Affine Transform Set: " + trans);
         Position position;
     }
