@@ -81,7 +81,7 @@ public class View {
         gc.setTransform(new Affine());
         if(dark) {
             gc.setStroke(Color.WHITE);
-            gc.setFill(Color.LIGHTGRAY);
+            gc.setFill(Color.DARKGRAY);
         } else{
             gc.setFill(Color.WHITE);
             gc.setStroke(Color.BLACK);

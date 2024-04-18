@@ -25,12 +25,10 @@
                      <children>
                         <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="94.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
                            <children>
-                              <Button id="fileBtn" fx:id="fileBtn" alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#readFile" prefHeight="94.0" prefWidth="100.0" />
-                              <ImageView fitHeight="60.0" fitWidth="54.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@GUI%20Icons/icons8-folder-512.png" />
-                                 </image>
-                              </ImageView>
+                              <Button id="fileBtn" fx:id="fileBtn" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSearch" prefHeight="94.0" prefWidth="100.0" text="SEARCH">
+                                 <font>
+                                    <Font name="Bodoni MT Black" size="15.0" />
+                                 </font></Button>
                            </children>
                         </StackPane>
                         <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="94.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
@@ -68,11 +66,11 @@
                   <Pane fx:id="backgroundPane" prefHeight="200.0" prefWidth="1018.0" BorderPane.alignment="CENTER">
                      <children>
                         <Pane fx:id="mapPane" blendMode="SRC_ATOP" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="638.0" prefWidth="1003.0" />
-                        <TextField fx:id="searchBar" layoutX="22.0" layoutY="17.0" onInputMethodTextChanged="#StartSearch" prefHeight="54.0" prefWidth="334.0" promptText="From" style="-fx-background-radius: 50;">
+                        <TextField fx:id="searchBar" layoutX="22.0" layoutY="17.0" onInputMethodTextChanged="#StartSearch" prefHeight="54.0" prefWidth="334.0" promptText="TO" style="-fx-background-radius: 50;">
                            <font>
                               <Font name="Bodoni MT" size="25.0" />
                            </font></TextField>
-                        <TextField fx:id="searchBar1" layoutX="360.0" layoutY="17.0" onInputMethodTextChanged="#StopSearch" prefHeight="54.0" prefWidth="334.0" promptText="To" style="-fx-background-radius: 50;">
+                        <TextField fx:id="searchBar1" layoutX="360.0" layoutY="17.0" onInputMethodTextChanged="#StopSearch" prefHeight="54.0" prefWidth="334.0" promptText="FROM" style="-fx-background-radius: 50;">
                            <font>
                               <Font name="Bodoni MT" size="25.0" />
                            </font>

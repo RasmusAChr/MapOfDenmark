@@ -112,12 +112,21 @@ public class Controller {
           });
     }
     @FXML
+    private void handleSearch() {
+        StartSearch();
+        StopSearch();
+    }
+
+
+    @FXML
     private void StartSearch(){
-       model.StartDijstra(searchBar.getText());
+        System.out.println("StartSearch");
+      // model.StartDijstra(searchBar.getText());
     }
 
     @FXML
     private void StopSearch(){
+        System.out.println("EndSearch");
         // input address
         //model.getDijkstraPath();
                 // Returns int or notes?

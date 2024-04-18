@@ -171,7 +171,7 @@ public class Model implements Serializable {
                         ways.add(new Way(way));
                     }
                     if (addingRoad) {
-                        EdgeweightedDigraphModifier(addingsRoadV, addingRoadSpeed, way, addingsRoadDirection);
+                       // EdgeweightedDigraphModifier(addingsRoadV, addingRoadSpeed, way, addingsRoadDirection);
                     }
 //                    ways.add(new Way(way));
                     //Way newWay = new Way(way);
@@ -195,7 +195,7 @@ public class Model implements Serializable {
             }
         }
     }
-    private void EdgeweightedDigraphModifier(String roadType, int maxSpeed, ArrayList<Node> way, boolean roadDirection) {
+  /*  private void EdgeweightedDigraphModifier(String roadType, int maxSpeed, ArrayList<Node> way, boolean roadDirection) {
         if (roadDirection) {
             if (roadType.equals("tertiary")) {
 
@@ -223,7 +223,7 @@ public class Model implements Serializable {
             }
         }
 
-    }
+    }*/
     // Dijkstra implementation
     public void StartDijstra(Address startaddress){
         this.Dijkstra = new SP(this.EWD,DigraphNodeToIndex.get(addressIdMap.get(startaddress))); // this starts the dijkstra search from the index that refferes to a node
