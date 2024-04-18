@@ -12,7 +12,7 @@ public class SP_Tests {
         Digraph.addEdge(new DirectedEdge(0, 5, 0.5));
         SP Dijkstra = new SP(Digraph,0);
 
-        System.out.println(Dijkstra.pathTo(5));
+        System.out.println(Dijkstra.pathTo(3));
 
     }
 }
