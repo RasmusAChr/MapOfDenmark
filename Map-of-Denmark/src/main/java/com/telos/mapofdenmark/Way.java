@@ -20,10 +20,8 @@ public class Way implements Serializable {
     public void draw(GraphicsContext gc) {
         gc.beginPath();
         gc.moveTo(coords[0], coords[1]);
-        System.out.println("Draw was called");
         for (int i = 2 ; i < coords.length ; i += 2) {
             gc.lineTo(coords[i], coords[i+1]);
-            System.out.println("Drawing to: " + coords[i] + ", " + coords[i + 1]);
         }
         gc.stroke();
     }
