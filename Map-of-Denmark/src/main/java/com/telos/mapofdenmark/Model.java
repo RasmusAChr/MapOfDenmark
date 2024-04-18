@@ -242,8 +242,8 @@ public class Model implements Serializable {
 
     }*/
     // Dijkstra implementation
-    public void StartDijstra(Node startaddress){
-        this.Dijkstra = new SP(this.EWD,DigraphNodeToIndex.get(startaddress)); // this starts the dijkstra search from the index that refferes to a node
+    public void StartDijkstra(Node startaddress){
+        this.Dijkstra = new SP(this.EWD,this.DigraphNodeToIndex.get(startaddress)); // this starts the dijkstra search from the index that refferes to a node
     }
 
     /**

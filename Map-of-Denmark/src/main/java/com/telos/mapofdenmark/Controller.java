@@ -124,7 +124,7 @@ public class Controller {
     private void StartSearch(){
         String input = searchBar.getText();
         Node node = model.getAddressIdMap().get(input);
-        model.StartDijstra(node);
+        model.StartDijkstra(node);
     }
 
     @FXML
@@ -152,6 +152,7 @@ public class Controller {
             view.redraw();
         }
     }
+   /* To BE DELETED NOT USED
     @FXML
     private void readFile(){
         System.out.println("Attempting to show read file dialog");
@@ -175,7 +176,7 @@ public class Controller {
             System.out.println("error"); // or something else
         }
 
-    }
+    }*/
     @FXML
     private void placeInterest(){
         System.out.println("You clicked the interest button");

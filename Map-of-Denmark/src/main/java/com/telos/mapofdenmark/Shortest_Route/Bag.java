@@ -1,4 +1,5 @@
 package com.telos.mapofdenmark.Shortest_Route;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -22,7 +23,7 @@ import java.util.NoSuchElementException;
  *
  *  @param <Item> the generic type of each item in this bag
  */
-public class Bag<Item> implements Iterable<Item> {
+public class Bag<Item> implements Iterable<Item>, Serializable {
     private Node<Item> first;    // beginning of bag
     private int n;               // number of elements in bag
 
