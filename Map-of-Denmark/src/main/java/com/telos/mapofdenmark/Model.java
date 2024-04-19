@@ -45,7 +45,6 @@ public class Model implements Serializable {
     KDTree kdTree;
     Address address;
     EdgeWeightedDigraph EWD;
-    Bag<DirectedEdge> EWD_Temp;
     HashMap<Node, Integer> DigraphNodeToIndex;
     HashMap<Integer, Node> IndexToNode;
     int roadCount;
@@ -64,7 +63,6 @@ public class Model implements Serializable {
 
     public Model(String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
         this.roadTemp = new ArrayList<>();
-        this.EWD_Temp = new Bag<>();
         this.DigraphNodeToIndex = new HashMap<>();
         this.IndexToNode = new HashMap<>();
         this.roadCount = 0;
@@ -127,7 +125,7 @@ public class Model implements Serializable {
                     var id = Long.parseLong(input.getAttributeValue(null, "id"));
                     var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
                     var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
-                    Node tempNode = new Node(lat, lon);
+                    Node tempNode = new Node(id, lat, lon);
                     id2node.put(id, tempNode);
                     nodeList.add(tempNode);
                     addressId = id;
@@ -143,7 +141,7 @@ public class Model implements Serializable {
                 } else if (name == "tag") {
                     var v = input.getAttributeValue(null, "v");
                     var k = input.getAttributeValue(null, "k");
-                    if (k.equals("highway")) {
+                    if (k.equals("highway") && v.equals("tertiary")) {
                         roadtype = "highway";
                         addingRoad = true;
                         addingsRoadV = v;
@@ -176,9 +174,9 @@ public class Model implements Serializable {
                         ways.add(new Way(way));
                     }
                     if (addingRoad) {
-                       // EdgeweightedDigraphModifier(addingsRoadV, addingRoadSpeed, way, addingsRoadDirection);
+                       EdgeweightedDigraphModifier(addingsRoadV, addingRoadSpeed, way, addingsRoadDirection);
                     }
-//                    ways.add(new Way(way));
+//                  ways.add(new Way(way));
                     //Way newWay = new Way(way);
                     //ways.add(newWay);
                     // Ensuring that every node has a ref to the way it is apart of
@@ -199,6 +197,7 @@ public class Model implements Serializable {
                 }
             }
         }
+        EWD = new EdgeWeightedDigraph(roadTemp.size(),roadTemp);
     }
     private void EdgeweightedDigraphModifier(String roadType, int maxSpeed, ArrayList<Node> way, boolean roadDirection) {
         System.out.println(roadCount + " This is the current RoadCount");
@@ -250,8 +249,10 @@ public class Model implements Serializable {
     }
     // Dijkstra implementation
     public void StartDijkstra(Node startaddress){
-        this.Dijkstra = new SP(this.EWD,this.DigraphNodeToIndex.get(startaddress)); // this starts the dijkstra search from the index that refferes to a node
+        this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(findNodeByID(nodeList,"335909826"))); // this starts the dijkstra search from the index that refferes to a node
     }
+
+
 
     /**
      * Since it iterates backwards from the end goal to the front that won't matter since the distance/ drawn area will be the same
@@ -264,20 +265,35 @@ public class Model implements Serializable {
      * @param Endaddress The end addres for Dijkstras algorithm
      * @return Returns a list of nodes in order from start to finish
      */
-    public List<Node> getDijkstraPath(Node Endaddress) {
+    public void getDijkstraPath(Node Endaddress) {
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
-
-         for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(Endaddress))) {
+        System.out.println(Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList,"17232420"))));
+         for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList,"335909826")))) {
+            System.out.println(i);
              if (!NodeAdded.contains(IndexToNode.get(i.to()))) { // adds the two points because it iterates backwards
                  NodeAdded.add(IndexToNode.get(i.to()));
                  path.add(IndexToNode.get(i.to()));
+
              } else if (!NodeAdded.contains(IndexToNode.get(i.from()))) {
                  NodeAdded.add(IndexToNode.get(i.from()));
                  path.add(IndexToNode.get(i.from()));
              }
+
          }
-        return path;
+        System.out.println(path);
+        //return path;
+    }
+    // used for test
+    public Node findNodeByID(List<Node> nodeList, String id) {
+
+        for (Node node : nodeList) {
+            if(node.getId().equals(id)){
+                return node;
+            }
+        }
+        System.out.println("yes");
+        return null;
     }
 
     private void parseTXT(String filename) throws FileNotFoundException {
@@ -356,6 +372,8 @@ public class Model implements Serializable {
         serializeTrie(trie, "data/trie.obj");
         return trie;
     }
+
+
 
     private void serializeTrie(Trie trie, String filepath) {
         try (

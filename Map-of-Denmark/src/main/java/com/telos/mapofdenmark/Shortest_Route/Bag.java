@@ -28,7 +28,7 @@ public class Bag<Item> implements Iterable<Item>, Serializable {
     private int n;               // number of elements in bag
 
     // helper linked list class
-    private static class Node<Item> {
+    private static class Node<Item> implements Serializable {
         private Item item;
         private Node<Item> next;
     }

@@ -4,10 +4,12 @@ import java.io.Serializable;
 
 
 public class Node implements Serializable {
+    long id;
     double lat, lon;
     Way way;
 
-    public Node(double lat, double lon) {
+    public Node(long id, double lat, double lon) {
+        this.id = id;
         this.lat = lat;
         this.lon = lon;
         this.way = null;
@@ -24,4 +26,12 @@ public class Node implements Serializable {
         this.way = way;
     }
 
+    public String getId(){
+        return this.id + "";
+    }
+
+    @Override
+    public String toString() {
+        return "Node" + this.id;
+    }
 }
