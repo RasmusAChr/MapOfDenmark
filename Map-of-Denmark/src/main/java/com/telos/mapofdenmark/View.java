@@ -98,7 +98,7 @@ public class View {
         for (var way : model.ways) {
             way.draw(gc);
         }*/
-
+        /*
         for (Object nodeSpatial : getNodesFromSpatial()) {
             Node node = (Node) nodeSpatial;
             if (node.getWay() != null) {
@@ -106,7 +106,9 @@ public class View {
             }
             //node.getWay().draw(gc);
         }
-        System.out.println("Redrawing, number of ways: " + getNodesFromSpatial().size()); // Debug the count of ways
+
+         */
+        //System.out.println("Redrawing, number of ways: " + getNodesFromSpatial().size()); // Debug the count of ways
     }
 
     void pan(double dx, double dy) {
@@ -140,57 +142,57 @@ public class View {
         }
     }
 
-    public Rectangle2D getCanvasCoordAsGeoCoord(){
-//        Point2D mapPaneTopLeft = mapPane.sceneToLocal(canvas.localToScene(x1, y1));
-//        Point2D mapPaneBottomRight = mapPane.sceneToLocal(canvas.localToScene(x2, y2));
-//
-//        Point2D geoTopLeft = model.convertToCoordinates(mapPaneTopLeft, true, trans);
-//        Point2D geoBottomRight = model.convertToCoordinates(mapPaneBottomRight, true, trans);
-//
-//        double minX = Math.min(geoTopLeft.getX(), geoBottomRight.getX());
-//        double minY = Math.min(geoTopLeft.getY(), geoBottomRight.getY());
-//        double width = Math.abs(geoBottomRight.getX() - geoTopLeft.getX());
-//        double height = Math.abs(geoBottomRight.getY() - geoTopLeft.getY());
-//
-//        return new Rectangle2D(minX, minY, width, height);
-        Point2D geoTopLeft = mousetoModel(0, 0);
-        Point2D geoBottomRight = mousetoModel(canvas.getWidth(), canvas.getHeight());
 
-        double minX = Math.min(geoTopLeft.getX(), geoBottomRight.getX());
-        double maxX = Math.max(geoTopLeft.getX(), geoBottomRight.getX());
-        double minY = Math.min(geoTopLeft.getY(), geoBottomRight.getY());
-        double maxY = Math.max(geoTopLeft.getY(), geoBottomRight.getY());
 
-        return new Rectangle2D(minX, minY, maxX - minX, maxY - minY);
+    public Rectangle2D createRectangle(double minLon, double maxLon, double minLat, double maxLat){
+        // Calculate the width and height, by subtracting maxLon/maxLat with minLon/minLat
+        double width = maxLon - minLon;
+        double height = maxLat - minLat;
+
+
+        return new Rectangle2D(minLon, minLat, width, height);
     }
 
-    public Queue<Node> getNodesFromSpatial(){
-//        Rectangle2D bounds = getCanvasCoordAsGeoCoord();
-//        Queue<Node> nodes = model.kdTree.rangeSearch(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
-//        System.out.println("Bounds getMinX: " + bounds.getMinX() + " Bounds getMaxX: " + bounds.getMaxX() + " Bounds getMinY: " + bounds.getMinY()+ " Bounds getMaxY: " + bounds.getMaxY());
-//        return nodes;
-        Boolean isZero = false;
-        Rectangle2D bounds = getCanvasCoordAsGeoCoord();
-        Queue<Node> nodes = model.kdTree.rangeSearch(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
-        System.out.println("Bounds: " + bounds);
-        System.out.println("Size of KDTree: " + model.kdTree.size());
-        System.out.println("Nodes returned: " + nodes.size());
-        if(nodes.size()<=1){
-            isZero = true;
+    public Rectangle2D createCanvasRectangle(double minLon, double maxLon, double minLat, double maxLat, double canvasWidth, double canvasHeight) {
+        double width = maxLon - minLon;
+        double height = maxLat - minLat;
+        double aspectRatio = canvasWidth / canvasHeight;
+
+        if (width / height > aspectRatio) {
+            double newHeight = width / aspectRatio;
+            double deltaLat = (newHeight - height) / 2;
+            minLat -= deltaLat;
+            maxLat += deltaLat;
+            height = newHeight;
+        } else {
+            double newWidth = height * aspectRatio;
+            double deltaLon = (newWidth - width) / 2;
+            minLon -= deltaLon;
+            maxLon += deltaLon;
+            width = newWidth;
         }
-        return nodes;
+
+        return new Rectangle2D(minLon, minLat, width, height);
     }
 
-    public void setupAffine(double width, double height, double minLon, double maxLon, double minLat, double maxLat){
-//        double scaleX = width / (maxLon - minLon);
-//        double scaleY = height / (maxLat - minLat);
-//        trans = new Affine();
-//        trans.appendScale(scaleX, -scaleY); // Negate scaleY to flip Y-axis
-//        trans.appendTranslation(-minLon * scaleX, -maxLat * scaleY);
+    public void setupAffine(double width, double height, double minLon, double maxLon, double minLat, double maxLat) {
+        Rectangle2D mapRect = createRectangle(model.getMinlon(), model.getMaxlon(), model.getMinlat(),model.getMaxlat());
 
-        double scaleX = width / (maxLon - minLon);
-        double scaleY = height / (maxLat - minLat);
-        trans.setToTransform(scaleX, 0, -minLon * scaleX, 0, -scaleY, maxLat * scaleY);
+        Point2D mapCenter = calculateCenter(model.getMinlon(), model.getMaxlon(), model.getMinlat(),model.getMaxlat());
+        double halfCanvasWidth = width / 2;
+        double halfCanvasHeight = height / 2;
+        double canvasMinX = mapCenter.getX() - halfCanvasWidth;
+        double canvasMaxX = mapCenter.getX() + halfCanvasWidth;
+        double canvasMinY = mapCenter.getY() - halfCanvasHeight;
+        double canvasMaxY = mapCenter.getY() + halfCanvasHeight;
+        Rectangle2D canvasRect = createCanvasRectangle(canvasMinX, canvasMaxX, canvasMinY, canvasMaxY, canvas.getWidth(), canvas.getHeight());
+
+        double scaleX = canvasRect.getWidth() / mapRect.getWidth();
+        double scaleY = canvasRect.getHeight() / mapRect.getHeight();
+        double translateX = -mapRect.getMinX() * scaleX;
+        double translateY = -mapRect.getMinY() * scaleY;
+
+        trans.setToTransform(scaleX, 0, translateX, 0, -scaleY, height - translateY);
     }
 
     public Point2D calculateCenter(double minLon, double maxLon, double minLat, double maxLat){
