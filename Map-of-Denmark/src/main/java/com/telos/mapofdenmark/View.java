@@ -56,7 +56,7 @@ public class View {
         //Write a system out println for cavas height width and model minlon maxlon minlat and maxlat
         System.out.println("Canvas Width: " + canvas.getWidth() + " Canvas Height: " + canvas.getHeight());
         System.out.println("Model minLon: " + model.getMinlon() + " Model maxLon: " + model.getMaxlon() + " Model minLat: " + model.getMinlat() + " Model maxLat: " + model.getMaxlat());
-        setupAffine(canvas.getWidth(), canvas.getHeight(), model.getMinlon(), model.getMaxlon(),model.getMinlat(), model.getMaxlat());
+        setupAffine();
 
         Scene scene = new Scene(root);
         //Looks for the node in the scene graph hiearchy by the ID #mapPane.
@@ -175,12 +175,12 @@ public class View {
         return new Rectangle2D(minLon, minLat, width, height);
     }
 
-    public void setupAffine(double width, double height, double minLon, double maxLon, double minLat, double maxLat) {
+    public void setupAffine() {
         Rectangle2D mapRect = createRectangle(model.getMinlon(), model.getMaxlon(), model.getMinlat(),model.getMaxlat());
 
         Point2D mapCenter = calculateCenter(model.getMinlon(), model.getMaxlon(), model.getMinlat(),model.getMaxlat());
-        double halfCanvasWidth = width / 2;
-        double halfCanvasHeight = height / 2;
+        double halfCanvasWidth = canvas.getWidth() / 2;
+        double halfCanvasHeight = canvas.getHeight() / 2;
         double canvasMinX = mapCenter.getX() - halfCanvasWidth;
         double canvasMaxX = mapCenter.getX() + halfCanvasWidth;
         double canvasMinY = mapCenter.getY() - halfCanvasHeight;
@@ -192,7 +192,7 @@ public class View {
         double translateX = -mapRect.getMinX() * scaleX;
         double translateY = -mapRect.getMinY() * scaleY;
 
-        trans.setToTransform(scaleX, 0, translateX, 0, -scaleY, height - translateY);
+        trans.setToTransform(scaleX, 0, translateX, 0, -scaleY, canvas.getHeight() - translateY);
     }
 
     public Point2D calculateCenter(double minLon, double maxLon, double minLat, double maxLat){
