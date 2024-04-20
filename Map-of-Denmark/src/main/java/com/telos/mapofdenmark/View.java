@@ -103,22 +103,23 @@ public class View {
         for (var way : model.ways) {
             way.draw(gc);
         }*/
-        /*
+
+
         for (Object nodeSpatial : getNodesFromSpatial()) {
             Node node = (Node) nodeSpatial;
             if (node.getWay() != null) {
                 node.getWay().draw(gc);
             }
-            //node.getWay().draw(gc);
         }
 
-         */
         //System.out.println("Redrawing, number of ways: " + getNodesFromSpatial().size()); // Debug the count of ways
     }
 
     void pan(double dx, double dy) {
         double newX = canvasRect.getMinX() - dx / scaleX;
         double newY = canvasRect.getMinY() - dy / scaleY;
+        System.out.println("");
+        System.out.println("Check before boundary: " + "newX: " + newX + " newY: " + newY);
 
         // Checks whether the newX is less than the minimum X coordinate of map rectangle, and updates it to stay within bounds of the left side
         // if it goes outside the map
@@ -136,12 +137,18 @@ public class View {
             newY = mapRect.getMaxY() - canvasRect.getHeight();
         }
 
+        System.out.println("Check after boundary: " + "newX: " + newX + " newY: " + newY);
+
         //trans.prependTranslation(dx, dy);
         // Creates a new instance of canvasRect to "update" our rectangle to the new position
         canvasRect = new Rectangle2D(newX, newY,canvasRect.getWidth(), canvasRect.getHeight());
 
+        System.out.println("updated canvasRect: " + canvasRect);
+
         // Called to update our Affine transformation
-        setupAffine();
+        updateTransform();
+
+        System.out.println("Panning just happened. Coordinates for rectangle is: " + canvasRect.getMinX() + " " + canvasRect.getMaxX() + " " + canvasRect.getMinY() + " " + canvasRect.getMaxY());
 
         redraw();
     }
@@ -191,8 +198,9 @@ public class View {
 
         // Creates a new instance of canvasRect to essentially "update" our rectangle to the new zoom position
         canvasRect = new Rectangle2D(newX, newY, newWidth, newHeight);
-        // Calls setupAffine to update the affine transformation
-        setupAffine();
+        // Called to update our Affine transformation
+        updateTransform();
+        System.out.println("Zoom just happened. Coordinates for rectangle is: " + canvasRect.getMinX() + " " + canvasRect.getMaxX() + " " + canvasRect.getMinY() + " " + canvasRect.getMaxY());
 
         redraw();
     }
@@ -259,6 +267,7 @@ public class View {
         trans.setToTransform(scaleX, 0, translateX, 0, -scaleY, canvas.getHeight() - translateY);
     }
 
+
     public Point2D calculateCenter(double minLon, double maxLon, double minLat, double maxLat){
         // Calculates center for latitude
         double centerLat = (minLat + maxLat) / 2;
@@ -267,6 +276,31 @@ public class View {
         double centerLon = (minLon + maxLon) / 2;
 
         return new Point2D(centerLat, centerLon);
+    }
+    // Used to update the transform by the end of pan, zoom etc.
+    public void updateTransform() {
+        scaleX = canvasRect.getWidth() / mapRect.getWidth();
+        scaleY = canvasRect.getHeight() / mapRect.getHeight();
+        double translateX = -canvasRect.getMinX() * scaleX;
+        double translateY = -canvasRect.getMinY() * scaleY;
+
+        trans.setToTransform(scaleX, 0, translateX, 0, -scaleY, canvas.getHeight() - translateY);
+    }
+
+    public Queue<Node> getNodesFromSpatial(){
+//        Rectangle2D bounds = getCanvasCoordAsGeoCoord();
+//        Queue<Node> nodes = model.kdTree.rangeSearch(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
+//        System.out.println("Bounds getMinX: " + bounds.getMinX() + " Bounds getMaxX: " + bounds.getMaxX() + " Bounds getMinY: " + bounds.getMinY()+ " Bounds getMaxY: " + bounds.getMaxY());
+//        return nodes;
+        Boolean isZero = false;
+        Queue<Node> nodes = model.kdTree.rangeSearch(canvasRect.getMinX(), canvasRect.getMaxX(), canvasRect.getMinY(), canvasRect.getMaxY());
+        //System.out.println("Bounds: " + canvasRect);
+        //System.out.println("Size of KDTree: " + model.kdTree.size());
+        //System.out.println("Nodes returned: " + nodes.size());
+        if(nodes.size()<=1){
+            isZero = true;
+        }
+        return nodes;
     }
 
 }
