@@ -39,6 +39,11 @@ public class View {
     @FXML
     private Pane backgroundPane;
 
+    private Rectangle2D mapRect;
+    private Rectangle2D canvasRect;
+    private double scaleX;
+    private double scaleY;
+
     public View(Model model, Stage primaryStage) throws IOException {
         this.model = model;
         primaryStage.setTitle("Map of Denmark");
@@ -112,7 +117,32 @@ public class View {
     }
 
     void pan(double dx, double dy) {
-        trans.prependTranslation(dx, dy);
+        double newX = canvasRect.getMinX() - dx / scaleX;
+        double newY = canvasRect.getMinY() - dy / scaleY;
+
+        // Checks whether the newX is less than the minimum X coordinate of map rectangle, and updates it to stay within bounds of the left side
+        // if it goes outside the map
+        if (newX < mapRect.getMinX()) {
+            newX = mapRect.getMinX();
+        }
+        // Same as the above code but checks for the right side and makes sure it is inside bounds
+        else if (newX + canvasRect.getWidth() > mapRect.getMaxX()) {
+            newX = mapRect.getMaxX() - canvasRect.getWidth();
+        }
+        // Same principle but for top and bottom of the map
+        if (newY < mapRect.getMinY()) {
+            newY = mapRect.getMinY();
+        } else if (newY + canvasRect.getHeight() > mapRect.getMaxY()) {
+            newY = mapRect.getMaxY() - canvasRect.getHeight();
+        }
+
+        //trans.prependTranslation(dx, dy);
+        // Creates a new instance of canvasRect to "update" our rectangle to the new position
+        canvasRect = new Rectangle2D(newX, newY,canvasRect.getWidth(), canvasRect.getHeight());
+
+        // Called to update our Affine transformation
+        setupAffine();
+
         redraw();
     }
 
@@ -127,9 +157,43 @@ public class View {
     }
 
     void zoom(double dx, double dy, double factor) {
+        /*
         pan(-dx, -dy);
         trans.prependScale(factor, factor);
         pan(dx, dy);
+
+         */
+
+        double zoomCenterX = canvasRect.getMinX() + dx / scaleX;
+        double zoomCenterY = canvasRect.getMinY() + dy / scaleY;
+
+        double newWidth = canvasRect.getWidth() / factor;
+        double newHeight = canvasRect.getHeight() / factor;
+
+        double newX = zoomCenterX - (zoomCenterX - canvasRect.getMinX()) / factor;
+        double newY = zoomCenterY - (zoomCenterY - canvasRect.getMinY()) / factor;
+
+
+        // Check whether the new coordinates are within the bounds, same logic as the pan method
+        if(newX < mapRect.getMinX()){
+            newX = mapRect.getMinX();
+        }
+        else if(newX + newWidth > mapRect.getMaxX()){
+            newX = mapRect.getMaxX() - newWidth;
+        }
+
+        if(newY < mapRect.getMinY()){
+            newY = mapRect.getMinY();
+        }
+        else if(newY + newHeight > mapRect.getMaxY()){
+            newY = mapRect.getMaxY() - newHeight;
+        }
+
+        // Creates a new instance of canvasRect to essentially "update" our rectangle to the new zoom position
+        canvasRect = new Rectangle2D(newX, newY, newWidth, newHeight);
+        // Calls setupAffine to update the affine transformation
+        setupAffine();
+
         redraw();
     }
 
@@ -176,7 +240,7 @@ public class View {
     }
 
     public void setupAffine() {
-        Rectangle2D mapRect = createRectangle(model.getMinlon(), model.getMaxlon(), model.getMinlat(),model.getMaxlat());
+        mapRect = createRectangle(model.getMinlon(), model.getMaxlon(), model.getMinlat(),model.getMaxlat());
 
         Point2D mapCenter = calculateCenter(model.getMinlon(), model.getMaxlon(), model.getMinlat(),model.getMaxlat());
         double halfCanvasWidth = canvas.getWidth() / 2;
@@ -185,10 +249,10 @@ public class View {
         double canvasMaxX = mapCenter.getX() + halfCanvasWidth;
         double canvasMinY = mapCenter.getY() - halfCanvasHeight;
         double canvasMaxY = mapCenter.getY() + halfCanvasHeight;
-        Rectangle2D canvasRect = createCanvasRectangle(canvasMinX, canvasMaxX, canvasMinY, canvasMaxY, canvas.getWidth(), canvas.getHeight());
+        canvasRect = createCanvasRectangle(canvasMinX, canvasMaxX, canvasMinY, canvasMaxY, canvas.getWidth(), canvas.getHeight());
 
-        double scaleX = canvasRect.getWidth() / mapRect.getWidth();
-        double scaleY = canvasRect.getHeight() / mapRect.getHeight();
+        scaleX = canvasRect.getWidth() / mapRect.getWidth();
+        scaleY = canvasRect.getHeight() / mapRect.getHeight();
         double translateX = -mapRect.getMinX() * scaleX;
         double translateY = -mapRect.getMinY() * scaleY;
 
