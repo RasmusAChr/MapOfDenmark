@@ -31,6 +31,6 @@ public class Road extends Way{
             super.draw(gc, zoom, darkMode);
         }
         gc.setStroke(Color.BLACK);
-        gc.setLineWidth(0.000001);
+        gc.setLineWidth(0.00001);
     }
 }

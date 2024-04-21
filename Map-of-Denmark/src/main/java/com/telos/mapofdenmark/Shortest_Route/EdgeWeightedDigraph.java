@@ -7,7 +7,7 @@ public class EdgeWeightedDigraph implements Serializable {
     private final int V;
     private final Bag<DirectedEdge>[] adj;
 
-    public EdgeWeightedDigraph(int V, ArrayList<ArrayList<DirectedEdge>> roads){
+    public EdgeWeightedDigraph(int V){
         this.V = V;
         adj = (Bag<DirectedEdge>[]) new Bag[V];
         for (int v = 0; v < V; v++)

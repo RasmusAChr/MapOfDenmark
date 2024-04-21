@@ -15,13 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.ZipInputStream;
 import java.util.Comparator;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.*;
 
 import com.telos.mapofdenmark.KDTreeClasses.KDTree;
-import com.telos.mapofdenmark.Shortest_Route.Bag;
 import com.telos.mapofdenmark.Shortest_Route.DirectedEdge;
 import com.telos.mapofdenmark.Shortest_Route.EdgeWeightedDigraph;
 import com.telos.mapofdenmark.Shortest_Route.SP;
@@ -46,9 +42,10 @@ public class Model implements Serializable {
     Address address;
     EdgeWeightedDigraph EWD;
     HashMap<Node, Integer> DigraphNodeToIndex;
-    HashMap<Integer, Node> IndexToNode;
+    HashMap<Integer, Node> DigraphIndexToNode;
+    HashMap<Long, Node> id2node;
     int roadCount;
-    ArrayList<ArrayList<DirectedEdge>> roadTemp;
+    HashSet<String> roadIdSet = new HashSet<>(Arrays.asList("motorway", "trunk", "primary", "secondary", "tertiary", "unclassified", "residential", "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link", "living_street", "track"));
 
 
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
@@ -62,9 +59,9 @@ public class Model implements Serializable {
 
 
     public Model(String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
-        this.roadTemp = new ArrayList<>();
         this.DigraphNodeToIndex = new HashMap<>();
-        this.IndexToNode = new HashMap<>();
+        this.DigraphIndexToNode = new HashMap<>();
+        this.id2node = new HashMap<>();
         this.roadCount = 0;
         this.addressList = new ArrayList<>();
         this.address = new Address();
@@ -72,7 +69,7 @@ public class Model implements Serializable {
         if (filename.endsWith(".osm.zip")) {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
-            parseOSM(filename);
+            parseRouteNet(filename);
         } else {
             parseTXT(filename);
         }
@@ -81,8 +78,73 @@ public class Model implements Serializable {
         this.kdTree = new KDTree();
 
     }
+    private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
+        var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        long addressId = 0;
+        int roadCountX = 0;
 
 
+        while (input.hasNext()) {
+
+            var tagKind = input.next();
+            if (tagKind == XMLStreamConstants.START_ELEMENT) {
+                var name = input.getLocalName();
+                switch (name) {
+                    case "bounds" -> {
+                        minlat = Double.parseDouble(input.getAttributeValue(null, "minlat"));
+                        maxlat = Double.parseDouble(input.getAttributeValue(null, "maxlat"));
+                        minlon = Double.parseDouble(input.getAttributeValue(null, "minlon"));
+                        maxlon = Double.parseDouble(input.getAttributeValue(null, "maxlon"));
+                    }
+                    case "node" -> {
+                        var id = Long.parseLong(input.getAttributeValue(null, "id"));
+                        var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
+                        var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
+                        Node node = new Node(id, lat, lon);
+                        id2node.put(id, node);
+                        nodeList.add(node);
+                        addressId = id;
+                        DigraphNodeToIndex.put(node, roadCountX);
+                        DigraphIndexToNode.put(roadCountX, node);
+                        roadCountX++;
+//                    address = new Address(); // Reset for new node
+                    }
+                    case "tag" -> {
+                        var v = input.getAttributeValue(null, "v");
+                        var k = input.getAttributeValue(null, "k");
+                        if (k.startsWith("addr:")) {
+                            // Lazy initialization of address
+                            if (address == null) {
+                                address = new Address();
+                            }
+                            parseAddressFromOSM(v, k);
+                        }
+                    }
+                    case "way" -> {
+                        EWD = new EdgeWeightedDigraph(roadCountX);
+                        parseOSM(input, tagKind);
+                        return;
+                    }
+                }
+            } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
+                var name = input.getLocalName();
+                if(name.equals("node")){
+                    if (address != null && !address.getStreet().isBlank()) {
+                        addressList.add(address);
+                        //System.out.println(addressId);
+                        addressIdMap.put(address.getFullAdress().toLowerCase(), id2node.get(addressId));
+                        addressId = 0;
+                        address = null; // Reset for the next address
+                    }
+
+                }
+            }
+        }
+    }
+
+    private void parseRouteNet(String filename) throws IOException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
+        parseNodeNet(new FileInputStream(filename));
+    }
 
     void save(String filename) throws FileNotFoundException, IOException {
         try (var out = new ObjectOutputStream(new FileOutputStream(filename))) {
@@ -93,163 +155,90 @@ public class Model implements Serializable {
     private void parseZIP(String filename) throws IOException, XMLStreamException, FactoryConfigurationError {
         var input = new ZipInputStream(new FileInputStream(filename));
         input.getNextEntry();
-        parseOSM(input);
+        parseNodeNet(input);
     }
 
-    private void parseOSM(String filename) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
-        parseOSM(new FileInputStream(filename));
-    }
-
-    private void parseOSM(InputStream inputStream) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
-        var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-        var id2node = new HashMap<Long, Node>();
+    private void parseOSM(XMLStreamReader input1, int tagKind) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         var way = new ArrayList<Node>();
         var coast = false;
-        long addressId = 0;
         String roadtype = "";
-        boolean addingRoad = false;
-        String addingsRoadV = "";
-        boolean addingsRoadDirection = false;
-        int addingRoadSpeed = 0;
-        while (input.hasNext()) {
+        boolean shouldAdd = false;
+        boolean drivable = false;
+        boolean cycleable = false;
+        boolean oneway = false;
+        boolean onewayBicycle = false;
+        int vertexIndex = -1;
 
-            var tagKind = input.next();
+
+        while (input1.hasNext()) {
+            tagKind = input1.next();
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
-                var name = input.getLocalName();
-                if (name == "bounds") {
-                    minlat = Double.parseDouble(input.getAttributeValue(null, "minlat"));
-                    maxlat = Double.parseDouble(input.getAttributeValue(null, "maxlat"));
-                    minlon = Double.parseDouble(input.getAttributeValue(null, "minlon"));
-                    maxlon = Double.parseDouble(input.getAttributeValue(null, "maxlon"));
-                } else if (name == "node") {
-                    var id = Long.parseLong(input.getAttributeValue(null, "id"));
-                    var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
-                    var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
-                    Node tempNode = new Node(id, lat, lon);
-                    id2node.put(id, tempNode);
-                    nodeList.add(tempNode);
-                    addressId = id;
-//                    address = new Address(); // Reset for new node
-                } else if (name == "way") {
+                var name = input1.getLocalName();
+                if (name == "way") {
                     way.clear();
-                    roadtype = "";
-                    addingRoad = false;
-                    addingsRoadV = "";
-                    addingRoadSpeed = 0;
-                    addingsRoadDirection = false;
-                    coast = false;
                 } else if (name == "tag") {
-                    var v = input.getAttributeValue(null, "v");
-                    var k = input.getAttributeValue(null, "k");
-                    if (k.equals("highway") && v.equals("tertiary")) {
-                        roadtype = "highway";
-                        addingRoad = true;
-                        addingsRoadV = v;
-                    }
-                    if (k.startsWith("addr:")){
-                        // Lazy initialization of address
-                        if (address == null) {
-                            address = new Address();
+                    var v = input1.getAttributeValue(null, "v");
+                    var k = input1.getAttributeValue(null, "k");
+                    if (k.equals("highway")) {
+                        if (roadIdSet.contains(v)) {
+                            drivable = true;
+                            shouldAdd = true;
+                            roadtype = "highway";
                         }
-                        parseAddressFromOSM(v, k);
+
                     }
-                    if (k.equals("maxspeed")) {
-                        addingRoadSpeed = Integer.parseInt(v);
-                    }
-                    if (k.equals("oneway") && v.equals("yes")) {
-                        addingsRoadDirection = true;
-                    }
+
                 } else if (name == "nd") {
-                    var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
+                    var ref = Long.parseLong(input1.getAttributeValue(null, "ref"));
                     var node = id2node.get(ref);
                     way.add(node);
                 }
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
-                var name = input.getLocalName();
+                var name = input1.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name == "way") {
-                    if (roadtype == "highway") {
+                    if (roadtype.equals("highway")) {
                         ways.add(new Road(way, roadtype));
                     } else {
                         ways.add(new Way(way));
                     }
-                    if (addingRoad) {
-                       EdgeweightedDigraphModifier(addingsRoadV, addingRoadSpeed, way, addingsRoadDirection);
-                    }
-//                  ways.add(new Way(way));
-                    //Way newWay = new Way(way);
-                    //ways.add(newWay);
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
+                        if (shouldAdd) {
+                            if (vertexIndex != -1) {
+                                int weight = weightCalculate();
+                                EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight));
+                                EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight));
+                            } else {
+                                vertexIndex = DigraphNodeToIndex.get(node);
+                            }
+                        }
+
                         node.setWay(new Way(way)); // Set the way reference in each node
                     }
                     way.clear();
-
+                    roadtype = "";
+                    shouldAdd = false;
+                    drivable = false;
+                    cycleable = false;
+                    oneway = false;
+                    onewayBicycle = false;
+                    vertexIndex = -1;
                 }
-                if(name.equals("node")){
-                    if (address != null && !address.getStreet().isBlank()) {
-                        addressList.add(address);
-                        System.out.println(addressId);
-                        addressIdMap.put(address.getFullAdress().toLowerCase(), id2node.get(addressId));
-                        addressId = 0;
-                        address = null; // Reset for the next address
-                    }
-                }
-            }
-        }
-        EWD = new EdgeWeightedDigraph(roadTemp.size(),roadTemp);
-    }
-    private void EdgeweightedDigraphModifier(String roadType, int maxSpeed, ArrayList<Node> way, boolean roadDirection) {
-        System.out.println(roadCount + " This is the current RoadCount");
-        System.out.println(roadTemp.size() + " This is the current value of roadTemp");
-
-        if (roadDirection) {
-            if (roadType.equals("tertiary")) {
-                Node nodeFrom = way.get(0);
-                if (!DigraphNodeToIndex.containsKey(nodeFrom)) {
-                    roadTemp.add(new ArrayList<>());
-                    //roadCount++;
-                    DigraphNodeToIndex.put(nodeFrom, roadCount);
-                    IndexToNode.put(roadCount, nodeFrom);
-                    roadCount++;
-                }
-                for (int i = 1; i < way.size(); i++) {
-                    // Distance is the distance between the latitude ang longitude pair
-                    // Input lat 1 lat 2 and lon 1 lon 2
-                    Node nodeTo = way.get(i);
-                    if (!DigraphNodeToIndex.containsKey(nodeTo)) {
-                        roadTemp.add(new ArrayList<>());
-                        DigraphNodeToIndex.put(nodeTo, roadCount);
-                        IndexToNode.put(roadCount, nodeTo);
-                        int roadFromIndex = DigraphNodeToIndex.get(nodeFrom);
-                        double weight = distance(nodeFrom.lat, nodeTo.lat, nodeFrom.lon, nodeTo.lon) / maxSpeed;
-                        roadTemp.add(new ArrayList<>(List.of(new DirectedEdge(roadFromIndex, roadCount, weight))));
-                        roadCount++;
-                    } else {
-                        double weight = distance(nodeFrom.lat, nodeTo.lat, nodeFrom.lon, nodeTo.lon) / maxSpeed;
-                        int roadFromIndex = DigraphNodeToIndex.get(nodeFrom);
-                        int roadToIndex = DigraphNodeToIndex.get(nodeTo);
-                        roadTemp.get(roadFromIndex).add(new DirectedEdge(roadFromIndex, roadToIndex, weight));
-                    }
-                    nodeFrom = nodeTo;
-                }
-
-            } else {
-
-            }
-
-        } else {
-            if (roadType.equals("tertiary")) {
-
-            } else {
 
             }
         }
-
     }
-    // Dijkstra implementation
+
+    private int weightCalculate() {
+        //calculate the weight of the edge, based on different factors.
+
+        return 20;
+    }
+
+    //Dijkstra implementation
     public void StartDijkstra(Node startaddress){
-        this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(findNodeByID(nodeList,"335909826"))); // this starts the dijkstra search from the index that refferes to a node
+        this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(findNodeByID(nodeList, "697814"))); // this starts the dijkstra search from the index that refferes to a node
     }
 
 
@@ -262,22 +251,23 @@ public class Model implements Serializable {
      * This will then return the paths ass nodes in an arraylist goning for index 0 being the final node up to the first node at n place in the array.
      * This will make it easier to draw since we know have a new Way of those nodes to be drawn.
      *
-     * @param Endaddress The end addres for Dijkstras algorithm
+     * @param /Endaddress The end addres for Dijkstras algorithm
      * @return Returns a list of nodes in order from start to finish
-     */
+     *
+     * */
     public void getDijkstraPath(Node Endaddress) {
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
-        System.out.println(Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList,"17232420"))));
-         for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList,"335909826")))) {
+        System.out.println(Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList, "92994313"))));
+         for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList, "335909826")))) {
             System.out.println(i);
-             if (!NodeAdded.contains(IndexToNode.get(i.to()))) { // adds the two points because it iterates backwards
-                 NodeAdded.add(IndexToNode.get(i.to()));
-                 path.add(IndexToNode.get(i.to()));
+             if (!NodeAdded.contains(id2node.get(i.to()))) { // adds the two points because it iterates backwards
+                 NodeAdded.add(id2node.get(i.to()));
+                 path.add(id2node.get(i.to()));
 
-             } else if (!NodeAdded.contains(IndexToNode.get(i.from()))) {
-                 NodeAdded.add(IndexToNode.get(i.from()));
-                 path.add(IndexToNode.get(i.from()));
+             } else if (!NodeAdded.contains(id2node.get(i.from()))) {
+                 NodeAdded.add(id2node.get(i.from()));
+                 path.add(id2node.get(i.from()));
              }
 
          }
@@ -295,6 +285,7 @@ public class Model implements Serializable {
         System.out.println("yes");
         return null;
     }
+
 
     private void parseTXT(String filename) throws FileNotFoundException {
         File f = new File(filename);
