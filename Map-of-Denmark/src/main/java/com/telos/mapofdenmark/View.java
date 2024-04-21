@@ -2,6 +2,7 @@ package com.telos.mapofdenmark;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
@@ -116,40 +117,7 @@ public class View {
     }
 
     void pan(double dx, double dy) {
-        double newX = canvasRect.getMinX() - dx / scaleX;
-        double newY = canvasRect.getMinY() - dy / scaleY;
-        System.out.println("");
-        System.out.println("Check before boundary: " + "newX: " + newX + " newY: " + newY);
-
-        // Checks whether the newX is less than the minimum X coordinate of map rectangle, and updates it to stay within bounds of the left side
-        // if it goes outside the map
-        if (newX < mapRect.getMinX()) {
-            newX = mapRect.getMinX();
-        }
-        // Same as the above code but checks for the right side and makes sure it is inside bounds
-        else if (newX + canvasRect.getWidth() > mapRect.getMaxX()) {
-            newX = mapRect.getMaxX() - canvasRect.getWidth();
-        }
-        // Same principle but for top and bottom of the map
-        if (newY < mapRect.getMinY()) {
-            newY = mapRect.getMinY();
-        } else if (newY + canvasRect.getHeight() > mapRect.getMaxY()) {
-            newY = mapRect.getMaxY() - canvasRect.getHeight();
-        }
-
-        System.out.println("Check after boundary: " + "newX: " + newX + " newY: " + newY);
-
-        //trans.prependTranslation(dx, dy);
-        // Creates a new instance of canvasRect to "update" our rectangle to the new position
-        canvasRect = new Rectangle2D(newX, newY,canvasRect.getWidth(), canvasRect.getHeight());
-
-        System.out.println("updated canvasRect: " + canvasRect);
-
-        // Called to update our Affine transformation
-        updateTransform();
-
-        System.out.println("Panning just happened. Coordinates for rectangle is: " + canvasRect.getMinX() + " " + canvasRect.getMaxX() + " " + canvasRect.getMinY() + " " + canvasRect.getMaxY());
-
+        trans.prependTranslation(dx, dy);
         redraw();
     }
 
@@ -163,45 +131,8 @@ public class View {
         dark = a;
     }
 
-    void zoom(double dx, double dy, double factor) {
-        /*
-        pan(-dx, -dy);
-        trans.prependScale(factor, factor);
-        pan(dx, dy);
-
-         */
-
-        double zoomCenterX = canvasRect.getMinX() + dx / scaleX;
-        double zoomCenterY = canvasRect.getMinY() + dy / scaleY;
-
-        double newWidth = canvasRect.getWidth() / factor;
-        double newHeight = canvasRect.getHeight() / factor;
-
-        double newX = zoomCenterX - (zoomCenterX - canvasRect.getMinX()) / factor;
-        double newY = zoomCenterY - (zoomCenterY - canvasRect.getMinY()) / factor;
-
-
-        // Check whether the new coordinates are within the bounds, same logic as the pan method
-        if(newX < mapRect.getMinX()){
-            newX = mapRect.getMinX();
-        }
-        else if(newX + newWidth > mapRect.getMaxX()){
-            newX = mapRect.getMaxX() - newWidth;
-        }
-
-        if(newY < mapRect.getMinY()){
-            newY = mapRect.getMinY();
-        }
-        else if(newY + newHeight > mapRect.getMaxY()){
-            newY = mapRect.getMaxY() - newHeight;
-        }
-
-        // Creates a new instance of canvasRect to essentially "update" our rectangle to the new zoom position
-        canvasRect = new Rectangle2D(newX, newY, newWidth, newHeight);
-        // Called to update our Affine transformation
-        updateTransform();
-        System.out.println("Zoom just happened. Coordinates for rectangle is: " + canvasRect.getMinX() + " " + canvasRect.getMaxX() + " " + canvasRect.getMinY() + " " + canvasRect.getMaxY());
-
+    void zoom(double factor, Point2D center) {
+        trans.prependScale(factor, factor, center.getX(), center.getY());
         redraw();
     }
 
@@ -248,22 +179,11 @@ public class View {
     }
 
     public void setupAffine() {
-        mapRect = createRectangle(model.getMinlon(), model.getMaxlon(), model.getMinlat(),model.getMaxlat());
-
-        Point2D mapCenter = calculateCenter(model.getMinlon(), model.getMaxlon(), model.getMinlat(),model.getMaxlat());
-        double halfCanvasWidth = canvas.getWidth() / 2;
-        double halfCanvasHeight = canvas.getHeight() / 2;
-        double canvasMinX = mapCenter.getX() - halfCanvasWidth;
-        double canvasMaxX = mapCenter.getX() + halfCanvasWidth;
-        double canvasMinY = mapCenter.getY() - halfCanvasHeight;
-        double canvasMaxY = mapCenter.getY() + halfCanvasHeight;
-        canvasRect = createCanvasRectangle(canvasMinX, canvasMaxX, canvasMinY, canvasMaxY, canvas.getWidth(), canvas.getHeight());
-
-        scaleX = canvasRect.getWidth() / mapRect.getWidth();
-        scaleY = canvasRect.getHeight() / mapRect.getHeight();
+        mapRect = createRectangle(model.getMinlon(), model.getMaxlon(), model.getMinlat(), model.getMaxlat());
+        double scaleX = canvas.getWidth() / mapRect.getWidth();
+        double scaleY = canvas.getHeight() / mapRect.getHeight();
         double translateX = -mapRect.getMinX() * scaleX;
         double translateY = -mapRect.getMinY() * scaleY;
-
         trans.setToTransform(scaleX, 0, translateX, 0, -scaleY, canvas.getHeight() - translateY);
     }
 
@@ -277,30 +197,28 @@ public class View {
 
         return new Point2D(centerLat, centerLon);
     }
-    // Used to update the transform by the end of pan, zoom etc.
-    public void updateTransform() {
-        scaleX = canvasRect.getWidth() / mapRect.getWidth();
-        scaleY = canvasRect.getHeight() / mapRect.getHeight();
-        double translateX = -canvasRect.getMinX() * scaleX;
-        double translateY = -canvasRect.getMinY() * scaleY;
 
-        trans.setToTransform(scaleX, 0, translateX, 0, -scaleY, canvas.getHeight() - translateY);
-    }
-
-    public Queue<Node> getNodesFromSpatial(){
-//        Rectangle2D bounds = getCanvasCoordAsGeoCoord();
-//        Queue<Node> nodes = model.kdTree.rangeSearch(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
-//        System.out.println("Bounds getMinX: " + bounds.getMinX() + " Bounds getMaxX: " + bounds.getMaxX() + " Bounds getMinY: " + bounds.getMinY()+ " Bounds getMaxY: " + bounds.getMaxY());
-//        return nodes;
-        Boolean isZero = false;
-        Queue<Node> nodes = model.kdTree.rangeSearch(canvasRect.getMinX(), canvasRect.getMaxX(), canvasRect.getMinY(), canvasRect.getMaxY());
-        //System.out.println("Bounds: " + canvasRect);
-        //System.out.println("Size of KDTree: " + model.kdTree.size());
-        //System.out.println("Nodes returned: " + nodes.size());
-        if(nodes.size()<=1){
-            isZero = true;
-        }
+    public Queue<Node> getNodesFromSpatial() {
+        BoundingBox boundingBox = getScreenBoundingBox();
+        Queue<Node> nodes = model.kdTree.rangeSearch(boundingBox);
         return nodes;
     }
 
+    private BoundingBox getScreenBoundingBox() {
+        double x1 = trans.getTx() / Math.sqrt(trans.determinant());
+        double y1 = (-trans.getTy()) / Math.sqrt(trans.determinant());
+        double x2 = x1 + canvas.getWidth();
+        double y2 = y1 + canvas.getHeight();
+        Point2D p1 = mouseToModel(new Point2D(x1, y1));
+        Point2D p2 = mouseToModel(new Point2D(x2, y2));
+        return new BoundingBox((float) p1.getX(), (float) p2.getX(), (float) p1.getY(), (float) p2.getY());
+    }
+
+    public Point2D mouseToModel(Point2D point) {
+        try {
+            return trans.inverseTransform(point);
+        } catch (NonInvertibleTransformException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.telos.mapofdenmark.KDTreeClasses;
 
 import com.telos.mapofdenmark.Node;
+import javafx.geometry.BoundingBox;
 
 import java.security.Key;
 import java.util.Comparator;
@@ -223,15 +224,14 @@ public class KDTree
         if (medianIndex + 1 < nodelist.size()) populateKDTree(nodelist.subList(medianIndex+1, nodelist.size()), depth);
     }
 
-    public Queue<Node> rangeSearch(double xMin, double xMax, double yMin, double yMax)
+    public Queue<Node> rangeSearch(BoundingBox boundingBox)
     {
-        System.out.println("Range Searching for these param: xMin:"+xMin+" xMax:"+xMax+" yMin:"+yMin+" yMax:"+yMax);
         Queue<Node> queue = new LinkedList<>();
-        rangeSearch(root, queue, xMin, xMax, yMin, yMax, 0);
+        rangeSearch(root, queue, boundingBox, 0);
         return queue;
     }
 
-    private void rangeSearch(KDNode x, Queue<Node> queue, double xMin, double xMax, double yMin, double yMax, int depth)
+    private void rangeSearch(KDNode x, Queue<Node> queue, BoundingBox boundingBox, int depth)
     {
         if (x == null) return;
 
@@ -241,17 +241,17 @@ public class KDTree
         // if the axis is 0, compare the x value long else comp     are lat
         if(axis == 0){
             // Sort based on the x-axis
-             cmplo = Double.compare(xMin,x.x);
-             cmphi = Double.compare(xMax,x.x);
+             cmplo = Double.compare(boundingBox.getMinX(),x.x);
+             cmphi = Double.compare(boundingBox.getMaxX(),x.x);
 
         } else {
             // Sort based on the y-axis
-             cmplo = Double.compare(yMin,x.y);
-             cmphi = Double.compare(yMax,x.y);
+            cmplo = Double.compare(boundingBox.getMinY(), x.y);
+            cmphi = Double.compare(boundingBox.getMaxY(), x.y);
         }
-        if (cmplo < 0) rangeSearch(x.left, queue, xMin, xMax, yMin, yMax, depth+1);
+        if (cmplo < 0) rangeSearch(x.left, queue, boundingBox, depth+1);
         if (cmplo <= 0 && cmphi >= 0) queue.add(x.val);
-        if (cmphi > 0) rangeSearch(x.right, queue, xMin, xMax, yMin, yMax, depth+1);
+        if (cmphi > 0) rangeSearch(x.right, queue, boundingBox, depth+1);
     }
 
 }

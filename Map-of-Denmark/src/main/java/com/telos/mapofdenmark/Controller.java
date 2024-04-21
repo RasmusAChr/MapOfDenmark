@@ -114,11 +114,9 @@ public class Controller {
             // Take absolute value of deltaFactor
             deltaFactor = Math.abs(deltaFactor);
 
-            double dy = view.canvas.getHeight() / 2;
-            double dx = view.canvas.getWidth() / 2;
-
-            // Apply zoom
-            view.zoom(dx, dy, Math.pow(1.07, zoomDirection * deltaFactor));
+            double factor = Math.pow(1.07, zoomDirection * deltaFactor);
+            Point2D center = new Point2D(view.canvas.getWidth() / 2, view.canvas.getHeight() / 2);
+            view.zoom(factor, center);
           });
     }
 
