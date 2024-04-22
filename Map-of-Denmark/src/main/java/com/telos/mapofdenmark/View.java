@@ -91,15 +91,37 @@ public class View {
         gc.setTransform(trans);
        // double zoomValue = 1/Math.sqrt(trans.determinant());
         gc.setLineWidth(0.000005);
+        /*
         for (var line : model.list) {
             line.draw(gc);
         }
         for (var way : model.ways) {
             way.draw(gc, slider_value, dark);
         }
+
+         */
+        Point2D canvasTopLeft = mousetoModel(0,0);
+        Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
+        System.out.println("Top Left: " + canvasTopLeft);
+        System.out.println("Bottom right: " + canvasBottomRight);
+
+        for (Node nodeSpatial : model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasTopLeft.getY(), canvasBottomRight.getX(),canvasBottomRight.getY())) {
+            Way way = nodeSpatial.getWay();
+            if (way != null) {
+                System.out.println("Node.getWay = " + way.coords);
+                way.draw(gc, slider_value, dark);
+            } else if (way == null){
+                System.out.println("------: WAY IS NULL :------");
+            }
+        }
+
+
+        
+        
     }
 
     void pan(double dx, double dy) {
+        System.out.println("Pan was called");
         trans.prependTranslation(dx, dy);
         redraw();
     }
@@ -115,6 +137,7 @@ public class View {
     }
 
     void zoom(double dx, double dy, double factor) {
+        System.out.println("Zoom was called");
         pan(-dx, -dy);
         trans.prependScale(factor, factor);
         pan(dx, dy);
@@ -134,11 +157,20 @@ public class View {
         slider_value = value;
     }
 
-//    public Queue<Node> getNodesFromSpatial(){
-//        Queue<Node> nodes = model.kdTree.rangeSearch(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
-//        System.out.println("Bounds: " + bounds);
-//        System.out.println("Size of KDTree: " + model.kdTree.size());
-//        System.out.println("Nodes returned: " + nodes.size());
-//        return nodes;
-//    }
+
+
+    /*
+    public Queue<Node> getNodesFromSpatial(){
+        //Rectangle2D canvasRectangle = createCanvasRectangle();
+
+        Point2D canvasTopLeft = mousetoModel(0,0);
+        Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
+        System.out.println("Top Left: " + canvasTopLeft);
+        System.out.println("Bottom right: " + canvasBottomRight);
+        Queue<Node> nodes = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasTopLeft.getY(), canvasBottomRight.getX(),canvasBottomRight.getY());
+
+        return nodes;
+    }
+
+     */
 }
