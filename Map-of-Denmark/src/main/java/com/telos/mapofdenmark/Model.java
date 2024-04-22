@@ -19,7 +19,6 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-
 import com.telos.mapofdenmark.KDTreeClasses.KDTree;
 import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
@@ -64,7 +63,7 @@ public class Model implements Serializable {
         save(filename+".obj");
         this.trie = deserializeTrie("data/.obj");
         this.kdTree = new KDTree();
-
+        kdTree.populate(nodeList);
     }
 
 
@@ -91,9 +90,7 @@ public class Model implements Serializable {
         var way = new ArrayList<Node>();
         var coast = false;
         long addressId = 0;
-        String roadtype = "";
         while (input.hasNext()) {
-
             var tagKind = input.next();
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
                 var name = input.getLocalName();
@@ -113,14 +110,13 @@ public class Model implements Serializable {
 //                    address = new Address(); // Reset for new node
                 } else if (name == "way") {
                     way.clear();
-                    roadtype = "";
                     coast = false;
                 } else if (name == "tag") {
                     var v = input.getAttributeValue(null, "v");
-                    var k = input.getAttributeValue(null, "k");
-                    if (k.equals("highway")) {
-                        roadtype = "highway";
+                    if (v.equals("coastline")) {
+                        coast = true;
                     }
+                    var k = input.getAttributeValue(null, "k");
                     if (k.startsWith("addr:")){
                         // Lazy initialization of address
                         if (address == null) {
@@ -137,25 +133,19 @@ public class Model implements Serializable {
                 var name = input.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name == "way") {
-                    if (roadtype == "highway") {
-                        ways.add(new Road(way, roadtype));
-                    } else {
-                        ways.add(new Way(way));
-                    }
 //                    ways.add(new Way(way));
-                    //Way newWay = new Way(way);
-                    //ways.add(newWay);
+                    Way newWay = new Way(way);
+                    ways.add(newWay);
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
-                        node.setWay(new Way(way)); // Set the way reference in each node
+                        node.setWay(newWay); // Set the way reference in each node
                     }
                     way.clear();
-
                 }
                 if(name.equals("node")){
                     if (address != null && !address.getStreet().isBlank()) {
                         addressList.add(address);
-                        System.out.println(addressId);
+                        //System.out.println(addressId);
                         addressIdMap.put(address.getFullAdress().toLowerCase(), id2node.get(addressId));
                         addressId = 0;
                         address = null; // Reset for the next address
@@ -257,10 +247,17 @@ public class Model implements Serializable {
         return trie.getAddressSuggestions(input.toLowerCase(), 4);
 
     }
-    public void populateKDTree(){
-        populateKDTree(kdTree, nodeList, 0);
-    }
-    private static void populateKDTree(KDTree kdTree, List<Node> nodeList, int depth) {
+
+    // Method to populate a kdtree and making it balanced with data from an array
+//    public void populateKDTree(){
+////        populateKDTree(kdtree, nodelist, 0);
+//        kdTree.populate(kdTree, nodeList);
+//    }
+
+    // Helper method which makes recursive calls to itself.
+    /*private static void populateKDTree(KDTree kdTree, List<Node> nodeList, int depth) {
+        if (nodeList.isEmpty()) return;  // Ensure no operations on an empty list
+
         List<Node> nodes = nodeList;
         int axis = depth % 2;
         // if the axis is 0, compare the x value long else compare lat
@@ -286,41 +283,10 @@ public class Model implements Serializable {
         // Recursive population call
         // Left Recursive Call, Handles the elements before the median index by only providing from the start of the list to one less than the median index
         // The subList does not include the end of the range in the list is provides
-        populateKDTree(kdTree, nodes.subList(0, medianIndex), depth);
+        if (medianIndex > 0)  populateKDTree(kdTree, nodes.subList(0, medianIndex), depth);
         // Right Recursive Call, Handles the elements after the median index by only providing from the median index+1 (avoids duplicates) to the end of the list
-        populateKDTree(kdTree, nodes.subList(medianIndex+1, nodes.size()), depth);
-    }
-
-
-
-
-
-    // Converts canvas coordinates to geo coordinates or vice versa, depending on true/false
-    public Point2D convertToCoordinates(Point2D pointFromCanvas, Boolean toGeoCoord, Affine trans){
-        try{
-            // Transforms coordinates from canvas to geo coordinates using inbuilt functionality
-            if(toGeoCoord){
-                Point2D geoCoordPoint = trans.inverseTransform(pointFromCanvas);
-
-                // Calculations to make sure the coordinates are within the bounds
-                double geoLon = Math.max(minlon, Math.min(maxlon, geoCoordPoint.getX()));
-                double geoLat = Math.max(minlat, Math.min(maxlat, geoCoordPoint.getY()));
-                return new Point2D(geoLon, geoLat);
-            }
-            // Vice versa
-            else{
-                double reverseLon = Math.max(minlon, Math.min(maxlon, pointFromCanvas.getX()));
-                double reverseLat = Math.max(minlat, Math.min(maxlat, pointFromCanvas.getY()));
-
-                Point2D canvasPoint = new Point2D(reverseLon, reverseLat);
-                return trans.transform(canvasPoint);
-            }
-        }catch(NonInvertibleTransformException e){
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
+        if (medianIndex + 1 < nodeList.size()) populateKDTree(kdTree, nodes.subList(medianIndex+1, nodes.size()), depth);
+    }*/
 
 }
 
