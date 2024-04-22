@@ -122,7 +122,7 @@ public class Model implements Serializable {
                     }
                     case "way" -> {
                         EWD = new EdgeWeightedDigraph(roadCountX);
-                        parseOSM(input, tagKind);
+                        parseWaysAndRelations(input, tagKind);
                         return;
                     }
                 }
@@ -158,7 +158,7 @@ public class Model implements Serializable {
         parseNodeNet(input);
     }
 
-    private void parseOSM(XMLStreamReader input1, int tagKind) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
+    private void parseWaysAndRelations(XMLStreamReader input1, int tagKind) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         var way = new ArrayList<Node>();
         var coast = false;
         String roadtype = "";
