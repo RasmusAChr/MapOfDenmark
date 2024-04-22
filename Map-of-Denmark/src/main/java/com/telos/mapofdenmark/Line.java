@@ -20,7 +20,6 @@ public class Line implements Serializable {
             coords[2 * i] = 0.56 * node.lon;
             coords[2 * i + 1] = -node.lat;
         }
-        System.out.println("jajajjaj");
     }
 
     public void draw(GraphicsContext gc) {
