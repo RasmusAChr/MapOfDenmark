@@ -105,9 +105,11 @@ public class View {
 //        System.out.println("Top Left: " + canvasTopLeft);
 //        System.out.println("Bottom right: " + canvasBottomRight);
         System.out.println("Size of KDTree: "+model.kdTree.size());
-        System.out.println("Size of queue after rangesearch: " + model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasTopLeft.getY(), canvasBottomRight.getX(),canvasBottomRight.getY()).size());
-
-        for (Node nodeSpatial : model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasTopLeft.getY(), canvasBottomRight.getX(),canvasBottomRight.getY())) {
+//        System.out.println("Size of queue after rangesearch: " + model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasTopLeft.getY(), canvasBottomRight.getX(),canvasBottomRight.getY()).size());
+        Queue<Node> nodesFromKD = model.kdTree.rangeSearch(0,10,0,10);
+        System.out.println("Size of queue after rangesearch: " + model.kdTree.rangeSearch(0,10,0,10).size());
+//        for (Node nodeSpatial : model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasTopLeft.getY(), canvasBottomRight.getX(),canvasBottomRight.getY())) {
+          for(Node nodeSpatial : nodesFromKD){
             Way way = nodeSpatial.getWay();
             if (way != null) {
                 System.out.println("Node.getWay = " + way.coords);
