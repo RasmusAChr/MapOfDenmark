@@ -1,9 +1,6 @@
 package com.telos.mapofdenmark;
 
 
-import com.telos.mapofdenmark.Shortest_Route.EdgeWeightedDigraph;
-import com.telos.mapofdenmark.Shortest_Route.SP;
-import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -11,9 +8,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +47,10 @@ public class Controller {
     private TextField searchBar;
     @FXML
     private TextField searchBar1;
+    @FXML
+    private ToggleButton ToggleMode;
+    @FXML
+    private Boolean vehicle;
 
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
@@ -74,6 +72,7 @@ public class Controller {
     }
     @FXML
     private void initialize(){
+        vehicle = false;
         zoomSlider.setValue(50.0);
         // Sets the visuals of the theme toggle
         themeToggleBtn.getStyleClass().add("root-light");
@@ -124,15 +123,29 @@ public class Controller {
     private void StartSearch(){
         String input = searchBar.getText();
         Node node = model.getAddressIdMap().get(input);
-        model.StartDijkstra(node);
+        model.StartDijkstra(node,vehicle);
     }
 
     @FXML
     private void StopSearch(){
         String input = searchBar1.getText();
         Node node = model.getAddressIdMap().get(input);
-        model.getDijkstraPath(node);
+        model.list.add(new Line(model.getDijkstraPath(node)));
+        view.redraw();
 
+    }
+    @FXML
+    private void toggleMode(){
+        if(ToggleMode.isSelected()){
+        vehicle = true;
+        } else {
+            vehicle = false;
+        }
+        if(vehicle){
+            System.out.println("BIKE");
+        }else {
+            System.out.println("CAR");
+        }
     }
 
     @FXML

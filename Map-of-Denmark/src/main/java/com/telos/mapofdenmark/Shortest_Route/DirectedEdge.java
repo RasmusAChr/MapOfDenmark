@@ -5,18 +5,22 @@ import java.io.Serializable;
 
 public class DirectedEdge implements Serializable {
     private final int V,W;
-    private final double weight;
-    public DirectedEdge(int V, int W, double weight) {
+    private final double weightbike,weightcar;
+    public DirectedEdge(int V, int W, double weightbike, double weightcar) {
         this.V = V;
         this.W = W;
-        this.weight = weight;
+        this.weightbike = weightbike;
+        this.weightcar = weightcar;
     }
 
     public int from(){return V;}
     public int to(){return W;}
-    public double weight(){return weight;}
+    public double weight(boolean vehicle){
+        if(vehicle) return weightbike;
+        return weightcar;
+    }
 
     public String toString(){
-        return "from: " + from() + ", to: " + to() + ", weight: " + weight();
+        return "from: " + from() + ", to: " + to() + ", weightcar: " + weightcar+ ", weightbike: " + weightbike;
     }
 }

@@ -41,6 +41,37 @@ public class ColorScheme implements Serializable{
         colors.put("highway", "#0000FF");
         darkColors.put("highway", "#FFFFFF");
 
+        colors.put("default", "#0000FF");
+        darkColors.put("default", "#FFFFFF");
+        colors.put("highway", "#0000FF");
+        darkColors.put("highway", "#FFFFFF");
+        colors.put("trunk", "#0000FF");
+        darkColors.put("trunk", "#FFFFFF");
+        colors.put("primary", "#0000FF");
+        darkColors.put("primary", "#FFFFFF");
+        colors.put("secondary", "#0000FF");
+        darkColors.put("secondary", "#FFFFFF");
+        colors.put("tertiary", "#0000FF");
+        darkColors.put("tertiary", "#FFFFFF");
+        colors.put("unclassified", "#0000FF");
+        darkColors.put("unclassified", "#FFFFFF");
+        colors.put("residential", "#0000FF");
+        darkColors.put("residential", "#FFFFFF");
+        colors.put("motorway_link", "#0000FF");
+        darkColors.put("motorway_link", "#FFFFFF");
+        colors.put("trunk_link", "#0000FF");
+        darkColors.put("trunk_link", "#FFFFFF");
+        colors.put("primary_link", "#0000FF");
+        darkColors.put("primary_link", "#FFFFFF");
+        colors.put("secondary_link", "#0000FF");
+        darkColors.put("secondary_link", "#FFFFFF");
+        colors.put("tertiary_link", "#0000FF");
+        darkColors.put("tertiary_link", "#FFFFFF");
+        colors.put("living_street", "#0000FF");
+        darkColors.put("living_street", "#FFFFFF");
+        colors.put("track", "#0000FF");
+        darkColors.put("track", "#FFFFFF");
+
         // NATURALS
         colors.put("fell","#48a160");
         colors.put("grassland","#68bf60");

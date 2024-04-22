@@ -1,38 +1,37 @@
 package com.telos.mapofdenmark;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 public class Line implements Serializable {
-    double x1, y1, x2, y2;
+    List<Node> way;
+    double[] coords;
 
-    LineThickness lt = new LineThickness();
-
-    public Line(String line) {
-        String[] coord = line.split(" ");
-        x1 = Double.parseDouble(coord[1]);
-        y1 = Double.parseDouble(coord[2]);
-        x2 = Double.parseDouble(coord[3]);
-        y2 = Double.parseDouble(coord[4]);
-    }
-
-    public Line(Point2D p1, Point2D p2) {
-        x1 = p1.getX();
-        y1 = p1.getY();
-        x2 = p2.getX();
-        y2 = p2.getY();
+    public Line(List<Node> way) {
+        this.way = way;
+        coords = new double[way.size() * 2];
+        for (int i = 0 ; i < way.size() ; ++i) {
+            var node = way.get(i);
+            coords[2 * i] = 0.56 * node.lon;
+            coords[2 * i + 1] = -node.lat;
+        }
+        System.out.println("jajajjaj");
     }
 
     public void draw(GraphicsContext gc) {
         gc.beginPath();
-        gc.moveTo(x1, y1);
-        gc.lineTo(x2, y2);
+        gc.moveTo(coords[0], coords[1]);
+        for (int i = 2 ; i < coords.length ; i += 2) {
+            gc.lineTo(coords[i], coords[i+1]);
+        }
+        gc.setStroke(Color.RED);
+        gc.setLineWidth(0.00003);
         gc.stroke();
-    }
-
-    public void setLineSize(int a) {
-
     }
 
 }

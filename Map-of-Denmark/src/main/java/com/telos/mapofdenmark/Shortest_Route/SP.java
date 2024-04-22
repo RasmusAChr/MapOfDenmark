@@ -7,8 +7,10 @@ public class SP
     private DirectedEdge[] edgeTo;
     private double[] distTo;
     private IndexMinPQ<Double> pq;
-    public SP(EdgeWeightedDigraph G, int s)
+    private boolean vehicle;
+    public SP(EdgeWeightedDigraph G, int s, boolean vehicle)
     {
+        this.vehicle = vehicle;
         edgeTo = new DirectedEdge[G.V()];
         distTo = new double[G.V()];
         pq = new IndexMinPQ<Double>(G.V());
@@ -25,9 +27,9 @@ public class SP
     private void relax(DirectedEdge e)
     {
         int v = e.from(), w = e.to();
-        if (distTo[w] > distTo[v] + e.weight())
+        if (distTo[w] > distTo[v] + e.weight(vehicle))
         {
-            distTo[w] = distTo[v] + e.weight();
+            distTo[w] = distTo[v] + e.weight(vehicle);
             edgeTo[w] = e;
             if (pq.contains(w)) pq.decreaseKey(w, distTo[w]);
             else pq.insert (w, distTo[w]);

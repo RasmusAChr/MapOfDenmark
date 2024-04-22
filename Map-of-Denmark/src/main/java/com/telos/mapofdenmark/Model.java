@@ -45,9 +45,7 @@ public class Model implements Serializable {
     HashMap<Integer, Node> DigraphIndexToNode;
     HashMap<Long, Node> id2node;
     int roadCount;
-    HashSet<String> roadIdSet = new HashSet<>(Arrays.asList("motorway", "trunk", "primary", "secondary", "tertiary", "unclassified", "residential", "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link", "living_street", "track"));
-
-
+    Map<String, Double> roadIdSet;
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
             try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
@@ -59,6 +57,21 @@ public class Model implements Serializable {
 
 
     public Model(String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
+        this.roadIdSet = new HashMap<String, Double>(Map.of(
+                "motorway",0.4545,
+                "trunk", 0.625,
+                "primary", 60.0,
+                "secondary", 60.2,
+                "tertiary", 60.4,
+                "unclassified", 20.01,
+                "residential", 20.02,
+                "motorway_link", 20.03,
+                "trunk_link", 20.04,
+                "primary_link", 20.05));
+        roadIdSet.put("secondary_link", 20.06);
+        roadIdSet.put("tertiary_link", 20.06);
+        roadIdSet.put("living_street", 20.06);
+        roadIdSet.put("track", 20.06);
         this.DigraphNodeToIndex = new HashMap<>();
         this.DigraphIndexToNode = new HashMap<>();
         this.id2node = new HashMap<>();
@@ -70,9 +83,9 @@ public class Model implements Serializable {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
             parseRouteNet(filename);
-        } else {
+        } /*else {
             parseTXT(filename);
-        }
+        }*/
         save(filename+".obj");
         this.trie = deserializeTrie("data/.obj");
         this.kdTree = new KDTree();
@@ -162,6 +175,7 @@ public class Model implements Serializable {
         var way = new ArrayList<Node>();
         var coast = false;
         String roadtype = "";
+        String waytype = "";
         boolean shouldAdd = false;
         boolean drivable = false;
         boolean cycleable = false;
@@ -180,12 +194,19 @@ public class Model implements Serializable {
                     var v = input1.getAttributeValue(null, "v");
                     var k = input1.getAttributeValue(null, "k");
                     if (k.equals("highway")) {
-                        if (roadIdSet.contains(v)) {
+                        if (roadIdSet.containsKey(v)) {
                             drivable = true;
                             shouldAdd = true;
-                            roadtype = "highway";
+                            roadtype = v;
                         }
-
+                    waytype = v;
+                    } else if (k.equals("oneway")) {
+                        oneway = v.equals("yes");
+                    } else if (k.equals("onewayBicycle")) {
+                        onewayBicycle = v.equals("yes");
+                    } else if (k.equals("bicycle")) {
+                        cycleable = v.equals("yes");
+                        shouldAdd = true;
                     }
 
                 } else if (name == "nd") {
@@ -197,7 +218,7 @@ public class Model implements Serializable {
                 var name = input1.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name == "way") {
-                    if (roadtype.equals("highway")) {
+                    if (!roadtype.isEmpty()) {
                         ways.add(new Road(way, roadtype));
                     } else {
                         ways.add(new Way(way));
@@ -206,9 +227,18 @@ public class Model implements Serializable {
                     for (Node node : way) {
                         if (shouldAdd) {
                             if (vertexIndex != -1) {
-                                int weight = weightCalculate();
-                                EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight));
-                                EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight));
+                                double weight_without_modifier = weightCalculate();
+                                double weight_car = weightCalculate();
+                                // calculate the weight depending on tags
+                                if(cycleable){
+                                     weight_car = Integer.MAX_VALUE;
+                                }
+
+                                if (oneway) {
+
+                                }
+                                EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_without_modifier, weight_car )); // needs specific weight for bike or car
+                                EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_without_modifier, weight_car ));
                             } else {
                                 vertexIndex = DigraphNodeToIndex.get(node);
                             }
@@ -237,8 +267,8 @@ public class Model implements Serializable {
     }
 
     //Dijkstra implementation
-    public void StartDijkstra(Node startaddress){
-        this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(findNodeByID(nodeList, "697814"))); // this starts the dijkstra search from the index that refferes to a node
+    public void StartDijkstra(Node startaddress,boolean vehicle){
+        this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(findNodeByID(nodeList, "697814")),vehicle); // this starts the dijkstra search from the index that refferes to a node
     }
 
 
@@ -255,7 +285,7 @@ public class Model implements Serializable {
      * @return Returns a list of nodes in order from start to finish
      *
      * */
-    public void getDijkstraPath(Node Endaddress) {
+    public List<Node> getDijkstraPath(Node Endaddress) {
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
          for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList, "92994313")))) {
@@ -268,8 +298,15 @@ public class Model implements Serializable {
              }
 
          }
-        System.out.println(path);
+         System.out.println(path);
+         return path;
     }
+    //
+
+
+
+
+
     // used for test
     public Node findNodeByID(List<Node> nodeList, String id) {
 
@@ -283,14 +320,14 @@ public class Model implements Serializable {
     }
 
 
-    private void parseTXT(String filename) throws FileNotFoundException {
+    /*private void parseTXT(String filename) throws FileNotFoundException {
         File f = new File(filename);
         try (Scanner s = new Scanner(f)) {
             while (s.hasNext()) {
                 list.add(new Line(s.nextLine()));
             }
         }
-    }
+    }*/
     public void parseAddressFromOSM(String v, String k){
         // Assuming you have a Trie instance called 'trie'
 //        trie.insert(fullAddress);
@@ -327,10 +364,6 @@ public class Model implements Serializable {
         distance = Math.pow(distance, 2) + Math.pow(height, 2);
 
         return Math.sqrt(distance);
-    }
-
-    public void add(Point2D p1, Point2D p2) {
-        list.add(new Line(p1, p2));
     }
 
     public List<Address> getAddressList() {

@@ -42,7 +42,12 @@
                            </children>
                         </StackPane>
                         <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="375.0" prefWidth="100.0" VBox.vgrow="ALWAYS" />
-                        <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="94.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+                        <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="94.0" prefWidth="100.0">
+                           <children>
+                              <ToggleButton fx:id="ToggleMode" mnemonicParsing="false" onMouseClicked="#toggleMode" prefHeight="42.0" prefWidth="90.0" style="-fx-background-radius: 50;" stylesheets="@Togglebutton.css" text="CAR/BIKE" />
+                           </children>
+                        </StackPane>
+                        <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="94.0" prefWidth="100.0">
                            <children>
                               <ToggleButton fx:id="themeToggleBtn" mnemonicParsing="false" onMouseClicked="#toggleTheme" prefHeight="42.0" prefWidth="90.0" style="-fx-background-radius: 50;" stylesheets="@Togglebutton.css" text="Dark/Light" />
                            </children>
