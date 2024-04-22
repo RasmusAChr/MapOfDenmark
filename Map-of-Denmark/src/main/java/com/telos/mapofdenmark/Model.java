@@ -122,7 +122,7 @@ public class Model implements Serializable {
                     }
                     case "way" -> {
                         EWD = new EdgeWeightedDigraph(roadCountX);
-                        parseOSM(input, tagKind);
+                        parseWaysAndRelations(input, tagKind);
                         return;
                     }
                 }
@@ -158,7 +158,7 @@ public class Model implements Serializable {
         parseNodeNet(input);
     }
 
-    private void parseOSM(XMLStreamReader input1, int tagKind) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
+    private void parseWaysAndRelations(XMLStreamReader input1, int tagKind) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         var way = new ArrayList<Node>();
         var coast = false;
         String roadtype = "";
@@ -258,7 +258,7 @@ public class Model implements Serializable {
     public void getDijkstraPath(Node Endaddress) {
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
-        System.out.println(Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList, "92994313"))));
+         System.out.println(Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList, "92994313"))));
          for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList, "335909826")))) {
             System.out.println(i);
              if (!NodeAdded.contains(id2node.get(i.to()))) { // adds the two points because it iterates backwards
