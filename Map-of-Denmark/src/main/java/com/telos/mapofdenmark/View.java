@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Queue;
 
 public class View {
     Canvas canvas = new Canvas(1091.0, 638.0);
@@ -132,4 +133,12 @@ public class View {
     public void Current_Slider_value(double value){
         slider_value = value;
     }
+
+//    public Queue<Node> getNodesFromSpatial(){
+//        Queue<Node> nodes = model.kdTree.rangeSearch(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
+//        System.out.println("Bounds: " + bounds);
+//        System.out.println("Size of KDTree: " + model.kdTree.size());
+//        System.out.println("Nodes returned: " + nodes.size());
+//        return nodes;
+//    }
 }
