@@ -102,26 +102,24 @@ public class View {
          */
         Point2D canvasTopLeft =  mousetoModel(0,0);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
-//        System.out.println("Top Left: " + canvasTopLeft);
-//        System.out.println("Bottom right: " + canvasBottomRight);
-        System.out.println("Size of KDTree: "+model.kdTree.size());
-//        System.out.println("Size of queue after rangesearch: " + model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasTopLeft.getY(), canvasBottomRight.getX(),canvasBottomRight.getY()).size());
-        Queue<Node> nodesFromKD = model.kdTree.rangeSearch(0,10,0,10);
-        System.out.println("Size of queue after rangesearch: " + model.kdTree.rangeSearch(0,10,0,10).size());
-//        for (Node nodeSpatial : model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasTopLeft.getY(), canvasBottomRight.getX(),canvasBottomRight.getY())) {
-          for(Node nodeSpatial : nodesFromKD){
+        System.out.println("Top Left: " + canvasTopLeft);
+        System.out.println("Bottom right: " + canvasBottomRight);
+        System.out.println("Size of KDTree: " + model.kdTree.size());
+        System.out.println("Size of queue after rangesearch: " + model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY()).size());
+        Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+
+        Line testline = new Line(canvasTopLeft, canvasBottomRight);
+        testline.draw(gc);
+
+        // rangeSearch(x1,x2,y1,y2)
+        for (Node nodeSpatial : nodesFromKD) {
+//          for(Node nodeSpatial : nodesFromKD){
             Way way = nodeSpatial.getWay();
             if (way != null) {
-                System.out.println("Node.getWay = " + way.coords);
+                //System.out.println("Node.getWay = " + way.coords);
                 way.draw(gc, slider_value, dark);
-            } else if (way == null){
-                System.out.println("------: WAY IS NULL :------");
             }
         }
-
-
-        
-        
     }
 
     void pan(double dx, double dy) {
