@@ -59,6 +59,8 @@ public class KDTree
 //        x.size = size(x.left) + size(x.right) + 1;
 //        return x;
 
+        //System.out.println("Put this node with a ref to this way: " + val.getWay());
+
         // New put adapted to KDTree
         if (x == null) return new KDNode(xCoord, yCoord, val, 1);
         // Perform comparison based on the determined axis

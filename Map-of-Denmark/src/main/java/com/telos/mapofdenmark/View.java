@@ -100,10 +100,12 @@ public class View {
         }
 
          */
-        Point2D canvasTopLeft = mousetoModel(0,0);
+        Point2D canvasTopLeft =  mousetoModel(0,0);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
-        System.out.println("Top Left: " + canvasTopLeft);
-        System.out.println("Bottom right: " + canvasBottomRight);
+//        System.out.println("Top Left: " + canvasTopLeft);
+//        System.out.println("Bottom right: " + canvasBottomRight);
+        System.out.println("Size of KDTree: "+model.kdTree.size());
+        System.out.println("Size of queue after rangesearch: " + model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasTopLeft.getY(), canvasBottomRight.getX(),canvasBottomRight.getY()).size());
 
         for (Node nodeSpatial : model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasTopLeft.getY(), canvasBottomRight.getX(),canvasBottomRight.getY())) {
             Way way = nodeSpatial.getWay();
