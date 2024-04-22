@@ -33,6 +33,7 @@ public class Model implements Serializable {
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
+    List<Relation> Relations = new ArrayList<>();
     SP Dijkstra = null;
     private Trie trie;
     double minlat, maxlat, minlon, maxlon;
@@ -44,6 +45,8 @@ public class Model implements Serializable {
     HashMap<Node, Integer> DigraphNodeToIndex;
     HashMap<Integer, Node> DigraphIndexToNode;
     HashMap<Long, Node> id2node;
+    List<Member> relationsMembers;
+    HashMap<Long, Way> id2way;
     int roadCount;
     Map<String, Double> roadIdSet;
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
@@ -74,7 +77,9 @@ public class Model implements Serializable {
         roadIdSet.put("track", 20.06);
         this.DigraphNodeToIndex = new HashMap<>();
         this.DigraphIndexToNode = new HashMap<>();
+        this.id2way = new HashMap<>();
         this.id2node = new HashMap<>();
+        this.relationsMembers = new ArrayList<>();
         this.roadCount = 0;
         this.addressList = new ArrayList<>();
         this.address = new Address();
@@ -138,6 +143,10 @@ public class Model implements Serializable {
                         parseWaysAndRelations(input, tagKind);
                         return;
                     }
+                    case "relation" -> {
+                        parseWaysAndRelations(input,tagKind);
+                        return;
+                    }
                 }
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input.getLocalName();
@@ -176,11 +185,14 @@ public class Model implements Serializable {
         var coast = false;
         String roadtype = "";
         String waytype = "";
+        String RelationsType = "";
         boolean shouldAdd = false;
         boolean drivable = false;
         boolean cycleable = false;
         boolean oneway = false;
         boolean onewayBicycle = false;
+        boolean insideRelation = false;
+        long wayid = 0;
         int vertexIndex = -1;
 
 
@@ -188,9 +200,10 @@ public class Model implements Serializable {
             tagKind = input1.next();
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
                 var name = input1.getLocalName();
-                if (name == "way") {
+                if (name.equals("way")) {
+                    wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
                     way.clear();
-                } else if (name == "tag") {
+                } else if (!insideRelation && name.equals("tag")) {
                     var v = input1.getAttributeValue(null, "v");
                     var k = input1.getAttributeValue(null, "k");
                     if (k.equals("highway")) {
@@ -209,15 +222,35 @@ public class Model implements Serializable {
                         shouldAdd = true;
                     }
 
-                } else if (name == "nd") {
+                } else if (name.equals("nd")) {
                     var ref = Long.parseLong(input1.getAttributeValue(null, "ref"));
                     var node = id2node.get(ref);
                     way.add(node);
+                } else if (name.equals("relation")) {
+                    
+                    insideRelation = true;
+                    relationsMembers.clear();
+                    RelationsType = "";
+                } else if (insideRelation && name.equals("member")) {
+                    // parse Ref
+                    var ref = Long.parseLong(input1.getAttributeValue(null,"ref"));
+                    var role = input1.getAttributeValue(null,"role");
+                    var Member = new Member(role,ref);
+                    Member.setWay(id2way.get(ref));
+                    relationsMembers.add(Member);
+                } else if (insideRelation && name.equals("tag")) {
+                    var k = input1.getAttributeValue(null,"k");
+                    var v = input1.getAttributeValue(null,"v");
+
+                    if(k.equals("type")){
+                        RelationsType = v;
+                    }
                 }
+
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input1.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
-                if (name == "way") {
+                if (name.equals("way")) {
                     if (!roadtype.isEmpty()) {
                         ways.add(new Road(way, roadtype));
                     } else {
@@ -245,7 +278,10 @@ public class Model implements Serializable {
                         }
 
                         node.setWay(new Way(way)); // Set the way reference in each node
+
                     }
+                    Way newWay = new Way(way);
+                    id2way.put(wayid,newWay);
                     way.clear();
                     roadtype = "";
                     shouldAdd = false;
@@ -254,8 +290,11 @@ public class Model implements Serializable {
                     oneway = false;
                     onewayBicycle = false;
                     vertexIndex = -1;
+                } else if (name.equals("relation") && insideRelation) {
+                    insideRelation = false;
+                    Relations.add(new Relation(RelationsType,relationsMembers));
+                    System.out.println("Relation added");
                 }
-
             }
         }
     }
