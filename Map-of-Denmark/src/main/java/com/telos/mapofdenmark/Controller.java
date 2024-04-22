@@ -152,31 +152,6 @@ public class Controller {
             view.redraw();
         }
     }
-   /* To BE DELETED NOT USED
-    @FXML
-    private void readFile(){
-        System.out.println("Attempting to show read file dialog");
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open .Obj or .OSM File");
-
-        // Set extension filters such that the user cannot choose undesird file types/extensions
-        FileChooser.ExtensionFilter osmFilter = new FileChooser.ExtensionFilter("OSM files (*.osm)", "*.osm");
-        FileChooser.ExtensionFilter objFilter = new FileChooser.ExtensionFilter("OBJ files (*.obj)", "*.obj");
-        fileChooser.getExtensionFilters().addAll(osmFilter, objFilter);
-
-        // This retrieves the Stage from this component's scene
-        Stage stage = (Stage) fileBtn.getScene().getWindow();
-        File file = fileChooser.showOpenDialog(stage);
-
-        if (file != null) {
-            String userFile = file.getPath();
-            System.out.println(file.getName());
-
-        } else  {
-            System.out.println("error"); // or something else
-        }
-
-    }*/
     @FXML
     private void placeInterest(){
         System.out.println("You clicked the interest button");

@@ -258,21 +258,17 @@ public class Model implements Serializable {
     public void getDijkstraPath(Node Endaddress) {
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
-        System.out.println(Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList, "92994313"))));
-         for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList, "335909826")))) {
-            System.out.println(i);
-             if (!NodeAdded.contains(id2node.get(i.to()))) { // adds the two points because it iterates backwards
-                 NodeAdded.add(id2node.get(i.to()));
-                 path.add(id2node.get(i.to()));
-
-             } else if (!NodeAdded.contains(id2node.get(i.from()))) {
-                 NodeAdded.add(id2node.get(i.from()));
-                 path.add(id2node.get(i.from()));
+         for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList, "92994313")))) {
+             if(!NodeAdded.contains(DigraphIndexToNode.get(i.to()))){
+                 NodeAdded.add(DigraphIndexToNode.get(i.to()));
+                 path.add(DigraphIndexToNode.get(i.to()));
+             } else if (!NodeAdded.contains(DigraphIndexToNode.get(i.from()))){
+                 NodeAdded.add(DigraphIndexToNode.get(i.from()));
+                 path.add(DigraphIndexToNode.get(i.from()));
              }
 
          }
         System.out.println(path);
-        //return path;
     }
     // used for test
     public Node findNodeByID(List<Node> nodeList, String id) {
