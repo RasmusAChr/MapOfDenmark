@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,8 @@ public class Controller {
     private ToggleButton ToggleMode;
     @FXML
     private Boolean vehicle;
+    @FXML
+    private Boolean POI_MODE;
 
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
@@ -69,10 +72,21 @@ public class Controller {
             lastX = e.getX();
             lastY = e.getY();
         });
+
+        view.canvas.setOnMousePressed(e ->{ // should take the coordinates of the
+            if(e.getButton() == MouseButton.SECONDARY && POI_MODE){
+                System.out.println("POInt");
+                lastX = e.getX();
+                lastY = e.getY();
+            view.POI(lastX, lastY);
+            }
+        });
+
     }
     @FXML
     private void initialize(){
         vehicle = false;
+        POI_MODE = false;
         zoomSlider.setValue(50.0);
         // Sets the visuals of the theme toggle
         themeToggleBtn.getStyleClass().add("root-light");
@@ -167,7 +181,13 @@ public class Controller {
     }
     @FXML
     private void placeInterest(){
-        System.out.println("You clicked the interest button");
+        if(POI_MODE){
+            POI_MODE = false;
+            System.out.println("Leaving POI MODE");
+        } else {
+            POI_MODE = true;
+            System.out.println("Started POI MODE");
+        }
     }
     @FXML
     public double getPanWidth(){

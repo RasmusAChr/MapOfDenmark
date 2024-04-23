@@ -98,6 +98,15 @@ public class View {
         }
     }
 
+    void POI(Double lastx, Double lasty) {
+        Point2D point = mousetoModel(lastx,lasty);
+        double lat = point.getX();
+        double lon = point.getY();
+        // Get nearest neighbor to selected
+        // color the node
+        redraw();
+    }
+
     void pan(double dx, double dy) {
         trans.prependTranslation(dx, dy);
         redraw();
