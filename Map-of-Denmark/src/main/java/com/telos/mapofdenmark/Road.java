@@ -26,10 +26,8 @@ public class Road extends Way{
                 zoomValue = lt.getWidth(roadType) / (zoom/10);
             }
             gc.setLineWidth(zoomValue);
-            super.draw(gc, zoom, darkMode);
-        } else {
-            super.draw(gc, zoom, darkMode);
         }
+        super.draw(gc, zoom, darkMode);
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(0.00001);
     }

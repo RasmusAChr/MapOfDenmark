@@ -71,6 +71,8 @@ public class ColorScheme implements Serializable{
         darkColors.put("living_street", "#FFFFFF");
         colors.put("track", "#0000FF");
         darkColors.put("track", "#FFFFFF");
+        colors.put("cycleway", "#FFFF00");
+        darkColors.put("cycleway", "#FFFFFF");
 
         // NATURALS
         colors.put("fell","#48a160");

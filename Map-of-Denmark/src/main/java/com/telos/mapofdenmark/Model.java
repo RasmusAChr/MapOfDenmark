@@ -48,6 +48,8 @@ public class Model implements Serializable {
     HashMap<Long, Way> id2way;
     int roadCount;
     Map<String, Double> roadIdSet;
+    HashSet<String> bicycleIdSet;
+    HashSet<String> cycleWayIdSet;
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
             try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
@@ -74,6 +76,8 @@ public class Model implements Serializable {
         roadIdSet.put("tertiary_link", 1.0);
         roadIdSet.put("living_street", 2.5);
         roadIdSet.put("track", 1.25);
+        this.bicycleIdSet = new HashSet<>(List.of("yes", "designated", "permissive", "destination"));
+        this.cycleWayIdSet = new HashSet<>(List.of("track", "lane"));
         this.DigraphNodeToIndex = new HashMap<>();
         this.DigraphIndexToNode = new HashMap<>();
         this.id2way = new HashMap<>();
@@ -188,7 +192,7 @@ public class Model implements Serializable {
         boolean drivable = false;
         boolean cycleable = false;
         boolean oneway = false;
-        boolean onewayBicycle = false;
+        boolean onewayBicycle = true;
         boolean insideRelation = false;
         long wayid = 0;
         int vertexIndex = -1;
@@ -209,13 +213,25 @@ public class Model implements Serializable {
                             drivable = true;
                             shouldAdd = true;
                             roadtype = v;
+                            if(v.equals("residential")) cycleable = true;
+                        } else if (v.equals("cycleway")) {
+                            drivable = false;
+                            shouldAdd = true;
+                            cycleable = true;
+                            roadtype = "cycleway";
                         }
+                    } else if (k.equals("cycleway")) {
+                        if (bicycleIdSet.contains(v)) {
+
+                        }
+
+
                     } else if (k.equals("oneway")) {
                         oneway = v.equals("yes");
                     } else if (k.equals("onewayBicycle")) {
-                        onewayBicycle = v.equals("yes");
-                    } else if (k.equals("bicycle")) {
-                        cycleable = v.equals("yes");
+                        onewayBicycle = false;
+                    } else if (k.equals("bicycle") && v.equals("yes")) {
+                        cycleable = true;
                         shouldAdd = true;
                     }
 
@@ -267,7 +283,6 @@ public class Model implements Serializable {
                                 if (!drivable) {
                                     weight_car = Integer.MAX_VALUE;
                                 }
-
                                 if (oneway) {
                                     if (onewayBicycle) {
                                         EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
@@ -295,7 +310,7 @@ public class Model implements Serializable {
                     drivable = false;
                     cycleable = false;
                     oneway = false;
-                    onewayBicycle = false;
+                    onewayBicycle = true;
                     vertexIndex = -1;
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
