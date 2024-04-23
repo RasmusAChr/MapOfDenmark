@@ -2,7 +2,6 @@ package com.telos.mapofdenmark.KDTreeClasses;
 
 import com.telos.mapofdenmark.Node;
 
-import java.security.Key;
 import java.util.*;
 
 // Inspiration to KDTree from https://www.geeksforgeeks.org/search-and-insertion-in-k-dimensional-tree/
@@ -275,12 +274,12 @@ public class KDTree
     public Node ceiling(Double xCoord, Double yCoord, boolean findNearestRoad) {
         if (xCoord == null || yCoord == null) throw new IllegalArgumentException("argument to ceiling() is null");
         if (isEmpty()) throw new NoSuchElementException("calls ceiling() with empty symbol table");
-        KDNode x = ceiling(root, xCoord, yCoord, 0, findNearestRoad);
+        KDNode x = ceiling(root, xCoord, yCoord, 0, findNearestRoad, null);
         if (x == null) throw new NoSuchElementException("argument to ceiling() is too large");
         else return x.val;
     }
 
-    private KDNode ceiling(KDNode x, Double xCoord, Double yCoord, int depth, boolean findNearestRoad) {
+    private KDNode ceiling(KDNode x, Double xCoord, Double yCoord, int depth, boolean shouldFindNearestRoad, KDNode best) {
         if (x == null) return null;
         int cmp;
         // Determine the axis of comparison based on current depth (0 for x, 1 for y)
@@ -290,26 +289,62 @@ public class KDTree
         else cmp = Double.compare(yCoord, x.y); // Compare y-coordinates if axis is 1
 
         // Normal ceiling
-        if (!findNearestRoad){
-            if (cmp == 0) return x;
-            if (cmp < 0) {
-                KDNode t = ceiling(x.left, x.x, x.y, depth+1, findNearestRoad);
-                if (t != null) return t;
-                else return x;
-            }
-            // else if (cmp > 0)
-            return ceiling(x.right, x.x, x.y, depth+1, findNearestRoad);
+        if (!shouldFindNearestRoad){
+            if (cmp < 0) return ceiling(x.left, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
+            else if (cmp > 0) return ceiling(x.right, xCoord, yCoord, depth + 1, shouldFindNearestRoad, x);
+            else return x;
         }
         // If we want to find the nearest node that is also a road
         else {
-            if (cmp == 0) return x;
             if (cmp < 0) {
-                KDNode t = ceiling(x.left, x.x, x.y, depth+1, findNearestRoad);
-                if (t != null) return t;
-                else return x;
+                if (x.val.getWay().isPartOfRoad()) best = x;
+                return ceiling(x.left, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
             }
-            // else if (cmp > 0)
-            return ceiling(x.right, x.x, x.y, depth+1, findNearestRoad);
+            else if (cmp > 0) {
+                if (x.val.getWay().isPartOfRoad()) best = x;
+                return ceiling(x.right, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
+            }
+            else {
+                if (x.val.getWay().isPartOfRoad()) return x;
+                else return best;
+            }
+        }
+    }
+
+    public Node floor(double xCoord, double yCoord, boolean shouldFindNearestRoad) {
+        KDNode x = floor(root, xCoord, yCoord, 0, shouldFindNearestRoad, null);
+        if (x == null) throw new NoSuchElementException("argument to floor() is too small");
+        else return x.val;
+
+    }
+
+    private KDNode floor(KDNode x, double xCoord, double yCoord, int depth, boolean shouldFindNearestRoad, KDNode best) {
+        if (x == null) return best;
+        int cmp;
+        // Determine the axis of comparison based on current depth (0 for x, 1 for y)
+        int axis = depth % 2;
+        // The following two conditionals is used to determine whether to divide half-plane vertically or horizontally
+        if (axis == 0) cmp = Double.compare(xCoord, x.x); // Compare x-coordinates if axis is 0
+        else cmp = Double.compare(yCoord, x.y); // Compare y-coordinates if axis is 1
+        if (!shouldFindNearestRoad) {
+            if (cmp  < 0) return floor(x.left, xCoord, yCoord,depth + 1, shouldFindNearestRoad, best);
+            else if (cmp  > 0) return floor(x.right, xCoord, yCoord,depth + 1, shouldFindNearestRoad, best);
+            else return x;
+        }
+        // If we want to find the nearest node that is also a road
+        else {
+            if (cmp < 0) {
+                if (x.val.getWay().isPartOfRoad()) best = x;
+                return floor(x.left, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
+            }
+            else if (cmp > 0) {
+                if (x.val.getWay().isPartOfRoad()) best = x;
+                return floor(x.right, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
+            }
+            else {
+                if (x.val.getWay().isPartOfRoad()) return x;
+                else return best;
+            }
         }
     }
 }
