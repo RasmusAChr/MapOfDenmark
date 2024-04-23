@@ -82,7 +82,7 @@ public class View {
         gc.setTransform(new Affine());
         if(dark) {
             gc.setStroke(Color.WHITE);
-            gc.setFill(Color.LIGHTGRAY);
+            gc.setFill(Color.DARKGRAY);
         } else{
             gc.setFill(Color.WHITE);
             gc.setStroke(Color.BLACK);
@@ -91,15 +91,13 @@ public class View {
         gc.setTransform(trans);
        // double zoomValue = 1/Math.sqrt(trans.determinant());
         gc.setLineWidth(0.000005);
-        /*
+//        for (var way : model.ways) {
+//            way.draw(gc, slider_value, dark);
+//        }
         for (var line : model.list) {
             line.draw(gc);
         }
-        for (var way : model.ways) {
-            way.draw(gc, slider_value, dark);
-        }
 
-         */
         Point2D canvasTopLeft =  mousetoModel(0,0);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
 //        System.out.println("Top Left: " + canvasTopLeft);
@@ -124,7 +122,6 @@ public class View {
     }
 
     void pan(double dx, double dy) {
-        System.out.println("Pan was called");
         trans.prependTranslation(dx, dy);
         redraw();
     }
@@ -140,7 +137,6 @@ public class View {
     }
 
     void zoom(double dx, double dy, double factor) {
-        System.out.println("Zoom was called");
         pan(-dx, -dy);
         trans.prependScale(factor, factor);
         pan(dx, dy);
@@ -159,21 +155,4 @@ public class View {
     public void Current_Slider_value(double value){
         slider_value = value;
     }
-
-
-
-    /*
-    public Queue<Node> getNodesFromSpatial(){
-        //Rectangle2D canvasRectangle = createCanvasRectangle();
-
-        Point2D canvasTopLeft = mousetoModel(0,0);
-        Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
-        System.out.println("Top Left: " + canvasTopLeft);
-        System.out.println("Bottom right: " + canvasBottomRight);
-        Queue<Node> nodes = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasTopLeft.getY(), canvasBottomRight.getX(),canvasBottomRight.getY());
-
-        return nodes;
-    }
-
-     */
 }

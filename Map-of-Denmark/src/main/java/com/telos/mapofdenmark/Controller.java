@@ -1,7 +1,6 @@
 package com.telos.mapofdenmark;
 
 
-import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -9,9 +8,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +45,12 @@ public class Controller {
     private ListView<String> suggestionsBox; // The ListView to display suggestions
     @FXML
     private TextField searchBar;
+    @FXML
+    private TextField searchBar1;
+    @FXML
+    private ToggleButton ToggleMode;
+    @FXML
+    private Boolean vehicle;
 
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
@@ -70,6 +72,7 @@ public class Controller {
     }
     @FXML
     private void initialize(){
+        vehicle = false;
         zoomSlider.setValue(50.0);
         // Sets the visuals of the theme toggle
         themeToggleBtn.getStyleClass().add("root-light");
@@ -109,6 +112,41 @@ public class Controller {
             view.Current_Slider_value(newVal.doubleValue());
           });
     }
+    @FXML
+    private void handleSearch() {
+        StartSearch();
+        StopSearch();
+    }
+
+
+    @FXML
+    private void StartSearch(){
+        String input = searchBar.getText();
+        Node node = model.getAddressIdMap().get(input);
+        model.StartDijkstra(input,vehicle); // changed from node to string for testing
+    }
+
+    @FXML
+    private void StopSearch(){
+        String input = searchBar1.getText();
+        Node node = model.getAddressIdMap().get(input);
+        model.list.add(new Line(model.getDijkstraPath(input)));// changed from node to string for testing
+        view.redraw();
+
+    }
+    @FXML
+    private void toggleMode(){
+        if(ToggleMode.isSelected()){
+        vehicle = true;
+        } else {
+            vehicle = false;
+        }
+        if(vehicle){
+            System.out.println("BIKE");
+        }else {
+            System.out.println("CAR");
+        }
+    }
 
     @FXML
     private void toggleTheme(){
@@ -126,30 +164,6 @@ public class Controller {
             view.togglecolor(Dark);
             view.redraw();
         }
-    }
-    @FXML
-    private void readFile(){
-        System.out.println("Attempting to show read file dialog");
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open .Obj or .OSM File");
-
-        // Set extension filters such that the user cannot choose undesird file types/extensions
-        FileChooser.ExtensionFilter osmFilter = new FileChooser.ExtensionFilter("OSM files (*.osm)", "*.osm");
-        FileChooser.ExtensionFilter objFilter = new FileChooser.ExtensionFilter("OBJ files (*.obj)", "*.obj");
-        fileChooser.getExtensionFilters().addAll(osmFilter, objFilter);
-
-        // This retrieves the Stage from this component's scene
-        Stage stage = (Stage) fileBtn.getScene().getWindow();
-        File file = fileChooser.showOpenDialog(stage);
-
-        if (file != null) {
-            String userFile = file.getPath();
-            System.out.println(file.getName());
-
-        } else  {
-            System.out.println("error"); // or something else
-        }
-
     }
     @FXML
     private void placeInterest(){

@@ -33,7 +33,7 @@ public class Controller_Boot {
         this.view = view;
         this.primaryStage = primaryStage;
         this.path = System.getProperty("user.dir"); // gets which directory the project is placed
-        this.userFile = path + "\\data\\kbh.osm";
+        this.userFile = path + "/data/kbh.osm"; // To be Looked at
     }
 
 
@@ -47,7 +47,8 @@ public class Controller_Boot {
         // Set extension filters such that the user cannot choose undesird file types/extensions
         FileChooser.ExtensionFilter osmFilter = new FileChooser.ExtensionFilter("OSM files (*.osm)", "*.osm");
         FileChooser.ExtensionFilter objFilter = new FileChooser.ExtensionFilter("OBJ files (*.obj)", "*.obj");
-        fileChooser.getExtensionFilters().addAll(osmFilter, objFilter);
+        FileChooser.ExtensionFilter zippedFilter = new FileChooser.ExtensionFilter("Zipped OSM files (*.osm.zip)", "*.osm.zip");
+        fileChooser.getExtensionFilters().addAll(osmFilter, objFilter,zippedFilter);
 
         // This retrieves the Stage from this component's scene
         Stage stage = (Stage) btn_YES.getScene().getWindow();

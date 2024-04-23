@@ -4,14 +4,15 @@ import java.io.Serializable;
 
 
 public class Node implements Serializable {
-    public double lat, lon;
+    long id;
+    double lat, lon;
     Way way;
-    private boolean isPartOfRoad;
-    public Node(double lat, double lon) {
+
+    public Node(long id, double lat, double lon) {
+        this.id = id;
         this.lat = lat;
         this.lon = lon;
         this.way = null;
-        this.isPartOfRoad = false;
     }
 
     public double getLat(){
@@ -24,14 +25,13 @@ public class Node implements Serializable {
     public void setWay(Way way) {
         this.way = way;
     }
-    public void setPartOfRoad(boolean partOfRoad) {
-        isPartOfRoad = partOfRoad;
-    }
-    public boolean getIsPartOfRoad(){
-        return isPartOfRoad;
-    }
-    public Way getWay() {
-        return this.way;
+
+    public String getId(){
+        return this.id + "";
     }
 
+    @Override
+    public String toString() {
+        return "Node" + this.id;
+    }
 }
