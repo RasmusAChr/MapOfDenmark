@@ -93,7 +93,7 @@ public class Model implements Serializable {
         save(filename+".obj");
         this.trie = deserializeTrie("data/.obj");
         this.kdTree = new KDTree();
-
+        kdTree.populate(nodeList);
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));

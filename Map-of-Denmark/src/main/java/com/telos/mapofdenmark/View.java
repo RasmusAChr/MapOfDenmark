@@ -94,9 +94,6 @@ public class View {
 //        for (var way : model.ways) {
 //            way.draw(gc, slider_value, dark);
 //        }
-        for (var line : model.list) {
-            line.draw(gc);
-        }
 
         Point2D canvasTopLeft =  mousetoModel(0,0);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
@@ -115,9 +112,14 @@ public class View {
 //          for(Node nodeSpatial : nodesFromKD){
             Way way = nodeSpatial.getWay();
             if (way != null) {
+                gc.setStroke(Color.BLACK);
                 //System.out.println("Node.getWay = " + way.coords);
                 way.draw(gc, slider_value, dark);
             }
+        }
+
+        for (var line : model.list) {
+            line.draw(gc);
         }
     }
 

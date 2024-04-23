@@ -19,14 +19,14 @@ class KDTreeTest {
     void testGetPut() {
         double[] point = new double[] {0,0};
         String value = "First Point";
-        tree.put(point[0], point[1],new Node(1,1));
+        tree.put(point[0], point[1],new Node(1,1,1));
         assertEquals(value, tree.get(0,0), "get should return the correct value for point1");
     }
     @Test
     void testGetNonExistentPoint() {
         double[] point = new double[] {1,0};
         String value = "First Point";
-        tree.put(point[0], point[1],new Node(1,1));
+        tree.put(point[0], point[1],new Node(1,1,1));
         assertNull(tree.get(0,0), "get should return null for a non-existent point");
     }
 
@@ -34,7 +34,7 @@ class KDTreeTest {
     void testPopulationSize(){
         List<Node> listOfNodes = new ArrayList<>();
         for(int i = 0 ; i < 10 ; i++){
-            listOfNodes.add(new Node(i,i));
+            listOfNodes.add(new Node(i,i,i));
         }
         tree.populate(listOfNodes);
         assertEquals(10,tree.size());
@@ -44,7 +44,7 @@ class KDTreeTest {
     void testBalancingOnRoot(){
         List<Node> listOfNodes = new ArrayList<>();
         for(int i = 0 ; i < 10 ; i++){
-            listOfNodes.add(new Node(i,i));
+            listOfNodes.add(new Node(i,i,i));
         }
         tree.populate(listOfNodes);
         assertEquals(5, tree.getRootX());
@@ -53,7 +53,7 @@ class KDTreeTest {
     void testBalancingOnTree(){
         List<Node> listOfNodes = new ArrayList<>();
         for(int i = 0 ; i < 10 ; i++){
-            listOfNodes.add(new Node(i,i));
+            listOfNodes.add(new Node(i, i,i));
         }
         tree.populate(listOfNodes);
         tree.levelOrderTraverse();
@@ -62,7 +62,7 @@ class KDTreeTest {
     void testRangeSearch(){
         List<Node> listOfNodes = new ArrayList<>();
         for(int i = 0 ; i < 10 ; i++){
-            listOfNodes.add(new Node(i,i));
+            listOfNodes.add(new Node(i,i,i));
         }
         tree.populate(listOfNodes);
         assertEquals(3, tree.rangeSearch(0,2,0,2).size());

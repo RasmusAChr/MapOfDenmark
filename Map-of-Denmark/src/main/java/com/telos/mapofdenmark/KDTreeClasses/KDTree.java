@@ -225,7 +225,7 @@ public class KDTree
 
     public Queue<Node> rangeSearch(double xMin, double xMax, double yMin, double yMax)
     {
-        System.out.println("Range Searching for these param: xMin:"+xMin+" xMax:"+xMax+" yMin:"+yMin+" yMax:"+yMax);
+//        System.out.println("Range Searching for these param: xMin:"+xMin+" xMax:"+xMax+" yMin:"+yMin+" yMax:"+yMax);
         Queue<Node> queue = new LinkedList<>();
         rangeSearch(root, queue, xMin, xMax, yMin, yMax, 0);
         return queue;

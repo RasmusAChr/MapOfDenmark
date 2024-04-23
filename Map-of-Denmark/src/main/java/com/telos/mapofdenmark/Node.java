@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public class Node implements Serializable {
     long id;
-    double lat, lon;
+    public double lat, lon;
     Way way;
 
     public Node(long id, double lat, double lon) {
@@ -33,5 +33,9 @@ public class Node implements Serializable {
     @Override
     public String toString() {
         return "Node" + this.id;
+    }
+
+    public Way getWay() {
+        return way;
     }
 }
