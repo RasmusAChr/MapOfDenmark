@@ -1,7 +1,6 @@
 package com.telos.mapofdenmark;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -63,18 +62,18 @@ public class Model implements Serializable {
         this.roadIdSet = new HashMap<String, Double>(Map.of(
                 "motorway",0.4545,
                 "trunk", 0.625,
-                "primary", 60.0,
-                "secondary", 60.2,
-                "tertiary", 60.4,
-                "unclassified", 20.01,
-                "residential", 20.02,
-                "motorway_link", 20.03,
-                "trunk_link", 20.04,
-                "primary_link", 20.05));
-        roadIdSet.put("secondary_link", 20.06);
-        roadIdSet.put("tertiary_link", 20.06);
-        roadIdSet.put("living_street", 20.06);
-        roadIdSet.put("track", 20.06);
+                "primary", 0.625,
+                "secondary", 0.7142857,
+                "tertiary", 0.833,
+                "unclassified", 1.0,
+                "residential", 1.25,
+                "motorway_link", 0.4545,
+                "trunk_link", 0.71428574,
+                "primary_link", 0.7142857));
+        roadIdSet.put("secondary_link", 0.833);
+        roadIdSet.put("tertiary_link", 1.0);
+        roadIdSet.put("living_street", 2.5);
+        roadIdSet.put("track", 1.25);
         this.DigraphNodeToIndex = new HashMap<>();
         this.DigraphIndexToNode = new HashMap<>();
         this.id2way = new HashMap<>();
@@ -184,7 +183,6 @@ public class Model implements Serializable {
         var way = new ArrayList<Node>();
         var coast = false;
         String roadtype = "";
-        String waytype = "";
         String RelationsType = "";
         boolean shouldAdd = false;
         boolean drivable = false;
@@ -212,7 +210,6 @@ public class Model implements Serializable {
                             shouldAdd = true;
                             roadtype = v;
                         }
-                    waytype = v;
                     } else if (k.equals("oneway")) {
                         oneway = v.equals("yes");
                     } else if (k.equals("onewayBicycle")) {
@@ -262,16 +259,26 @@ public class Model implements Serializable {
                             if (vertexIndex != -1) {
                                 double weight_without_modifier = weightCalculate();
                                 double weight_car = weightCalculate();
+                                double weight_cycle = 1.0;
                                 // calculate the weight depending on tags
-                                if(cycleable){
-                                     weight_car = Integer.MAX_VALUE;
+                                if(!cycleable){
+                                     weight_cycle = Integer.MAX_VALUE;
+                                }
+                                if (!drivable) {
+                                    weight_car = Integer.MAX_VALUE;
                                 }
 
                                 if (oneway) {
-
+                                    if (onewayBicycle) {
+                                        EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
+                                    } else {
+                                        EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
+                                        EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_cycle, Integer.MAX_VALUE ));
+                                    }
+                                } else {
+                                    EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
+                                    EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_cycle, weight_car ));
                                 }
-                                EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_without_modifier, weight_car )); // needs specific weight for bike or car
-                                EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_without_modifier, weight_car ));
                             } else {
                                 vertexIndex = DigraphNodeToIndex.get(node);
                             }
