@@ -3,24 +3,19 @@ package com.telos.mapofdenmark;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.FillRule;
-import javafx.scene.shape.Polygon;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Relation implements Serializable {
     private String type;
-    private List<Member> memberRefs;
+    private List<Member> members;
 
 
     public Relation(String type, List<Member> memberRefs) {
         ColorScheme cs = new ColorScheme();
         this.type = type;
-        this.memberRefs = memberRefs;
-        for (Member m : memberRefs) {
-            System.out.println(m.way + " " + m.getType() + " " + m.ref);
-        }
+        this.members = memberRefs;
     }
 
     public String getType() {
@@ -31,17 +26,49 @@ public class Relation implements Serializable {
         this.type = type;
     }
 
-    public List<Member> getMemberRefs() {
-        return memberRefs;
+    public List<Member> getMember() {
+        return members;
     }
 
-    public void setMemberRefs(List<Member> memberRefs) {
-        this.memberRefs = memberRefs;
+    public void setMember(List<Member> member) {
+        this.members = member;
     }
 
-   public void Draw(GraphicsContext gc, double zoom, boolean darkMode) {
-        System.out.println("Trying to draw Relation");
-        if(type.equals("multipolygon")) {
+    public void Draw(GraphicsContext gc, double zoom, boolean darkMode) {
+        gc.setFillRule(FillRule.EVEN_ODD); // Set fill rule to even-odd
+        gc.setFill(Color.PINK);
+
+        if (type.equals("multipolygon")) {
+            for (Member m : members) {
+                Way way = m.getWay();
+
+                if (way == null) break;
+
+                double[] coords = way.getCoords();
+
+
+
+                // Create separate arrays for x and y coordinates
+                double[] xPoints = new double[coords.length / 2];
+                double[] yPoints = new double[coords.length / 2];
+                for (int i = 0; i < coords.length; i += 2) {
+                    xPoints[i / 2] = coords[i];
+                    yPoints[i / 2] = coords[i + 1];
+                }
+
+                gc.moveTo(xPoints[0], yPoints[0]);
+                for (int i = 0; i < xPoints.length; i++){
+                    gc.lineTo(xPoints[i],yPoints[i]);
+                }
+
+
+                //gc.fillPolygon(xPoints, yPoints, xPoints.length);
+            }
+            // Draw the polygon
+            gc.fill();
+        }
+
+        /*if(type.equals("multipolygon")) {
             List<Double> xPoints = new ArrayList<>(), yPoints = new ArrayList<>();
             Polygon p = new Polygon();
             for (Member m : memberRefs) {
@@ -63,7 +90,7 @@ public class Relation implements Serializable {
 
             }
 
-        }
+        }*/
       /*  for (Member m : memberRefs) {
             if (m.getType().equals("outer")) {
                 gc.beginPath();

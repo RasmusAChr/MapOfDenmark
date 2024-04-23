@@ -91,7 +91,6 @@ public class View {
        // double zoomValue = 1/Math.sqrt(trans.determinant());
         gc.setLineWidth(0.000005);
         for (var relation : model.Relations){
-            System.out.println(relation.getMemberRefs());
             relation.Draw(gc,slider_value,dark);
         }
         for (var way : model.ways) {

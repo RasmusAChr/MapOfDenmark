@@ -232,7 +232,6 @@ public class Model implements Serializable {
                     var ref = Long.parseLong(input1.getAttributeValue(null,"ref"));
                     var role = input1.getAttributeValue(null,"role");
                     var Member = new Member(role,ref);
-                    System.out.println("role: " + role);
                     Member.setWay(id2way.get(ref));
                     relationsMembers.add(Member);
                 } else if (insideRelation && name.equals("tag")) {
@@ -302,8 +301,6 @@ public class Model implements Serializable {
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     Relations.add(new Relation(RelationsType,relationsMembers));
-                    System.out.println("Relation added");
-                    System.out.println(relationsMembers);
                 }
             }
         }
@@ -348,7 +345,6 @@ public class Model implements Serializable {
              }
 
          }
-         System.out.println(path);
          return path;
     }
     //
