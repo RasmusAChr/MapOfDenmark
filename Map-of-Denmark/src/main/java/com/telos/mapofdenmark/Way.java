@@ -2,8 +2,10 @@ package com.telos.mapofdenmark;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 public class Way implements Serializable {
     double[] coords;
@@ -16,6 +18,9 @@ public class Way implements Serializable {
             coords[2 * i + 1] = -node.lat;
         }
     }
+    public double[] getCoords() {
+        return coords;
+    }
 
     public void draw(GraphicsContext gc, double zoom, boolean darkMode) {
         //gc.setLineWidth(zoom);
@@ -26,5 +31,6 @@ public class Way implements Serializable {
         }
         gc.stroke();
     }
+
 
 }

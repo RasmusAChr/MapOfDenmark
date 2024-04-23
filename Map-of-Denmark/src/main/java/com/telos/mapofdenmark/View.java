@@ -96,6 +96,10 @@ public class View {
         for (var line : model.list) {
             line.draw(gc);
         }
+        for (var relation : model.Relations){
+            System.out.println(relation.getMemberRefs());
+            relation.Draw(gc,slider_value,dark);
+        }
     }
 
     void pan(double dx, double dy) {

@@ -78,7 +78,6 @@ public class Model implements Serializable {
         this.DigraphIndexToNode = new HashMap<>();
         this.id2way = new HashMap<>();
         this.id2node = new HashMap<>();
-        this.relationsMembers = new ArrayList<>();
         this.roadCount = 0;
         this.addressList = new ArrayList<>();
         this.address = new Address();
@@ -224,15 +223,16 @@ public class Model implements Serializable {
                     var node = id2node.get(ref);
                     way.add(node);
                 } else if (name.equals("relation")) {
-                    
+                    relationsMembers = new ArrayList<>();
                     insideRelation = true;
-                    relationsMembers.clear();
+
                     RelationsType = "";
                 } else if (insideRelation && name.equals("member")) {
                     // parse Ref
                     var ref = Long.parseLong(input1.getAttributeValue(null,"ref"));
                     var role = input1.getAttributeValue(null,"role");
                     var Member = new Member(role,ref);
+                    System.out.println("role: " + role);
                     Member.setWay(id2way.get(ref));
                     relationsMembers.add(Member);
                 } else if (insideRelation && name.equals("tag")) {
@@ -303,6 +303,7 @@ public class Model implements Serializable {
                     insideRelation = false;
                     Relations.add(new Relation(RelationsType,relationsMembers));
                     System.out.println("Relation added");
+                    System.out.println(relationsMembers);
                 }
             }
         }
@@ -367,15 +368,6 @@ public class Model implements Serializable {
         return null;
     }
 
-
-    /*private void parseTXT(String filename) throws FileNotFoundException {
-        File f = new File(filename);
-        try (Scanner s = new Scanner(f)) {
-            while (s.hasNext()) {
-                list.add(new Line(s.nextLine()));
-            }
-        }
-    }*/
     public void parseAddressFromOSM(String v, String k){
         // Assuming you have a Trie instance called 'trie'
 //        trie.insert(fullAddress);
