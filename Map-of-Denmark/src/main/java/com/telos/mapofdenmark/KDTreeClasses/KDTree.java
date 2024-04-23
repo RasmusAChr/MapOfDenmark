@@ -253,14 +253,16 @@ public class KDTree
         if (cmphi > 0) rangeSearch(x.right, queue, xMin, xMax, yMin, yMax, depth+1);
     }
 
-    public Node getNearestNeighbor(){
-
-        // some sort of loop
-        // call ceiling and get Node
-        // call floor and get Node
-        // check if floorNode or CeilingNode
-
-        return null;
+    public Node getNearestNeighbor(Double xCoord, Double yCoord, boolean shouldFindNearestRoad){
+        Node tmpNode1 = floor(xCoord, yCoord, shouldFindNearestRoad);
+        Node tmpNode2 = ceiling(xCoord, yCoord, shouldFindNearestRoad);
+        double distanceBetweenN1andInput = Math.hypot(tmpNode1.getLon()-xCoord, tmpNode1.getLat()-yCoord);
+        double distanceBetweenN2andInput = Math.hypot(tmpNode2.getLon() - xCoord, tmpNode2.getLat() - yCoord);
+        if(distanceBetweenN1andInput < distanceBetweenN2andInput){
+            return tmpNode1;
+        } else {
+            return tmpNode2;
+        }
     }
 
     /**
