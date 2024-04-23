@@ -266,6 +266,8 @@ public class Model implements Serializable {
                                 }
                                 if (!drivable) {
                                     weight_car = Integer.MAX_VALUE;
+                                }else if(roadIdSet.containsKey(name)){
+                                    weight_car = weight_without_modifier * roadIdSet.get(name);
                                 }
 
                                 if (oneway) {
@@ -313,8 +315,9 @@ public class Model implements Serializable {
     }
 
     //Dijkstra implementation
-    public void StartDijkstra(Node startaddress,boolean vehicle){
-        this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(findNodeByID(nodeList, "697814")),vehicle); // this starts the dijkstra search from the index that refferes to a node
+    public void StartDijkstra(String startaddress,boolean vehicle){// For testing change input From Node to String
+        list.clear();
+        this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(findNodeByID(nodeList, startaddress)),vehicle); // this starts the dijkstra search from the index that refferes to a node
     }
 
 
@@ -331,10 +334,10 @@ public class Model implements Serializable {
      * @return Returns a list of nodes in order from start to finish
      *
      * */
-    public List<Node> getDijkstraPath(Node Endaddress) {
+    public List<Node> getDijkstraPath(String Endaddress) {// For testing change input From Node to String
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
-         for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList, "92994313")))) {
+         for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList, Endaddress)))) {
              if(!NodeAdded.contains(DigraphIndexToNode.get(i.to()))){
                  NodeAdded.add(DigraphIndexToNode.get(i.to()));
                  path.add(DigraphIndexToNode.get(i.to()));
