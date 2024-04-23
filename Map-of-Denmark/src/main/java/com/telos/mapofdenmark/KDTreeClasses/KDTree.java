@@ -3,10 +3,7 @@ package com.telos.mapofdenmark.KDTreeClasses;
 import com.telos.mapofdenmark.Node;
 
 import java.security.Key;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 // Inspiration to KDTree from https://www.geeksforgeeks.org/search-and-insertion-in-k-dimensional-tree/
 // We also utilized code from chapter 3 in Algorithms 4 by Wayne and Sedgewick ch 3.2
@@ -257,4 +254,62 @@ public class KDTree
         if (cmphi > 0) rangeSearch(x.right, queue, xMin, xMax, yMin, yMax, depth+1);
     }
 
+    public Node getNearestNeighbor(){
+
+        // some sort of loop
+        // call ceiling and get Node
+        // call floor and get Node
+        // check if floorNode or CeilingNode
+
+        return null;
+    }
+
+    /**
+     * Returns the smallest key in the symbol table greater than or equal to {@code key}.
+     *
+     * @param  key the key
+     * @return the smallest key in the symbol table greater than or equal to {@code key}
+     * @throws NoSuchElementException if there is no such key
+     * @throws IllegalArgumentException if {@code key} is {@code null}
+     */
+    public Node ceiling(Double xCoord, Double yCoord, boolean findNearestRoad) {
+        if (xCoord == null || yCoord == null) throw new IllegalArgumentException("argument to ceiling() is null");
+        if (isEmpty()) throw new NoSuchElementException("calls ceiling() with empty symbol table");
+        KDNode x = ceiling(root, xCoord, yCoord, 0, findNearestRoad);
+        if (x == null) throw new NoSuchElementException("argument to ceiling() is too large");
+        else return x.val;
+    }
+
+    private KDNode ceiling(KDNode x, Double xCoord, Double yCoord, int depth, boolean findNearestRoad) {
+        if (x == null) return null;
+        int cmp;
+        // Determine the axis of comparison based on current depth (0 for x, 1 for y)
+        int axis = depth % 2;
+        // The following two conditionals is used to determine whether to divide half-plane vertically or horizontally
+        if (axis == 0) cmp = Double.compare(xCoord, x.x); // Compare x-coordinates if axis is 0
+        else cmp = Double.compare(yCoord, x.y); // Compare y-coordinates if axis is 1
+
+        // Normal ceiling
+        if (!findNearestRoad){
+            if (cmp == 0) return x;
+            if (cmp < 0) {
+                KDNode t = ceiling(x.left, x.x, x.y, depth+1, findNearestRoad);
+                if (t != null) return t;
+                else return x;
+            }
+            // else if (cmp > 0)
+            return ceiling(x.right, x.x, x.y, depth+1, findNearestRoad);
+        }
+        // If we want to find the nearest node that is also a road
+        else {
+            if (cmp == 0) return x;
+            if (cmp < 0) {
+                KDNode t = ceiling(x.left, x.x, x.y, depth+1, findNearestRoad);
+                if (t != null) return t;
+                else return x;
+            }
+            // else if (cmp > 0)
+            return ceiling(x.right, x.x, x.y, depth+1, findNearestRoad);
+        }
+    }
 }
