@@ -46,6 +46,7 @@ public class KDTree
         // Public method to insert a key-value pair; updates if key exists
         // Put method arguments change to acommodate nodes new attributes
         root = put(root, x, y, val, 0);
+//        System.out.println("lon: " + (x*-0.56) + " lat: " + y);
     }
     private KDNode put(KDNode x, double xCoord, double yCoord, Node val, int depth) {
         // Recursively inserts a key-value pair into the BST
@@ -212,7 +213,7 @@ public class KDTree
         Node medianNode = nodelist.get(medianIndex);
 
         // Insert median nodes into KDTree
-        put(medianNode.getLon(), medianNode.getLat(), medianNode);
+        put(medianNode.getLon()*0.56, -medianNode.getLat(), medianNode);
 
         // iterate depth to ensure that a new axis is sorted for
         depth++;
