@@ -2,6 +2,8 @@ package com.telos.mapofdenmark;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.FillRule;
+import javafx.scene.shape.Polygon;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,10 +39,32 @@ public class Relation implements Serializable {
         this.memberRefs = memberRefs;
     }
 
-    public void Draw(GraphicsContext gc, double zoom, boolean darkMode) {
+   public void Draw(GraphicsContext gc, double zoom, boolean darkMode) {
         System.out.println("Trying to draw Relation");
+        if(type.equals("multipolygon")) {
+            List<Double> xPoints = new ArrayList<>(), yPoints = new ArrayList<>();
+            Polygon p = new Polygon();
+            for (Member m : memberRefs) {
 
-        for (Member m : memberRefs) {
+                    double[] coords = m.way.getCoords();
+                    p.getPoints().add(coords[0]);
+                    p.getPoints().add(coords[1]);
+            }
+
+            p.setFill(Color.PINK);
+            p.setStroke(Color.BLACK);
+            gc.beginPath();
+            double x = p.getPoints().get(0);
+            double y = p.getPoints().get(1);
+            xPoints.add(x);
+            yPoints.add(y);
+            gc.moveTo(x, y);
+            for(int i = 0; i < p.getPoints().size(); i++) {
+
+            }
+
+        }
+      /*  for (Member m : memberRefs) {
             if (m.getType().equals("outer")) {
                 gc.beginPath();
                 Way way = m.way;
@@ -52,6 +76,7 @@ public class Relation implements Serializable {
                     }
                     gc.closePath();
                     gc.setFill(Color.PINK);
+                    gc.setFillRule(FillRule.EVEN_ODD);
                     gc.fill();
                     gc.setStroke(Color.PINK);
                     gc.stroke();
@@ -69,13 +94,14 @@ public class Relation implements Serializable {
                     }
                     gc.closePath();
                     gc.setFill(Color.GREEN);
+                    gc.setFillRule(FillRule.EVEN_ODD);
                     gc.fill();
                     gc.setStroke(Color.BLACK);
                     gc.stroke();
                     System.out.println("relation drawn");
                 }
             }
-        }
+        }*/
     }
 }
 

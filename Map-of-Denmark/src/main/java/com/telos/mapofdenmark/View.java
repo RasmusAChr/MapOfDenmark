@@ -90,16 +90,17 @@ public class View {
         gc.setTransform(trans);
        // double zoomValue = 1/Math.sqrt(trans.determinant());
         gc.setLineWidth(0.000005);
+        for (var relation : model.Relations){
+            System.out.println(relation.getMemberRefs());
+            relation.Draw(gc,slider_value,dark);
+        }
         for (var way : model.ways) {
             way.draw(gc, slider_value, dark);
         }
         for (var line : model.list) {
             line.draw(gc);
         }
-        for (var relation : model.Relations){
-            System.out.println(relation.getMemberRefs());
-            relation.Draw(gc,slider_value,dark);
-        }
+
     }
 
     void pan(double dx, double dy) {
