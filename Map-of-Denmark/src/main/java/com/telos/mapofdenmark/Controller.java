@@ -89,7 +89,7 @@ public class Controller {
 //        });
        // zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> ));
 
-        // Adds an event handler to the suggestionsBox, to put the text from the suggestions up in the searchBar
+        // Adds an event handler to the suggestionsBox, to put the text from the suggestions up in the searchBar and pan to the address
         suggestionsBox.setOnMouseClicked(event ->{
                 if(!suggestionsBox.getSelectionModel().getSelectedItem().isEmpty()){
                     String chosenSelection = suggestionsBox.getSelectionModel().getSelectedItem();
@@ -102,6 +102,12 @@ public class Controller {
                 }
 
                 });
+
+        searchImage.setOnMouseClicked(event -> {
+            // Call panToAddress method when searchImage is clicked
+
+            panToAddress(searchBar.getText());
+        });
 
         searchBar.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar.getText().isEmpty())) {
@@ -279,6 +285,9 @@ public class Controller {
             double addressX = addressNode.getLon();
             double addressY = addressNode.getLat();
             view.pan(addressX * 0.56,-addressY);
+        }
+        else{
+            System.out.println("not a valid Address");
         }
 
 
