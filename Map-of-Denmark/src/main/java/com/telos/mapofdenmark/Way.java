@@ -7,8 +7,6 @@ import javafx.scene.canvas.GraphicsContext;
 
 public class Way implements Serializable {
     double[] coords;
-    boolean isPartOfRoad;
-
     public Way(ArrayList<Node> way) {
         coords = new double[way.size() * 2];
         for (int i = 0 ; i < way.size() ; ++i) {
@@ -16,7 +14,6 @@ public class Way implements Serializable {
             coords[2 * i] = 0.56 * node.lon;
             coords[2 * i + 1] = -node.lat;
         }
-        this.isPartOfRoad = false;
     }
 
     public void draw(GraphicsContext gc, double zoom, boolean darkMode) {
@@ -27,13 +24,5 @@ public class Way implements Serializable {
             gc.lineTo(coords[i], coords[i+1]);
         }
         gc.stroke();
-    }
-
-    public boolean isPartOfRoad() {
-        return isPartOfRoad;
-    }
-
-    public void setPartOfRoad(boolean partOfRoad) {
-        isPartOfRoad = partOfRoad;
     }
 }

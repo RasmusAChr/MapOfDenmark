@@ -1,6 +1,7 @@
 package com.telos.mapofdenmark.KDTreeClasses;
 
 import com.telos.mapofdenmark.Node;
+import com.telos.mapofdenmark.Way;
 
 import java.util.*;
 
@@ -254,10 +255,16 @@ public class KDTree
     }
 
     public Node getNearestNeighbor(Double xCoord, Double yCoord, boolean shouldFindNearestRoad){
-        Node tmpNode1 = floor(xCoord, yCoord, shouldFindNearestRoad);
-        Node tmpNode2 = ceiling(xCoord, yCoord, shouldFindNearestRoad);
+        Node tmpNode1 = floor(xCoord*0.56, -yCoord, shouldFindNearestRoad);
+        Node tmpNode2 = ceiling(xCoord*0.56, -yCoord, shouldFindNearestRoad);
+
+        if (tmpNode1 == null && tmpNode2 == null) return null; // Return null if both floor and ceiling are null
+        if (tmpNode1 == null) return tmpNode2; // Return ceiling if floor is null
+        if (tmpNode2 == null) return tmpNode1; // Return floor if ceiling is null
+
         double distanceBetweenN1andInput = Math.hypot(tmpNode1.getLon()-xCoord, tmpNode1.getLat()-yCoord);
         double distanceBetweenN2andInput = Math.hypot(tmpNode2.getLon() - xCoord, tmpNode2.getLat() - yCoord);
+
         if(distanceBetweenN1andInput < distanceBetweenN2andInput){
             return tmpNode1;
         } else {
@@ -275,9 +282,9 @@ public class KDTree
      */
     public Node ceiling(Double xCoord, Double yCoord, boolean findNearestRoad) {
         if (xCoord == null || yCoord == null) throw new IllegalArgumentException("argument to ceiling() is null");
-        if (isEmpty()) throw new NoSuchElementException("calls ceiling() with empty symbol table");
+        if (isEmpty()) return null; // "calls ceiling() with empty symbol table"
         KDNode x = ceiling(root, xCoord, yCoord, 0, findNearestRoad, null);
-        if (x == null) throw new NoSuchElementException("argument to ceiling() is too large");
+        if (x == null) return  null; // "argument to ceiling() is too large"
         else return x.val;
     }
 
@@ -299,15 +306,15 @@ public class KDTree
         // If we want to find the nearest node that is also a road
         else {
             if (cmp < 0) {
-                if (x.val.getWay().isPartOfRoad()) best = x;
+                if (x.val.isPartOfRoad()) best = x;
                 return ceiling(x.left, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
             }
             else if (cmp > 0) {
-                if (x.val.getWay().isPartOfRoad()) best = x;
+                if (x.val.isPartOfRoad()) best = x;
                 return ceiling(x.right, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
             }
             else {
-                if (x.val.getWay().isPartOfRoad()) return x;
+                if (x.val.isPartOfRoad()) return x;
                 else return best;
             }
         }
@@ -315,7 +322,7 @@ public class KDTree
 
     public Node floor(double xCoord, double yCoord, boolean shouldFindNearestRoad) {
         KDNode x = floor(root, xCoord, yCoord, 0, shouldFindNearestRoad, null);
-        if (x == null) throw new NoSuchElementException("argument to floor() is too small");
+        if (x == null) return null; //"argument to floor() is too small"
         else return x.val;
 
     }
@@ -328,25 +335,59 @@ public class KDTree
         // The following two conditionals is used to determine whether to divide half-plane vertically or horizontally
         if (axis == 0) cmp = Double.compare(xCoord, x.x); // Compare x-coordinates if axis is 0
         else cmp = Double.compare(yCoord, x.y); // Compare y-coordinates if axis is 1
+
         if (!shouldFindNearestRoad) {
             if (cmp  < 0) return floor(x.left, xCoord, yCoord,depth + 1, shouldFindNearestRoad, best);
-            else if (cmp  > 0) return floor(x.right, xCoord, yCoord,depth + 1, shouldFindNearestRoad, best);
+            else if (cmp  > 0) return floor(x.right, xCoord, yCoord,depth + 1, shouldFindNearestRoad, x);
             else return x;
+
         }
         // If we want to find the nearest node that is also a road
         else {
             if (cmp < 0) {
-                if (x.val.getWay().isPartOfRoad()) best = x;
+                if (x.val.isPartOfRoad()) best = x;
                 return floor(x.left, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
             }
             else if (cmp > 0) {
-                if (x.val.getWay().isPartOfRoad()) best = x;
+                if (x.val.isPartOfRoad()) best = x;
                 return floor(x.right, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
             }
             else {
-                if (x.val.getWay().isPartOfRoad()) return x;
+                if (x.val.isPartOfRoad()) return x;
                 else return best;
             }
         }
+    }
+
+    // range serach methods that returns a set instead of a queue to ensure that the same way is not drawn multiple times
+    public Set<Way> rangeSearchSet(double xMin, double xMax, double yMin, double yMax)
+    {
+//        System.out.println("Range Searching for these param: xMin:"+xMin+" xMax:"+xMax+" yMin:"+yMin+" yMax:"+yMax);
+        Set<Way> waySet = new HashSet<>();
+        rangeSearchSet(root, waySet, xMin, xMax, yMin, yMax, 0);
+        return waySet;
+    }
+
+    private void rangeSearchSet(KDNode x, Set<Way> waySet, double xMin, double xMax, double yMin, double yMax, int depth)
+    {
+        if (x == null) return;
+
+        int axis = depth % 2;
+        double cmplo; //CompareToLow
+        double cmphi; //CompareToHigh
+        // if the axis is 0, compare the x value long else comp     are lat
+        if(axis == 0){
+            // Sort based on the x-axis
+            cmplo = Double.compare(xMin,x.x);
+            cmphi = Double.compare(xMax,x.x);
+
+        } else {
+            // Sort based on the y-axis
+            cmplo = Double.compare(yMin,x.y);
+            cmphi = Double.compare(yMax,x.y);
+        }
+        if (cmplo < 0) rangeSearchSet(x.left, waySet, xMin, xMax, yMin, yMax, depth+1);
+        if (cmplo <= 0 && cmphi >= 0) waySet.add(x.val.getWay());
+        if (cmphi > 0) rangeSearchSet(x.right, waySet, xMin, xMax, yMin, yMax, depth+1);
     }
 }

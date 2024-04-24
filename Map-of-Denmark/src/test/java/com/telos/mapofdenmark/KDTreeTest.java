@@ -67,5 +67,55 @@ class KDTreeTest {
         tree.populate(listOfNodes);
         assertEquals(3, tree.rangeSearch(0,2,0,2).size());
     }
+
+    // Ceiling. Smallest key in tree ≥ query key.
+    @Test
+    void testCeilingSearch(){
+        List<Node> listOfNodes = new ArrayList<>();
+        for(int i = 0 ; i < 10 ; i++){
+            listOfNodes.add(new Node(i,i,i));
+        }
+        tree.populate(listOfNodes);
+
+        double xCoord = 1.12;
+        double yCoord = -2.0;
+
+        double x = tree.ceiling(xCoord,yCoord,false).getLon();
+        double y = tree.ceiling(xCoord,yCoord,false).getLat();
+        System.out.println("x: "+x+" y:"+y);
+        assertEquals(2,x);
+        assertEquals(2,y);
+    }
+
+    // Floor. Largest node in tree ≤ query key.
+    @Test void testFloorSearch(){
+        List<Node> listOfNodes = new ArrayList<>();
+        for(int i = 0 ; i < 10 ; i++){
+            listOfNodes.add(new Node(i,i,i));
+        }
+        tree.populate(listOfNodes);
+
+        double xCoord = 7.0*0.56;
+        double yCoord = -7.0;
+        Node temp = tree.floor(xCoord, -yCoord,false);
+        double x = temp.getLon();
+        double y = temp.getLat();
+        System.out.println("x: "+x+" y:"+y);
+        tree.levelOrderTraverse();
+        assertEquals(7.0, x);
+        assertEquals(7.0, y);
+    }
+
+    @Test
+    void testNearestNeighbour(){
+        List<Node> listOfNodes = new ArrayList<>();
+        for(int i = 0 ; i < 10 ; i++){
+            listOfNodes.add(new Node(i,i,i));
+        }
+        listOfNodes.add(new Node(11,5.5,5.5));
+        tree.populate(listOfNodes);
+        Node neighborReturn = tree.getNearestNeighbor(5.3, 5.3, false);
+        assertEquals("11", neighborReturn.getId());
+    }
 }
 
