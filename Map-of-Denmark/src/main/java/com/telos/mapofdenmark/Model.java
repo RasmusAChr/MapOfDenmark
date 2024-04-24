@@ -28,11 +28,12 @@ import javafx.scene.transform.NonInvertibleTransformException;
 
 public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
-
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
     List<Relation> Relations = new ArrayList<>();
+    // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
+    List<Node> centerPointNodes = new ArrayList<>();
     SP Dijkstra = null;
     private Trie trie;
     double minlat, maxlat, minlon, maxlon;
@@ -48,6 +49,7 @@ public class Model implements Serializable {
     HashMap<Long, Way> id2way;
     int roadCount;
     Map<String, Double> roadIdSet;
+
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
             try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
@@ -93,7 +95,10 @@ public class Model implements Serializable {
         save(filename+".obj");
         this.trie = deserializeTrie("data/.obj");
         this.kdTree = new KDTree();
-        kdTree.populate(nodeList);
+        // Populates the KDTree using all nodes from .osm
+//        kdTree.populate(nodeList);
+        // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
+        kdTree.populate(centerPointNodes);
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -287,9 +292,8 @@ public class Model implements Serializable {
                                 vertexIndex = DigraphNodeToIndex.get(node);
                             }
                         }
-
                         node.setWay(new Way(way)); // Set the way reference in each node
-
+                        addToCenterPointNodes(way);
                     }
                     Way newWay = new Way(way);
                     id2way.put(wayid,newWay);
@@ -540,6 +544,22 @@ public class Model implements Serializable {
         }
     }
 
+    // finds the center lat and lon among a collection of nodes
+    public void addToCenterPointNodes(List<Node> nodes){
+        double sumLat = 0;
+        double sumLon = 0;
+        int index = 0;
+        for(Node node : nodes){
+            sumLat += node.getLat();
+            sumLon += node.getLon();
+        }
+        double centerLat = sumLat / nodes.size();
+        double centerLon = sumLon / nodes.size();
+        Node centeredNode = new Node(index, centerLat, centerLon);
+        centeredNode.setWay(nodes.get(0).getWay());
+        centerPointNodes.add(centeredNode);
+        index++;
+    }
 
 
 }
