@@ -81,9 +81,9 @@ public class View {
         gc.setTransform(new Affine());
         if(dark) {
             gc.setStroke(Color.WHITE);
-            gc.setFill(Color.DARKGRAY);
+            gc.setFill(Color.AQUA);
         } else{
-            gc.setFill(Color.WHITE);
+            gc.setFill(Color.AQUA);
             gc.setStroke(Color.BLACK);
         }
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());

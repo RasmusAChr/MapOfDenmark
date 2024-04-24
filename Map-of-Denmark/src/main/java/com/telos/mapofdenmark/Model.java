@@ -47,6 +47,8 @@ public class Model implements Serializable {
     List<Member> relationsMembers;
     HashMap<Long, Way> id2way;
     int roadCount;
+    long wayid = 0;
+    Set<String> uniqueWayTypes = new HashSet<>();
     Map<String, Double> roadIdSet;
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
@@ -92,6 +94,7 @@ public class Model implements Serializable {
         save(filename+".obj");
         this.trie = deserializeTrie("data/.obj");
         this.kdTree = new KDTree();
+        for (String s : uniqueWayTypes) System.out.println(s);
 
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
@@ -138,10 +141,12 @@ public class Model implements Serializable {
                     }
                     case "way" -> {
                         EWD = new EdgeWeightedDigraph(roadCountX);
-                        parseWaysAndRelations(input, tagKind);
+                        wayid = Long.parseLong(input.getAttributeValue(null,"id"));
+                        parseWaysAndRelations(input, tagKind); // First way element ???? input.getname = way
                         return;
                     }
                     case "relation" -> {
+                        //take the ID aswell
                         parseWaysAndRelations(input,tagKind);
                         return;
                     }
@@ -180,7 +185,9 @@ public class Model implements Serializable {
 
     private void parseWaysAndRelations(XMLStreamReader input1, int tagKind) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         var way = new ArrayList<Node>();
+        var building = false;
         var coast = false;
+        var place = "";
         String roadtype = "";
         String RelationsType = "";
         boolean shouldAdd = false;
@@ -189,9 +196,7 @@ public class Model implements Serializable {
         boolean oneway = false;
         boolean onewayBicycle = false;
         boolean insideRelation = false;
-        long wayid = 0;
         int vertexIndex = -1;
-
 
         while (input1.hasNext()) {
             tagKind = input1.next();
@@ -200,6 +205,8 @@ public class Model implements Serializable {
                 if (name.equals("way")) {
                     wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
                     way.clear();
+                    building = false;
+                    coast = false;
                 } else if (!insideRelation && name.equals("tag")) {
                     var v = input1.getAttributeValue(null, "v");
                     var k = input1.getAttributeValue(null, "k");
@@ -216,7 +223,8 @@ public class Model implements Serializable {
                     } else if (k.equals("bicycle")) {
                         cycleable = v.equals("yes");
                         shouldAdd = true;
-                    }
+                    } else if (k.equals("building")) building = true;
+                    else if (v.equals("coastline")) coast = true;
 
                 } else if (name.equals("nd")) {
                     var ref = Long.parseLong(input1.getAttributeValue(null, "ref"));
@@ -225,8 +233,8 @@ public class Model implements Serializable {
                 } else if (name.equals("relation")) {
                     relationsMembers = new ArrayList<>();
                     insideRelation = true;
-
                     RelationsType = "";
+                    place = "";
                 } else if (insideRelation && name.equals("member")) {
                     // parse Ref
                     var ref = Long.parseLong(input1.getAttributeValue(null,"ref"));
@@ -240,6 +248,8 @@ public class Model implements Serializable {
 
                     if(k.equals("type")){
                         RelationsType = v;
+                    } else if (k.equals("place")){
+                        place = v;
                     }
                 }
 
@@ -250,7 +260,7 @@ public class Model implements Serializable {
                     if (!roadtype.isEmpty()) {
                         ways.add(new Road(way, roadtype));
                     } else {
-                        ways.add(new Way(way));
+                        if(building || coast) ways.add(new Way(way));
                     }
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
@@ -298,9 +308,14 @@ public class Model implements Serializable {
                     oneway = false;
                     onewayBicycle = false;
                     vertexIndex = -1;
-                } else if (name.equals("relation") && insideRelation) {
+                }
+                else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
-                    Relations.add(new Relation(RelationsType,relationsMembers));
+                    if (RelationsType.equals("multipolygon")) {
+                        if (place.equals("islet")) {
+                            Relations.add(new Relation(RelationsType,relationsMembers));
+                        }
+                    }
                 }
             }
         }

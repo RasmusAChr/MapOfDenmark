@@ -1,11 +1,15 @@
 package com.telos.mapofdenmark;
 
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.FillRule;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Relation implements Serializable {
     private String type;
@@ -35,100 +39,46 @@ public class Relation implements Serializable {
     }
 
     public void Draw(GraphicsContext gc, double zoom, boolean darkMode) {
-        gc.setFillRule(FillRule.EVEN_ODD); // Set fill rule to even-odd
+
         gc.setFill(Color.PINK);
-
-        if (type.equals("multipolygon")) {
-            for (Member m : members) {
-                Way way = m.getWay();
-
-                if (way == null) break;
-
-                double[] coords = way.getCoords();
-
-
-
-                // Create separate arrays for x and y coordinates
-                double[] xPoints = new double[coords.length / 2];
-                double[] yPoints = new double[coords.length / 2];
-                for (int i = 0; i < coords.length; i += 2) {
-                    xPoints[i / 2] = coords[i];
-                    yPoints[i / 2] = coords[i + 1];
-                }
-
-                gc.moveTo(xPoints[0], yPoints[0]);
-                for (int i = 0; i < xPoints.length; i++){
-                    gc.lineTo(xPoints[i],yPoints[i]);
-                }
+        List<Double> coordsList = new ArrayList<>();
+        Set<Double> control = new HashSet<>();
+        for (Member m : members) {
+            Way way = m.getWay();
+            // Sometimes a way can be null, if it's not in the OSM file, but a
+            // part of the relation is and every member reference will be stored.
+            //System.out.println(m.ref + " " + m.getWay());
+            if (way == null) break;
+            for (Double coord : way.getCoords()) {
+                //control.add(coord);
+                coordsList.add(coord);
+                /*if(!control.contains(coord)){
 
 
-                //gc.fillPolygon(xPoints, yPoints, xPoints.length);
+                }*/
+                    // Hash set control men at samle koordinater i arrays i et arrayliste
+
+                /// check for duplicates fixes issue is that it need to be set of coordinates
             }
-            // Draw the polygon
-            gc.fill();
+        }
+        // Create separate arrays for x and y coordinates
+        double[] xPoints = new double[coordsList.size() / 2];
+        double[] yPoints = new double[coordsList.size() / 2];
+        for (int i = 0; i < coordsList.size(); i += 2) {
+            xPoints[i / 2] = coordsList.get(i);
+            yPoints[i / 2] = coordsList.get(i + 1);
+        }
+        // Moves to start coordinates
+        gc.moveTo(xPoints[0], yPoints[0]);
+
+        // Creates a not visible line to next coordinate (to create selection).
+        for (int i = 0; i < xPoints.length; i++){
+            gc.lineTo(xPoints[i],yPoints[i]);
         }
 
-        /*if(type.equals("multipolygon")) {
-            List<Double> xPoints = new ArrayList<>(), yPoints = new ArrayList<>();
-            Polygon p = new Polygon();
-            for (Member m : memberRefs) {
+        // Draw the polygon
+        gc.fill();
 
-                    double[] coords = m.way.getCoords();
-                    p.getPoints().add(coords[0]);
-                    p.getPoints().add(coords[1]);
-            }
-
-            p.setFill(Color.PINK);
-            p.setStroke(Color.BLACK);
-            gc.beginPath();
-            double x = p.getPoints().get(0);
-            double y = p.getPoints().get(1);
-            xPoints.add(x);
-            yPoints.add(y);
-            gc.moveTo(x, y);
-            for(int i = 0; i < p.getPoints().size(); i++) {
-
-            }
-
-        }*/
-      /*  for (Member m : memberRefs) {
-            if (m.getType().equals("outer")) {
-                gc.beginPath();
-                Way way = m.way;
-                if (!(way == null)) {
-                    double[] coords = way.getCoords();
-                    gc.moveTo(coords[0], coords[1]);
-                    for (int i = 2; i < coords.length; i += 2) {
-                        gc.lineTo(coords[i], coords[i + 1]);
-                    }
-                    gc.closePath();
-                    gc.setFill(Color.PINK);
-                    gc.setFillRule(FillRule.EVEN_ODD);
-                    gc.fill();
-                    gc.setStroke(Color.PINK);
-                    gc.stroke();
-                    System.out.println("relation drawn");
-                }
-            }
-            if (m.getType().equals("inner")) {
-                gc.beginPath();
-                Way way = m.way;
-                if (!(way == null)) {
-                    double[] coords = way.getCoords();
-                    gc.moveTo(coords[0], coords[1]);
-                    for (int i = 2; i < coords.length; i += 2) {
-                        gc.lineTo(coords[i], coords[i + 1]);
-                    }
-                    gc.closePath();
-                    gc.setFill(Color.GREEN);
-                    gc.setFillRule(FillRule.EVEN_ODD);
-                    gc.fill();
-                    gc.setStroke(Color.BLACK);
-                    gc.stroke();
-                    System.out.println("relation drawn");
-                }
-            }
-        }*/
     }
 }
 
