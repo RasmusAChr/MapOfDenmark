@@ -192,7 +192,7 @@ public class Model implements Serializable {
         boolean drivable = false;
         boolean cycleable = false;
         boolean oneway = false;
-        boolean onewayBicycle = true;
+        boolean onewayBicycle = false;
         boolean insideRelation = false;
         long wayid = 0;
         int vertexIndex = -1;
@@ -271,32 +271,31 @@ public class Model implements Serializable {
                     }
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
-                        if (shouldAdd) {
-                            if (vertexIndex != -1) {
-                                double weight_without_modifier = weightCalculate();
-                                double weight_car = weightCalculate();
-                                double weight_cycle = 1.0;
-                                // calculate the weight depending on tags
-                                if(!cycleable){
-                                     weight_cycle = Integer.MAX_VALUE;
-                                }
-                                if (!drivable) {
-                                    weight_car = Integer.MAX_VALUE;
-                                }
-                                if (oneway) {
-                                    if (onewayBicycle) {
-                                        EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
-                                    } else {
-                                        EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
-                                        EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_cycle, Integer.MAX_VALUE ));
-                                    }
+                        if (shouldAdd && vertexIndex != -1) {
+                            double weight_without_modifier = weightCalculate();
+                            double weight_car = weightCalculate();
+                            double weight_cycle = 1.0;
+                            // calculate the weight depending on tags
+                            if(!cycleable){
+                                 weight_cycle = Integer.MAX_VALUE;
+                            }
+                            if (!drivable) {
+                                weight_car = Integer.MAX_VALUE;
+                            }
+                            if (oneway) {
+                                if (onewayBicycle) {
+                                    EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
                                 } else {
                                     EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
-                                    EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_cycle, weight_car ));
+                                    EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_cycle, Integer.MAX_VALUE ));
                                 }
                             } else {
-                                vertexIndex = DigraphNodeToIndex.get(node);
+                                EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
+                                EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_cycle, weight_car ));
                             }
+
+                        } else {
+                            vertexIndex = DigraphNodeToIndex.get(node);
                         }
 
                         node.setWay(new Way(way)); // Set the way reference in each node
@@ -310,7 +309,7 @@ public class Model implements Serializable {
                     drivable = false;
                     cycleable = false;
                     oneway = false;
-                    onewayBicycle = true;
+                    onewayBicycle = false;
                     vertexIndex = -1;
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
