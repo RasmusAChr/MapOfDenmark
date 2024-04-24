@@ -255,10 +255,16 @@ public class KDTree
     }
 
     public Node getNearestNeighbor(Double xCoord, Double yCoord, boolean shouldFindNearestRoad){
-        Node tmpNode1 = floor(xCoord, yCoord, shouldFindNearestRoad);
-        Node tmpNode2 = ceiling(xCoord, yCoord, shouldFindNearestRoad);
+        Node tmpNode1 = floor(xCoord*0.56, -yCoord, shouldFindNearestRoad);
+        Node tmpNode2 = ceiling(xCoord*0.56, -yCoord, shouldFindNearestRoad);
+
+        if (tmpNode1 == null && tmpNode2 == null) return null; // Return null if both floor and ceiling are null
+        if (tmpNode1 == null) return tmpNode2; // Return ceiling if floor is null
+        if (tmpNode2 == null) return tmpNode1; // Return floor if ceiling is null
+
         double distanceBetweenN1andInput = Math.hypot(tmpNode1.getLon()-xCoord, tmpNode1.getLat()-yCoord);
         double distanceBetweenN2andInput = Math.hypot(tmpNode2.getLon() - xCoord, tmpNode2.getLat() - yCoord);
+
         if(distanceBetweenN1andInput < distanceBetweenN2andInput){
             return tmpNode1;
         } else {
@@ -276,9 +282,9 @@ public class KDTree
      */
     public Node ceiling(Double xCoord, Double yCoord, boolean findNearestRoad) {
         if (xCoord == null || yCoord == null) throw new IllegalArgumentException("argument to ceiling() is null");
-        if (isEmpty()) throw new NoSuchElementException("calls ceiling() with empty symbol table");
+        if (isEmpty()) return null; // "calls ceiling() with empty symbol table"
         KDNode x = ceiling(root, xCoord, yCoord, 0, findNearestRoad, null);
-        if (x == null) throw new NoSuchElementException("argument to ceiling() is too large");
+        if (x == null) return  null; // "argument to ceiling() is too large"
         else return x.val;
     }
 
@@ -316,7 +322,7 @@ public class KDTree
 
     public Node floor(double xCoord, double yCoord, boolean shouldFindNearestRoad) {
         KDNode x = floor(root, xCoord, yCoord, 0, shouldFindNearestRoad, null);
-        if (x == null) throw new NoSuchElementException("argument to floor() is too small");
+        if (x == null) return null; //"argument to floor() is too small"
         else return x.val;
 
     }
@@ -332,8 +338,9 @@ public class KDTree
 
         if (!shouldFindNearestRoad) {
             if (cmp  < 0) return floor(x.left, xCoord, yCoord,depth + 1, shouldFindNearestRoad, best);
-            else if (cmp  > 0) return floor(x.right, xCoord, yCoord,depth + 1, shouldFindNearestRoad, best);
+            else if (cmp  > 0) return floor(x.right, xCoord, yCoord,depth + 1, shouldFindNearestRoad, x);
             else return x;
+
         }
         // If we want to find the nearest node that is also a road
         else {
