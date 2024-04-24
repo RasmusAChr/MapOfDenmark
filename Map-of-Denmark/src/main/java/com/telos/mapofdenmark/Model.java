@@ -228,8 +228,8 @@ public class Model implements Serializable {
 
                     } else if (k.equals("oneway")) {
                         oneway = v.equals("yes");
-                    } else if (k.equals("onewayBicycle")) {
-                        onewayBicycle = false;
+                    } else if (k.equals("oneway:bicycle")) {
+                        onewayBicycle = v.equals("yes");
                     } else if (k.equals("bicycle") && v.equals("yes")) {
                         cycleable = true;
                         shouldAdd = true;
