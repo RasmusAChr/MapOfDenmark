@@ -1,6 +1,7 @@
 package com.telos.mapofdenmark.KDTreeClasses;
 
 import com.telos.mapofdenmark.Node;
+import com.telos.mapofdenmark.Way;
 
 import java.util.*;
 
@@ -348,5 +349,37 @@ public class KDTree
                 else return best;
             }
         }
+    }
+
+    // range serach methods that returns a set instead of a queue to ensure that the same way is not drawn multiple times
+    public Set<Way> rangeSearchSet(double xMin, double xMax, double yMin, double yMax)
+    {
+//        System.out.println("Range Searching for these param: xMin:"+xMin+" xMax:"+xMax+" yMin:"+yMin+" yMax:"+yMax);
+        Set<Way> waySet = new HashSet<>();
+        rangeSearchSet(root, waySet, xMin, xMax, yMin, yMax, 0);
+        return waySet;
+    }
+
+    private void rangeSearchSet(KDNode x, Set<Way> waySet, double xMin, double xMax, double yMin, double yMax, int depth)
+    {
+        if (x == null) return;
+
+        int axis = depth % 2;
+        double cmplo; //CompareToLow
+        double cmphi; //CompareToHigh
+        // if the axis is 0, compare the x value long else comp     are lat
+        if(axis == 0){
+            // Sort based on the x-axis
+            cmplo = Double.compare(xMin,x.x);
+            cmphi = Double.compare(xMax,x.x);
+
+        } else {
+            // Sort based on the y-axis
+            cmplo = Double.compare(yMin,x.y);
+            cmphi = Double.compare(yMax,x.y);
+        }
+        if (cmplo < 0) rangeSearchSet(x.left, waySet, xMin, xMax, yMin, yMax, depth+1);
+        if (cmplo <= 0 && cmphi >= 0) waySet.add(x.val.getWay());
+        if (cmphi > 0) rangeSearchSet(x.right, waySet, xMin, xMax, yMin, yMax, depth+1);
     }
 }
