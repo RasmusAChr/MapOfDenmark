@@ -87,6 +87,18 @@ public class Controller {
 //        });
        // zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> ));
 
+        // Adds an event handler to the suggestionsBox, to put the text from the suggestions up in the searchBar
+        suggestionsBox.setOnMouseClicked(event ->{
+                if(!suggestionsBox.getSelectionModel().getSelectedItem().isEmpty()){
+                    String chosenSelection = suggestionsBox.getSelectionModel().getSelectedItem();
+
+                    searchBar.setText(chosenSelection);
+
+                    suggestionsBox.setVisible(false);
+                }
+
+                });
+
         searchBar.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar.getText().isEmpty())) {
                 System.out.println(searchBar.getText());
