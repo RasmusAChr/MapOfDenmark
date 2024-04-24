@@ -313,6 +313,7 @@ public class Model implements Serializable {
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
                         if (place.equals("islet")) {
+                            System.out.println("islet");
                             Relations.add(new Relation(RelationsType,relationsMembers));
                         }
                     }
