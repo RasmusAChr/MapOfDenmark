@@ -51,6 +51,8 @@ public class Controller {
     private ToggleButton ToggleMode;
     @FXML
     private Boolean vehicle;
+    @FXML
+    private ImageView searchImage;
 
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
@@ -95,6 +97,8 @@ public class Controller {
                     searchBar.setText(chosenSelection);
 
                     suggestionsBox.setVisible(false);
+
+                    panToAddress(chosenSelection);
                 }
 
                 });
@@ -265,6 +269,21 @@ public class Controller {
         try {
             suggestionsBox.getItems().add("Lat is: " + node.getLat() + " Lon is: " + node.getLon());
         } catch (NullPointerException E) {}
+    }
+
+    // Panning method to pan map over to the given address
+    private void panToAddress(String selectedAddress){
+        if(model.getAddressIdMap().get(selectedAddress) != null){
+            Node addressNode = model.getAddressIdMap().get(selectedAddress);
+
+            double addressX = addressNode.getLon();
+            double addressY = addressNode.getLat();
+            view.pan(addressX * 0.56,-addressY);
+        }
+
+
+
+
     }
 
 }
