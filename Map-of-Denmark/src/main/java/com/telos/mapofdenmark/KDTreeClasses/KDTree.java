@@ -300,15 +300,15 @@ public class KDTree
         // If we want to find the nearest node that is also a road
         else {
             if (cmp < 0) {
-                if (x.val.getWay().isPartOfRoad()) best = x;
+                if (x.val.isPartOfRoad()) best = x;
                 return ceiling(x.left, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
             }
             else if (cmp > 0) {
-                if (x.val.getWay().isPartOfRoad()) best = x;
+                if (x.val.isPartOfRoad()) best = x;
                 return ceiling(x.right, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
             }
             else {
-                if (x.val.getWay().isPartOfRoad()) return x;
+                if (x.val.isPartOfRoad()) return x;
                 else return best;
             }
         }
@@ -329,6 +329,7 @@ public class KDTree
         // The following two conditionals is used to determine whether to divide half-plane vertically or horizontally
         if (axis == 0) cmp = Double.compare(xCoord, x.x); // Compare x-coordinates if axis is 0
         else cmp = Double.compare(yCoord, x.y); // Compare y-coordinates if axis is 1
+
         if (!shouldFindNearestRoad) {
             if (cmp  < 0) return floor(x.left, xCoord, yCoord,depth + 1, shouldFindNearestRoad, best);
             else if (cmp  > 0) return floor(x.right, xCoord, yCoord,depth + 1, shouldFindNearestRoad, best);
@@ -337,15 +338,15 @@ public class KDTree
         // If we want to find the nearest node that is also a road
         else {
             if (cmp < 0) {
-                if (x.val.getWay().isPartOfRoad()) best = x;
+                if (x.val.isPartOfRoad()) best = x;
                 return floor(x.left, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
             }
             else if (cmp > 0) {
-                if (x.val.getWay().isPartOfRoad()) best = x;
+                if (x.val.isPartOfRoad()) best = x;
                 return floor(x.right, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
             }
             else {
-                if (x.val.getWay().isPartOfRoad()) return x;
+                if (x.val.isPartOfRoad()) return x;
                 else return best;
             }
         }

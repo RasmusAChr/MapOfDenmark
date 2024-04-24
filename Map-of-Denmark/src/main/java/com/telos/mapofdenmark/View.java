@@ -118,7 +118,7 @@ public class View {
         // drawing ways from rangeSearch
         for (Way spatialWay : waysFromKD) {
             if (spatialWay != null) {
-                gc.setStroke(Color.BLACK);
+//                gc.setStroke(Color.BLACK);
                 //System.out.println("Node.getWay = " + way.coords);
                 spatialWay.draw(gc, slider_value, dark);
             }

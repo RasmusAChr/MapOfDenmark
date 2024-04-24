@@ -251,7 +251,7 @@ public class Model implements Serializable {
                     if (!roadtype.isEmpty()) {
                         ways.add(new Road(way, roadtype));
                         Node tmpNode = way.get(0);
-//                        tmpNode.getWay().setPartOfRoad(true);
+                        tmpNode.setPartOfRoad(true);
                     } else {
                         ways.add(new Way(way));
                     }
