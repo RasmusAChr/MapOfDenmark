@@ -28,11 +28,12 @@ import javafx.scene.transform.NonInvertibleTransformException;
 
 public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
-
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
     List<Relation> Relations = new ArrayList<>();
+    // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
+    List<Node> centerPointNodes = new ArrayList<>();
     SP Dijkstra = null;
     private Trie trie;
     double minlat, maxlat, minlon, maxlon;
@@ -76,8 +77,6 @@ public class Model implements Serializable {
         roadIdSet.put("tertiary_link", 1.0);
         roadIdSet.put("living_street", 2.5);
         roadIdSet.put("track", 1.25);
-        this.bicycleIdSet = new HashSet<>(List.of("yes", "designated", "permissive", "destination"));
-        this.cycleWayIdSet = new HashSet<>(List.of("track", "lane"));
         this.DigraphNodeToIndex = new HashMap<>();
         this.DigraphIndexToNode = new HashMap<>();
         this.id2way = new HashMap<>();
@@ -97,7 +96,10 @@ public class Model implements Serializable {
         save(filename+".obj");
         this.trie = deserializeTrie("data/.obj");
         this.kdTree = new KDTree();
-
+        // Populates the KDTree using all nodes from .osm
+//        kdTree.populate(nodeList);
+        // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
+        kdTree.populate(centerPointNodes);
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -301,9 +303,8 @@ public class Model implements Serializable {
                         } else {
                             vertexIndex = DigraphNodeToIndex.get(node);
                         }
-
                         node.setWay(new Way(way)); // Set the way reference in each node
-
+                        addToCenterPointNodes(way);
                     }
                     Way newWay = new Way(way);
                     id2way.put(wayid,newWay);
@@ -493,65 +494,22 @@ public class Model implements Serializable {
         return trie.getAddressSuggestions(input.toLowerCase(), 4);
 
     }
-    public void populateKDTree(){
-        populateKDTree(kdTree, nodeList, 0);
-    }
-    private static void populateKDTree(KDTree kdTree, List<Node> nodeList, int depth) {
-        List<Node> nodes = nodeList;
-        int axis = depth % 2;
-        // if the axis is 0, compare the x value long else compare lat
-        if(axis == 0){
-            // Sort based on the x-axis
-            nodes.sort(Comparator.comparingDouble(n -> n.lon));
 
-        } else {
-            // Sort based on the y-axis
-            nodes.sort(Comparator.comparingDouble(n -> n.lat));
+    // finds the center lat and lon among a collection of nodes
+    public void addToCenterPointNodes(List<Node> nodes){
+        double sumLat = 0;
+        double sumLon = 0;
+        int index = 0;
+        for(Node node : nodes){
+            sumLat += node.getLat();
+            sumLon += node.getLon();
         }
-
-        // Find median index
-        int medianIndex = nodes.size() / 2;
-        Node medianNode = nodes.get(medianIndex);
-
-        // Insert median nodes into KDTree
-        kdTree.put(medianNode.getLon(), medianNode.getLat(), medianNode);
-
-        // iterate depth to ensure that a new axis is sorted for
-        depth++;
-
-        // Recursive population call
-        // Left Recursive Call, Handles the elements before the median index by only providing from the start of the list to one less than the median index
-        // The subList does not include the end of the range in the list is provides
-        populateKDTree(kdTree, nodes.subList(0, medianIndex), depth);
-        // Right Recursive Call, Handles the elements after the median index by only providing from the median index+1 (avoids duplicates) to the end of the list
-        populateKDTree(kdTree, nodes.subList(medianIndex+1, nodes.size()), depth);
-    }
-
-
-    // Converts canvas coordinates to geo coordinates or vice versa, depending on true/false
-    public Point2D convertToCoordinates(Point2D pointFromCanvas, Boolean toGeoCoord, Affine trans){
-        try{
-            // Transforms coordinates from canvas to geo coordinates using inbuilt functionality
-            if(toGeoCoord){
-                Point2D geoCoordPoint = trans.inverseTransform(pointFromCanvas);
-
-                // Calculations to make sure the coordinates are within the bounds
-                double geoLon = Math.max(minlon, Math.min(maxlon, geoCoordPoint.getX()));
-                double geoLat = Math.max(minlat, Math.min(maxlat, geoCoordPoint.getY()));
-                return new Point2D(geoLon, geoLat);
-            }
-            // Vice versa
-            else{
-                double reverseLon = Math.max(minlon, Math.min(maxlon, pointFromCanvas.getX()));
-                double reverseLat = Math.max(minlat, Math.min(maxlat, pointFromCanvas.getY()));
-
-                Point2D canvasPoint = new Point2D(reverseLon, reverseLat);
-                return trans.transform(canvasPoint);
-            }
-        }catch(NonInvertibleTransformException e){
-            System.out.println(e.getMessage());
-            return null;
-        }
+        double centerLat = sumLat / nodes.size();
+        double centerLon = sumLon / nodes.size();
+        Node centeredNode = new Node(index, centerLat, centerLon);
+        centeredNode.setWay(nodes.get(0).getWay());
+        centerPointNodes.add(centeredNode);
+        index++;
     }
 
 

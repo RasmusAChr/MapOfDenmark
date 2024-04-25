@@ -90,9 +90,37 @@ public class View {
         gc.setTransform(trans);
        // double zoomValue = 1/Math.sqrt(trans.determinant());
         gc.setLineWidth(0.000005);
-        for (var way : model.ways) {
-            way.draw(gc, slider_value, dark);
+//        for (var way : model.ways) {
+//            way.draw(gc, slider_value, dark);
+//        }
+
+        Point2D canvasTopLeft =  mousetoModel(0,0);
+        Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
+//        System.out.println("Top Left: " + canvasTopLeft);
+//        System.out.println("Bottom right: " + canvasBottomRight);
+        System.out.println("Size of KDTree: " + model.kdTree.size());
+//        System.out.println("Size of queue after rangesearch: " + model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY()).size());
+        Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+//        Set<Way> waysFromKD = model.kdTree.rangeSearchSet(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        // rangeSearch(x1,x2,y1,y2)
+        for (Node nodeSpatial : nodesFromKD) {
+            Way way = nodeSpatial.getWay();
+            if (way != null) {
+                gc.setStroke(Color.BLACK);
+                //System.out.println("Node.getWay = " + way.coords);
+                way.draw(gc, slider_value, dark);
+            }
         }
+
+        // drawing ways from rangeSearch
+//        for (Way spatialWay : waysFromKD) {
+//            if (spatialWay != null) {
+////                gc.setStroke(Color.BLACK);
+//                //System.out.println("Node.getWay = " + way.coords);
+//                spatialWay.draw(gc, slider_value, dark);
+//            }
+//        }
+
         for (var line : model.list) {
             line.draw(gc);
         }
