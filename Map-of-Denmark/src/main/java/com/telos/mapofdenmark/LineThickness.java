@@ -42,6 +42,7 @@ public class LineThickness implements Serializable {
         linewidth.put("optional_sidepath", 0.0001);
         linewidth.put("permissive", 0.0001);
         linewidth.put("destination", 0.0001);
+        linewidth.put("service", 0.0001);
     }
 
     public boolean findKey(String a) {

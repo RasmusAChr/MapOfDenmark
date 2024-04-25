@@ -210,6 +210,7 @@ public class Model implements Serializable {
         boolean oneway = false;
         boolean onewayBicycle = false;
         boolean insideRelation = false;
+        boolean access = false;
         long wayid = 0;
         int vertexIndex = -1;
 
@@ -224,15 +225,14 @@ public class Model implements Serializable {
                     var v = input1.getAttributeValue(null, "v");
                     var k = input1.getAttributeValue(null, "k");
                     if (k.equals("highway")) {
+                        roadtype = v;
                         if (roadIdSet.containsKey(v)) {
                             drivable = true;
                             shouldAdd = true;
-                            roadtype = v;
                         }
                         if (cycleTags.contains(v)) {
                             cycleable = true;
                             shouldAdd = true;
-                            roadtype = v;
                         }
                     } else if (k.equals("oneway")) {
                         oneway = v.equals("yes");
@@ -242,7 +242,6 @@ public class Model implements Serializable {
                         if (cycleTags.contains(v)) {
                             cycleable = true;
                             shouldAdd = true;
-                            roadtype = v;
                         }
                     }
 
@@ -276,12 +275,10 @@ public class Model implements Serializable {
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name.equals("way")) {
                     if (!roadtype.isEmpty()) {
-//                        ways.add(new Road(way, roadtype));
                         Road tmpRoad = new Road(way,roadtype);
                         ways.add(tmpRoad);
                         addToCenterPointNodes(way, tmpRoad, true);
                     } else {
-//                        ways.add(new Way(way));
                         Way tmpWay = new Way(way);
                         ways.add(tmpWay);
                         addToCenterPointNodes(way, tmpWay, false);
@@ -327,6 +324,7 @@ public class Model implements Serializable {
                     oneway = false;
                     onewayBicycle = false;
                     vertexIndex = -1;
+                    access = false;
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     Relations.add(new Relation(RelationsType,relationsMembers));

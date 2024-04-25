@@ -84,6 +84,8 @@ public class ColorScheme implements Serializable{
         colors.put("permissive", "#FFFF00");
         darkColors.put("permissive", "#FFFF00");
         colors.put("destination", "#FFFF00");
+        colors.put("service", "#FFA500");
+        darkColors.put("service", "##FFA500");
 
         // NATURALS
         colors.put("fell","#48a160");
