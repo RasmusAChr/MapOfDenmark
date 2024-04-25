@@ -14,6 +14,7 @@ public class Relation implements Serializable {
     private List<Member> members;
     private List<Node> orderedNodes;
     boolean drawable;
+    Node lastNode = null;
 
 
     public Relation(String type, List<Member> memberRefs) {
@@ -34,8 +35,17 @@ public class Relation implements Serializable {
         //Member firstmember = members.get(0);
         //orderedNodes.addAll(firstmember.getWay().getNodes());
 
+
+
+        // call fhjksdhfsjk with all members
+        while (!addToOrderedNodes().isEmpty()) addToOrderedNodes();
+
+    }
+
+    public List<Member> addToOrderedNodes (){
+        List<Member> leftOverMembers = new ArrayList<>();
+
         // Get the last node in the list
-        Node lastNode = null;//orderedNodes.get(orderedNodes.size()-1);
 
         // Use iterator to iterate over members list
         // Using iterator because you cant manipulate a normal list.
@@ -44,10 +54,11 @@ public class Relation implements Serializable {
             Member m = iterator.next();
             if (m.getWay() == null) {
                 drawable = false;
-                return;
+                return null;
             }
 
             Node currentFirstNode = m.getWay().getNodes().get(0);
+
 
             if (lastNode == null){
                 orderedNodes.addAll(m.getWay().getNodes());
@@ -70,11 +81,14 @@ public class Relation implements Serializable {
                 System.out.println("reversed added");
             }
             else {
-                //iterator.add(m);
+                leftOverMembers.add(m);
                 System.out.println("else");
+                System.out.println(m.getRef());
             }
         }
+        return leftOverMembers;
     }
+
 
     public String getType() {
         return type;
