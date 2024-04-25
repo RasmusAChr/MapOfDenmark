@@ -32,7 +32,7 @@ public class Way implements Serializable {
         }
         gc.stroke();
     }
-    public ArrayList<Node> GetNodes(){
+    public ArrayList<Node> getNodes(){
         return nodesInWay;
     }
 

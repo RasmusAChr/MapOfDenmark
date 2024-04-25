@@ -199,22 +199,24 @@ public class Model implements Serializable {
         boolean parsedFirstWay = false;
         boolean parsedFirstRelation = false;
 
-        if (!parsedFirstWay){
-            System.out.println("test");
-            if (input1.getLocalName().equals("way")){
-                wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
-                parsedFirstWay = true;
-            }
+        //if (!parsedFirstWay){
+
+        if (input1.getLocalName().equals("way")){
+            System.out.println("WAY test");
+            wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
+            parsedFirstWay = true;
         }
-        if (!parsedFirstRelation){
-            if (input1.getLocalName().equals("relation")){
-                relationsMembers = new ArrayList<>();
-                insideRelation = true;
-                RelationsType = "";
-                place = "";
-                parsedFirstRelation = true;
-            }
+        //}
+        //if (!parsedFirstRelation){
+        if (input1.getLocalName().equals("relation")){
+            System.out.println("RELATION test");
+            relationsMembers = new ArrayList<>();
+            insideRelation = true;
+            RelationsType = "";
+            place = "";
+            parsedFirstRelation = true;
         }
+        //}
 
         while (input1.hasNext()) {
             tagKind = input1.next();

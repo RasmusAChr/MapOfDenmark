@@ -12,38 +12,54 @@ import java.util.*;
 public class Relation implements Serializable {
     private String type;
     private List<Member> members;
-    private List<double[]> orderedMemberCoords;
+    private List<Node> orderedNodes;
+    boolean drawable;
 
 
     public Relation(String type, List<Member> memberRefs) {
         ColorScheme cs = new ColorScheme();
         this.type = type;
         this.members = memberRefs;
-       // orderedMembersCoords();
+        this.drawable = true;
+        orderNodes();
     }
     // lav en tom arraylist af coords
     // tjek arraylist. size for sidste coords
     // tjek med den nye memeber om den matcher de sidste endte normalt eller reversed til føj dernæst alle coords til listen
     // hvis memberen ikke passer i rækkegølgen gå igenem igen senere.
 
-    public void orderMember(){
-        orderedMemberCoords = new ArrayList<>();
+    public void orderNodes(){
+        orderedNodes = new ArrayList<>();
         // Add first member to list
         Member firstmember = members.get(0);
-        orderedMemberCoords.add(firstmember.getWay().getCoords());
-        Node last = firstmember.getWay().GetNodes().get(firstmember.getWay().GetNodes().size());
-        while (!members.isEmpty()){
-            // Check end node in member matches first in a while loop if not check the reversed
-            for(Member m : members){
-                Node next_First = m.getWay().GetNodes().get(0);
+        orderedNodes.addAll(firstmember.getWay().getNodes());
 
-                if (last == next_First) {
-                    orderedMemberCoords.add(m.getWay().getCoords());
-                    last = m.getWay().GetNodes().get(m.getWay().GetNodes().size());
+        System.out.println(firstmember.getWay().getNodes());
+
+        // Get the last node in the list
+        Node lastNode = orderedNodes.get(orderedNodes.size()-1);
+
+        // Runs as long as there are members which nodes haven't been added to the list
+        while (!members.isEmpty()){
+            // Check if there is a member whose first Node matches the last node in list
+            for(Member m : members){
+                if (m.getWay() == null) {
+                    drawable = false;
+                    return;
                 }
-                else if (last == reverseNodes(m).get(0)) {
-                    reverseNodes(m);
-                    
+                Node currentFirstNode = m.getWay().getNodes().get(0);
+
+                // If the last node in list is the same as the first node in current member
+                if (lastNode == currentFirstNode) {
+                    orderedNodes.addAll(m.getWay().getNodes());
+                    lastNode = orderedNodes.get(orderedNodes.size()-1);
+                    members.remove(m);
+                }
+                // Else if the last node in list is the same as the last node in current member
+                else if (lastNode == reverseNodes(m).get(0)) {
+                    orderedNodes.addAll(reverseNodes(m));
+                    lastNode = orderedNodes.get(orderedNodes.size()-1);
+                    members.remove(m);
                 }
             }
         }
@@ -92,8 +108,7 @@ public class Relation implements Serializable {
             }
 
         }
-    }
-*/
+    }*/
 
     public String getType() {
         return type;
@@ -112,53 +127,33 @@ public class Relation implements Serializable {
     }
 
     public void Draw(GraphicsContext gc, double zoom, boolean darkMode) {
-        boolean firstElementParsed = false;
-        boolean secondElementParsed = false;
         gc.setFill(Color.PINK);
-         List<Double> coordsList = new ArrayList<>();
-        for (Member m : members) {
-            Way way = m.getWay();
-            // Sometimes a way can be null, if it's not in the OSM file, but a
-            // part of the relation is and every member reference will be stored.
-            if (way == null) break;
 
-            double[] coords = way.getCoords();
+        if (drawable){
+            double[] xPoints = new double[orderedNodes.size()];
+            double[] yPoints = new double[orderedNodes.size()];
 
-          /*  if (m == members.get(0)) { // Check if this is the first member
-                if (members.size() > 1) { // Check if there is a next member
-                    double[] nextList = members.get(1).getWay().getCoords();
-                    if (coords[coords.length - 1] != nextList[0]) {
-                        // Reverse the first array
-                        coords = reverseCoords(coords);
-                    }
-                }
-            }*/
-
-            for (Double coord : coords) {
-                coordsList.add(coord);
+            for (int i = 0; i < orderedNodes.size(); i++){
+                xPoints[i] = orderedNodes.get(i).getLat();
+                yPoints[i] = orderedNodes.get(i).getLon();
             }
-        }
-        // Create separate arrays for x and y coordinates
-        double[] xPoints = new double[coordsList.size() / 2];
-        double[] yPoints = new double[coordsList.size() / 2];
-        for (int i = 0; i < coordsList.size(); i += 2) {
-            xPoints[i / 2] = coordsList.get(i);
-            yPoints[i / 2] = coordsList.get(i + 1);
-        }
-        // Moves to start coordinates
-        gc.moveTo(xPoints[0], yPoints[0]);
 
-        // Creates a not visible line to next coordinate (to create selection).
-        for (int i = 0; i < xPoints.length; i++){
-            gc.lineTo(xPoints[i],yPoints[i]);
+            // Moves to start coordinates
+            gc.moveTo(xPoints[0], yPoints[0]);
+
+            // Creates a not visible line to next coordinate (to create selection).
+            for (int i = 0; i < xPoints.length; i++){
+                gc.lineTo(xPoints[i],yPoints[i]);
+            }
+
+            // Draw the polygon
+            gc.fill();
         }
 
-        // Draw the polygon
-        gc.fill();
     }
 
     public List<Node> reverseNodes(Member mem){
-        ArrayList<Node> listOfNodes = mem.getWay().GetNodes();
+        ArrayList<Node> listOfNodes = mem.getWay().getNodes();
         ArrayList<Node> reversOfNodes = new ArrayList<>();
         for(int i = listOfNodes.size() - 1; i >= 0; i-- ){
             reversOfNodes.add(listOfNodes.get(i));
