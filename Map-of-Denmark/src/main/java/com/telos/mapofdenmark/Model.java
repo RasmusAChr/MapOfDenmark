@@ -250,8 +250,6 @@ public class Model implements Serializable {
                 if (name.equals("way")) {
                     if (!roadtype.isEmpty()) {
                         ways.add(new Road(way, roadtype));
-                        Node tmpNode = way.get(0);
-                        tmpNode.setPartOfRoad(true);
                     } else {
                         ways.add(new Way(way));
                     }
@@ -267,8 +265,6 @@ public class Model implements Serializable {
                             }
                             if (!drivable) {
                                 weight_car = Integer.MAX_VALUE;
-                            } else if(roadIdSet.containsKey(name)){
-                                weight_car = weight_without_modifier * roadIdSet.get(name);
                             }
                             if (oneway) {
                                 if (onewayBicycle) {
