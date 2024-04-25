@@ -139,14 +139,10 @@ public class Model implements Serializable {
                             parseAddressFromOSM(v, k);
                         }
                     }
-                    case "way" -> {
+                    case "way","relation" -> {
                         EWD = new EdgeWeightedDigraph(roadCountX);
                         wayid = Long.parseLong(input.getAttributeValue(null,"id"));
                         parseWaysAndRelations(input, tagKind); // First way element ???? input.getname = way
-                        return;
-                    }
-                    case "relation" -> {
-                        parseWaysAndRelations(input,tagKind);
                         return;
                     }
                 }
@@ -202,14 +198,12 @@ public class Model implements Serializable {
         //if (!parsedFirstWay){
 
         if (input1.getLocalName().equals("way")){
-            System.out.println("WAY test");
             wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
             parsedFirstWay = true;
         }
         //}
         //if (!parsedFirstRelation){
         if (input1.getLocalName().equals("relation")){
-            System.out.println("RELATION test");
             relationsMembers = new ArrayList<>();
             insideRelation = true;
             RelationsType = "";
@@ -333,7 +327,6 @@ public class Model implements Serializable {
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
                         if (place.equals("islet")) {
-                            System.out.println("islet");
                             Relations.add(new Relation(RelationsType,relationsMembers));
                         }
                     }

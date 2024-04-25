@@ -12,7 +12,8 @@ public class Way implements Serializable {
     ArrayList<Node> nodesInWay;
 
     public Way(ArrayList<Node> way) {
-        nodesInWay = way;
+        nodesInWay = new ArrayList<>();
+        nodesInWay.addAll(way);
         coords = new double[way.size() * 2];
         for (int i = 0 ; i < way.size() ; ++i) {
             var node = way.get(i);

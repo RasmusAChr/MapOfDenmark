@@ -31,84 +31,50 @@ public class Relation implements Serializable {
     public void orderNodes(){
         orderedNodes = new ArrayList<>();
         // Add first member to list
-        Member firstmember = members.get(0);
-        orderedNodes.addAll(firstmember.getWay().getNodes());
-
-        System.out.println(firstmember.getWay().getNodes());
+        //Member firstmember = members.get(0);
+        //orderedNodes.addAll(firstmember.getWay().getNodes());
 
         // Get the last node in the list
-        Node lastNode = orderedNodes.get(orderedNodes.size()-1);
+        Node lastNode = null;//orderedNodes.get(orderedNodes.size()-1);
 
-        // Runs as long as there are members which nodes haven't been added to the list
-        while (!members.isEmpty()){
-            // Check if there is a member whose first Node matches the last node in list
-            for(Member m : members){
-                if (m.getWay() == null) {
-                    drawable = false;
-                    return;
-                }
-                Node currentFirstNode = m.getWay().getNodes().get(0);
+        // Use iterator to iterate over members list
+        // Using iterator because you cant manipulate a normal list.
+        ListIterator<Member> iterator = members.listIterator();
+        while (iterator.hasNext()) {
+            Member m = iterator.next();
+            if (m.getWay() == null) {
+                drawable = false;
+                return;
+            }
 
-                // If the last node in list is the same as the first node in current member
-                if (lastNode == currentFirstNode) {
-                    orderedNodes.addAll(m.getWay().getNodes());
-                    lastNode = orderedNodes.get(orderedNodes.size()-1);
-                    members.remove(m);
-                }
-                // Else if the last node in list is the same as the last node in current member
-                else if (lastNode == reverseNodes(m).get(0)) {
-                    orderedNodes.addAll(reverseNodes(m));
-                    lastNode = orderedNodes.get(orderedNodes.size()-1);
-                    members.remove(m);
-                }
+            Node currentFirstNode = m.getWay().getNodes().get(0);
+
+            if (lastNode == null){
+                orderedNodes.addAll(m.getWay().getNodes());
+                lastNode = orderedNodes.get(orderedNodes.size()-1);
+                iterator.remove();
+                System.out.println("first line added");
+            }
+            // If the last node in list is the same as the first node in current member
+            else if (lastNode.equals(currentFirstNode)) {
+                orderedNodes.addAll(m.getWay().getNodes());
+                lastNode = orderedNodes.get(orderedNodes.size()-1);
+                iterator.remove(); // Remove the current member using the iterator
+                System.out.println("normal added");
+            }
+            // Else if the last node in list is the same as the last node in current member
+            else if (lastNode.equals(reverseNodes(m).get(0))) {
+                orderedNodes.addAll(reverseNodes(m));
+                lastNode = orderedNodes.get(orderedNodes.size()-1);
+                iterator.remove(); // Remove the current member using the iterator
+                System.out.println("reversed added");
+            }
+            else {
+                //iterator.add(m);
+                System.out.println("else");
             }
         }
     }
-
-
-
-
-
-  /*  public void orderedMembersCoords(){
-        orderedMemberCoords = new ArrayList<>();
-        //Get first member coordinates
-        Member firstmember = members.get(0);
-        double[] coordsoffirst = firstmember.getWay().getCoords();
-        if (coordsoffirst == null) return;
-        // Add first member coordinates to list
-        for (double val : coordsoffirst){
-            orderedMemberCoords.add(val);
-            System.out.println(val);
-        }
-
-        // For every member (except first), check for last coordinate to see if there is a match in x,y value
-        for (int i = 1; i < members.size()-1; i++){
-            Member nextmem = members.get(i);
-            double[] coordsOfNextMem = nextmem.getWay().coords;
-            if (coordsOfNextMem == null) return;
-            // Check for x value -2 and for y -1
-            System.out.println("Ordered corrds " + orderedMemberCoords.get(orderedMemberCoords.size()-2) + " " + orderedMemberCoords.get(orderedMemberCoords.size()-1));
-            System.out.println("Needs to match " + coordsOfNextMem[0] + " " + coordsOfNextMem[1] + " or " + reverseCoords(coordsOfNextMem)[0] + " " +reverseCoords(coordsOfNextMem)[1] );
-            if (orderedMemberCoords.get(orderedMemberCoords.size()-2) == coordsOfNextMem[0] &&
-                orderedMemberCoords.get(orderedMemberCoords.size()-1) == coordsOfNextMem[1]) {
-                System.out.println("coords added for later than second");
-                // If next members first coords is equal to previous members last coords, add to coords list
-                for (double val : nextmem.getWay().coords){
-                    orderedMemberCoords.add(val);
-
-                }
-                // if the next members reversed coors is equal to the previous members last coords
-            } else if (orderedMemberCoords.get(orderedMemberCoords.size()-2) == reverseCoords(coordsOfNextMem)[0] &&
-                    orderedMemberCoords.get(orderedMemberCoords.size()-1) == reverseCoords(coordsOfNextMem)[1]) {
-                System.out.println("coords added for later than second 2");
-                    // adds the reversed coords to the list
-                for (double val : reverseCoords(coordsOfNextMem)){
-                    orderedMemberCoords.add(val);
-                }
-            }
-
-        }
-    }*/
 
     public String getType() {
         return type;
@@ -130,12 +96,15 @@ public class Relation implements Serializable {
         gc.setFill(Color.PINK);
 
         if (drawable){
+
             double[] xPoints = new double[orderedNodes.size()];
             double[] yPoints = new double[orderedNodes.size()];
 
             for (int i = 0; i < orderedNodes.size(); i++){
-                xPoints[i] = orderedNodes.get(i).getLat();
-                yPoints[i] = orderedNodes.get(i).getLon();
+                var node = orderedNodes.get(i);
+                System.out.println("(" + node.getLat() + "," + node.getLon() + ")");
+                xPoints[i] = 0.56 * node.getLon();
+                yPoints[i] = -node.getLat();
             }
 
             // Moves to start coordinates
@@ -149,6 +118,7 @@ public class Relation implements Serializable {
             // Draw the polygon
             gc.fill();
         }
+        System.out.println("--------------------------");
 
     }
 
