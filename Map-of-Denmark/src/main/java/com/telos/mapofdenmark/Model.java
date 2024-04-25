@@ -48,8 +48,6 @@ public class Model implements Serializable {
     HashMap<Long, Way> id2way;
     int roadCount;
     Map<String, Double> roadIdSet;
-    HashSet<String> bicycleIdSet;
-    HashSet<String> cycleWayIdSet;
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
             try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
@@ -76,8 +74,6 @@ public class Model implements Serializable {
         roadIdSet.put("tertiary_link", 1.0);
         roadIdSet.put("living_street", 2.5);
         roadIdSet.put("track", 1.25);
-        this.bicycleIdSet = new HashSet<>(List.of("yes", "designated", "permissive", "destination"));
-        this.cycleWayIdSet = new HashSet<>(List.of("track", "lane"));
         this.DigraphNodeToIndex = new HashMap<>();
         this.DigraphIndexToNode = new HashMap<>();
         this.id2way = new HashMap<>();
@@ -213,25 +209,13 @@ public class Model implements Serializable {
                             drivable = true;
                             shouldAdd = true;
                             roadtype = v;
-                            if(v.equals("residential")) cycleable = true;
-                        } else if (v.equals("cycleway")) {
-                            drivable = false;
-                            shouldAdd = true;
-                            cycleable = true;
-                            roadtype = "cycleway";
                         }
-                    } else if (k.equals("cycleway")) {
-                        if (bicycleIdSet.contains(v)) {
-
-                        }
-
-
                     } else if (k.equals("oneway")) {
                         oneway = v.equals("yes");
-                    } else if (k.equals("oneway:bicycle")) {
+                    } else if (k.equals("onewayBicycle")) {
                         onewayBicycle = v.equals("yes");
-                    } else if (k.equals("bicycle") && v.equals("yes")) {
-                        cycleable = true;
+                    } else if (k.equals("bicycle")) {
+                        cycleable = v.equals("yes");
                         shouldAdd = true;
                     }
 

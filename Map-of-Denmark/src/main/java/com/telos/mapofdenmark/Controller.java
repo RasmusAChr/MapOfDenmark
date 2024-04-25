@@ -51,6 +51,8 @@ public class Controller {
     private ToggleButton ToggleMode;
     @FXML
     private Boolean vehicle;
+    @FXML
+    private ImageView searchImage;
 
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
@@ -86,6 +88,26 @@ public class Controller {
 //            addressParsing(trie, newValue);
 //        });
        // zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> ));
+
+        // Adds an event handler to the suggestionsBox, to put the text from the suggestions up in the searchBar and pan to the address
+        suggestionsBox.setOnMouseClicked(event ->{
+                if(!suggestionsBox.getSelectionModel().getSelectedItem().isEmpty()){
+                    String chosenSelection = suggestionsBox.getSelectionModel().getSelectedItem();
+
+                    searchBar.setText(chosenSelection);
+
+                    suggestionsBox.setVisible(false);
+
+                    panToAddress(chosenSelection);
+                }
+
+                });
+
+        searchImage.setOnMouseClicked(event -> {
+            // Call panToAddress method when searchImage is clicked
+
+            panToAddress(searchBar.getText());
+        });
 
         searchBar.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar.getText().isEmpty())) {
@@ -123,14 +145,14 @@ public class Controller {
     private void StartSearch(){
         String input = searchBar.getText();
         Node node = model.getAddressIdMap().get(input);
-        model.StartDijkstra(node,vehicle);
+        model.StartDijkstra(input,vehicle); // changed from node to string for testing
     }
 
     @FXML
     private void StopSearch(){
         String input = searchBar1.getText();
         Node node = model.getAddressIdMap().get(input);
-        model.list.add(new Line(model.getDijkstraPath(node)));
+        model.list.add(new Line(model.getDijkstraPath(input)));// changed from node to string for testing
         view.redraw();
 
     }
@@ -253,6 +275,24 @@ public class Controller {
         try {
             suggestionsBox.getItems().add("Lat is: " + node.getLat() + " Lon is: " + node.getLon());
         } catch (NullPointerException E) {}
+    }
+
+    // Panning method to pan map over to the given address
+    private void panToAddress(String selectedAddress){
+        if(model.getAddressIdMap().get(selectedAddress) != null){
+            Node addressNode = model.getAddressIdMap().get(selectedAddress);
+
+            double addressX = addressNode.getLon();
+            double addressY = addressNode.getLat();
+            view.pan(addressX * 0.56,-addressY);
+        }
+        else{
+            System.out.println("not a valid Address");
+        }
+
+
+
+
     }
 
 }
