@@ -13,7 +13,6 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.ZipInputStream;
-import java.util.Comparator;
 import javax.xml.stream.*;
 
 import com.telos.mapofdenmark.KDTreeClasses.KDTree;
@@ -22,9 +21,6 @@ import com.telos.mapofdenmark.Shortest_Route.EdgeWeightedDigraph;
 import com.telos.mapofdenmark.Shortest_Route.SP;
 import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
-import javafx.geometry.Point2D;
-import javafx.scene.transform.Affine;
-import javafx.scene.transform.NonInvertibleTransformException;
 
 public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
@@ -48,6 +44,7 @@ public class Model implements Serializable {
     List<Member> relationsMembers;
     HashMap<Long, Way> id2way;
     int roadCount;
+    int indexForCenterPoints = 0;
     Map<String, Double> roadIdSet;
     HashSet<String> bicycleIdSet;
     HashSet<String> cycleWayIdSet;
@@ -321,7 +318,7 @@ public class Model implements Serializable {
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     Relations.add(new Relation(RelationsType,relationsMembers));
-                    System.out.println("Relation added");
+//                    System.out.println("Relation added");
                 }
             }
         }
@@ -501,17 +498,16 @@ public class Model implements Serializable {
     public void addToCenterPointNodes(List<Node> nodes){
         double sumLat = 0;
         double sumLon = 0;
-        int index = 0;
         for(Node node : nodes){
             sumLat += node.getLat();
             sumLon += node.getLon();
         }
         double centerLat = sumLat / nodes.size();
         double centerLon = sumLon / nodes.size();
-        Node centeredNode = new Node(index, centerLat, centerLon);
+        Node centeredNode = new Node(indexForCenterPoints, centerLat, centerLon);
         centeredNode.setWay(nodes.get(0).getWay());
         centerPointNodes.add(centeredNode);
-        index++;
+        indexForCenterPoints++;
     }
 
 

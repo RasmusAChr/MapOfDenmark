@@ -17,7 +17,7 @@ public class Relation implements Serializable{
         this.type=type;
         this.memberRefs = memberRefs;
         for(Member m : memberRefs){
-            System.out.println(m.way + " " +  m.getType() + " " + m.ref);
+//            System.out.println(m.way + " " +  m.getType() + " " + m.ref);
         }
     }
     public String getType(){

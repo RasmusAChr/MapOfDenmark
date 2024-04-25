@@ -91,9 +91,24 @@ public class View {
         gc.setTransform(trans);
        // double zoomValue = 1/Math.sqrt(trans.determinant());
         gc.setLineWidth(0.000005);
-        for (var way : model.ways) {
-            way.draw(gc, slider_value, dark);
+//        for (var way : model.ways) {
+//            way.draw(gc, slider_value, dark);
+//        }
+
+        // Logic for drawing ways from KDTree instead of all ways
+        Point2D canvasTopLeft =  mousetoModel(0,0);
+        Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
+        System.out.println("Size of KDTree: " + model.kdTree.size());
+        Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        // rangeSearch(x1,x2,y1,y2)
+        for (Node nodeSpatial : nodesFromKD) {
+            Way way = nodeSpatial.getWay();
+            if (way != null) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark);
+            }
         }
+
         for (var line : model.list) {
             line.draw(gc);
         }
@@ -133,21 +148,4 @@ public class View {
     public void Current_Slider_value(double value){
         slider_value = value;
     }
-
-    /*
-    public Rectangle2D getCanvasCoordAsGeoCoord(){
-        // Gets the canvas coordinates for top left coordinate and bottom right coordinate
-        Point2D mapPaneTopLeft = mapPane.sceneToLocal(canvas.localToScene(x1,y1));
-        Point2D mapPaneBottomRight = mapPane.sceneToLocal(canvas.localToScene(x2,y2));
-
-        // Converts top left and bottom right coordinates to geo coordinates using the model's method
-        Point2D geoTopLeft = model.convertToCoordinates(mapPaneTopLeft, true, trans);
-        Point2D geoBottomRight = model.convertToCoordinates(mapPaneBottomRight, true, trans);
-
-        // Creates a Rectangle2D object with the geo coordinates
-        return new Rectangle2D(geoTopLeft.getX(), geoTopLeft.getY(),geoBottomRight.getX() - geoTopLeft.getX(), geoBottomRight.getY() - geoTopLeft.getY());
-    }*/
-
-
-
 }
