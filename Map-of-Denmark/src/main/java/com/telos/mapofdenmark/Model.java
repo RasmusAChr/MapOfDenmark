@@ -223,10 +223,11 @@ public class Model implements Serializable {
                         }
                     } else if (k.equals("cycleway")) {
                         if (bicycleIdSet.contains(v)) {
-
+                            drivable = false;
+                            shouldAdd = true;
+                            cycleable = true;
+                            roadtype = "cycleway";
                         }
-
-
                     } else if (k.equals("oneway")) {
                         oneway = v.equals("yes");
                     } else if (k.equals("oneway:bicycle")) {
@@ -266,18 +267,22 @@ public class Model implements Serializable {
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name.equals("way")) {
                     if (!roadtype.isEmpty()) {
-                        ways.add(new Road(way, roadtype));
-                        Node tmpNode = way.get(0);
-                        tmpNode.setPartOfRoad(true);
+//                        ways.add(new Road(way, roadtype));
+                        Road tmpRoad = new Road(way,roadtype);
+                        ways.add(tmpRoad);
+                        addToCenterPointNodes(way, tmpRoad, true);
                     } else {
-                        ways.add(new Way(way));
+//                        ways.add(new Way(way));
+                        Way tmpWay = new Way(way);
+                        ways.add(tmpWay);
+                        addToCenterPointNodes(way, tmpWay, false);
                     }
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
                         if (shouldAdd && vertexIndex != -1) {
-                            double weight_without_modifier = weightCalculate();
-                            double weight_car = weightCalculate();
-                            double weight_cycle = 1.0;
+                            double weight_without_modifier = 1.0;
+                            double weight_car = 1.0;
+                            double weight_cycle = 0.5;
                             // calculate the weight depending on tags
                             if(!cycleable){
                                  weight_cycle = Integer.MAX_VALUE;
@@ -302,8 +307,6 @@ public class Model implements Serializable {
                         } else {
                             vertexIndex = DigraphNodeToIndex.get(node);
                         }
-                        node.setWay(new Way(way)); // Set the way reference in each node
-                        addToCenterPointNodes(way);
                     }
                     Way newWay = new Way(way);
                     id2way.put(wayid,newWay);
@@ -322,12 +325,6 @@ public class Model implements Serializable {
                 }
             }
         }
-    }
-
-    private int weightCalculate() {
-        //calculate the weight of the edge, based on different factors.
-
-        return 20;
     }
 
     //Dijkstra implementation
@@ -495,7 +492,7 @@ public class Model implements Serializable {
     }
 
     // finds the center lat and lon among a collection of nodes
-    public void addToCenterPointNodes(List<Node> nodes){
+    public void addToCenterPointNodes(List<Node> nodes, Way refWay, Boolean isPartOfRoad){
         double sumLat = 0;
         double sumLon = 0;
         for(Node node : nodes){
@@ -506,6 +503,8 @@ public class Model implements Serializable {
         double centerLon = sumLon / nodes.size();
         Node centeredNode = new Node(indexForCenterPoints, centerLat, centerLon);
         centeredNode.setWay(nodes.get(0).getWay());
+        centeredNode.setWay(refWay);
+        centeredNode.setPartOfRoad(isPartOfRoad);
         centerPointNodes.add(centeredNode);
         indexForCenterPoints++;
     }
