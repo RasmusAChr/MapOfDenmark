@@ -258,9 +258,9 @@ public class Model implements Serializable {
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
                         if (shouldAdd && vertexIndex != -1) {
-                            double weight_without_modifier = weightCalculate();
-                            double weight_car = weightCalculate();
-                            double weight_cycle = 1.0;
+                            double weight_without_modifier = 1.0;
+                            double weight_car = 1.0;
+                            double weight_cycle = 0.5;
                             // calculate the weight depending on tags
                             if(!cycleable){
                                  weight_cycle = Integer.MAX_VALUE;
@@ -306,12 +306,6 @@ public class Model implements Serializable {
                 }
             }
         }
-    }
-
-    private int weightCalculate() {
-        //calculate the weight of the edge, based on different factors.
-
-        return 20;
     }
 
     //Dijkstra implementation

@@ -145,14 +145,14 @@ public class Controller {
     private void StartSearch(){
         String input = searchBar.getText();
         Node node = model.getAddressIdMap().get(input);
-        model.StartDijkstra(input,vehicle); // changed from node to string for testing
+        model.StartDijkstra(node, vehicle); // changed from node to string for testing
     }
 
     @FXML
     private void StopSearch(){
         String input = searchBar1.getText();
         Node node = model.getAddressIdMap().get(input);
-        model.list.add(new Line(model.getDijkstraPath(input)));// changed from node to string for testing
+        model.list.add(new Line(model.getDijkstraPath(node)));// changed from node to string for testing
         view.redraw();
 
     }
