@@ -73,6 +73,7 @@ public class Model implements Serializable {
         roadIdSet.put("tertiary_link", 1.0);
         roadIdSet.put("living_street", 2.5);
         roadIdSet.put("track", 1.25);
+        roadIdSet.put("service", 1.0);
         this.cycleTags = new HashSet<String>(List.of(
                 "primary",
                 "secondary",
@@ -90,7 +91,8 @@ public class Model implements Serializable {
                 "use_sidepath",
                 "optional_sidepath",
                 "permissive",
-                "destination"));
+                "destination",
+                "private"));
         this.DigraphNodeToIndex = new HashMap<>();
         this.DigraphIndexToNode = new HashMap<>();
         this.id2way = new HashMap<>();
@@ -229,6 +231,16 @@ public class Model implements Serializable {
                         if (roadIdSet.containsKey(v)) {
                             drivable = true;
                             shouldAdd = true;
+                        } else if (v.equals("service")) {
+                            if (access) {
+                                shouldAdd = true;
+                                cycleable = true;
+                                drivable = true;
+                            } else {
+                                shouldAdd = false;
+                                cycleable = false;
+                                drivable = false;
+                            }
                         }
                         if (cycleTags.contains(v)) {
                             cycleable = true;
@@ -243,6 +255,8 @@ public class Model implements Serializable {
                             cycleable = true;
                             shouldAdd = true;
                         }
+                    } else if (k.equals("access")) {
+                        access = cycleTags.contains(v);
                     }
 
                 } else if (name.equals("nd")) {
