@@ -102,26 +102,26 @@ public class View {
 //        System.out.println("Bottom right: " + canvasBottomRight);
         System.out.println("Size of KDTree: " + model.kdTree.size());
 //        System.out.println("Size of queue after rangesearch: " + model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY()).size());
-//        Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-        Set<Way> waysFromKD = model.kdTree.rangeSearchSet(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+//        Set<Way> waysFromKD = model.kdTree.rangeSearchSet(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         // rangeSearch(x1,x2,y1,y2)
-//        for (Node nodeSpatial : nodesFromKD) {
-//            Way way = nodeSpatial.getWay();
-//            if (way != null) {
-//                gc.setStroke(Color.BLACK);
-//                //System.out.println("Node.getWay = " + way.coords);
-//                way.draw(gc, slider_value, dark);
-//            }
-//        }
-
-        // drawing ways from rangeSearch
-        for (Way spatialWay : waysFromKD) {
-            if (spatialWay != null) {
-//                gc.setStroke(Color.BLACK);
+        for (Node nodeSpatial : nodesFromKD) {
+            Way way = nodeSpatial.getWay();
+            if (way != null) {
+                gc.setStroke(Color.BLACK);
                 //System.out.println("Node.getWay = " + way.coords);
-                spatialWay.draw(gc, slider_value, dark);
+                way.draw(gc, slider_value, dark);
             }
         }
+
+        // drawing ways from rangeSearch
+//        for (Way spatialWay : waysFromKD) {
+//            if (spatialWay != null) {
+////                gc.setStroke(Color.BLACK);
+//                //System.out.println("Node.getWay = " + way.coords);
+//                spatialWay.draw(gc, slider_value, dark);
+//            }
+//        }
 
         for (var line : model.list) {
             line.draw(gc);
