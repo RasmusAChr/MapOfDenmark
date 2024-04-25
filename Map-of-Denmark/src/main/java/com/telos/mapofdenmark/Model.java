@@ -77,6 +77,8 @@ public class Model implements Serializable {
         roadIdSet.put("tertiary_link", 1.0);
         roadIdSet.put("living_street", 2.5);
         roadIdSet.put("track", 1.25);
+        this.bicycleIdSet = new HashSet<>(List.of("yes", "designated", "permissive", "destination"));
+        this.cycleWayIdSet = new HashSet<>(List.of("track", "lane"));
         this.DigraphNodeToIndex = new HashMap<>();
         this.DigraphIndexToNode = new HashMap<>();
         this.id2way = new HashMap<>();
