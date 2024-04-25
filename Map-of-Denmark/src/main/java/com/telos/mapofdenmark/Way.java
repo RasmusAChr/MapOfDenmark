@@ -9,8 +9,10 @@ import javafx.scene.paint.Color;
 
 public class Way implements Serializable {
     double[] coords;
+    ArrayList<Node> nodesInWay;
 
     public Way(ArrayList<Node> way) {
+        nodesInWay = way;
         coords = new double[way.size() * 2];
         for (int i = 0 ; i < way.size() ; ++i) {
             var node = way.get(i);
@@ -29,6 +31,9 @@ public class Way implements Serializable {
             gc.lineTo(coords[i], coords[i+1]);
         }
         gc.stroke();
+    }
+    public ArrayList<Node> GetNodes(){
+        return nodesInWay;
     }
 
 
