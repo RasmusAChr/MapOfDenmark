@@ -21,9 +21,9 @@ public class Road extends Way{
         if(lt.findKey(roadType)) {
             gc.setStroke(cs.getColor(roadType, darkMode));
             if (zoom < 0.1) {
-                zoomValue = lt.getWidth(roadType) / 5;
+                zoomValue = lt.getWidth(roadType) / 1.666;
             } else {
-                zoomValue = lt.getWidth(roadType) / (zoom/10);
+                zoomValue = lt.getWidth(roadType) / (zoom/30);
             }
             gc.setLineWidth(zoomValue);
         }

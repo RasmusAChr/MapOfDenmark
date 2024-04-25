@@ -46,8 +46,7 @@ public class Model implements Serializable {
     int roadCount;
     int indexForCenterPoints = 0;
     Map<String, Double> roadIdSet;
-    HashSet<String> bicycleIdSet;
-    HashSet<String> cycleWayIdSet;
+    HashSet<String> cycleTags;
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
             try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
@@ -74,8 +73,24 @@ public class Model implements Serializable {
         roadIdSet.put("tertiary_link", 1.0);
         roadIdSet.put("living_street", 2.5);
         roadIdSet.put("track", 1.25);
-        this.bicycleIdSet = new HashSet<>(List.of("yes", "designated", "permissive", "destination"));
-        this.cycleWayIdSet = new HashSet<>(List.of("track", "lane"));
+        this.cycleTags = new HashSet<String>(List.of(
+                "primary",
+                "secondary",
+                "tertiary",
+                "unclassified",
+                "residential",
+                "primary_link",
+                "secondary_link",
+                "tertiary_link",
+                "living_street",
+                "track",
+                "cycleway",
+                "yes",
+                "designated",
+                "use_sidepath",
+                "optional_sidepath",
+                "permissive",
+                "destination"));
         this.DigraphNodeToIndex = new HashMap<>();
         this.DigraphIndexToNode = new HashMap<>();
         this.id2way = new HashMap<>();
@@ -198,7 +213,6 @@ public class Model implements Serializable {
         long wayid = 0;
         int vertexIndex = -1;
 
-
         while (input1.hasNext()) {
             tagKind = input1.next();
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
@@ -214,27 +228,22 @@ public class Model implements Serializable {
                             drivable = true;
                             shouldAdd = true;
                             roadtype = v;
-                            if(v.equals("residential")) cycleable = true;
-                        } else if (v.equals("cycleway")) {
-                            drivable = false;
-                            shouldAdd = true;
-                            cycleable = true;
-                            roadtype = "cycleway";
                         }
-                    } else if (k.equals("cycleway")) {
-                        if (bicycleIdSet.contains(v)) {
-                            drivable = false;
-                            shouldAdd = true;
+                        if (cycleTags.contains(v)) {
                             cycleable = true;
-                            roadtype = "cycleway";
+                            shouldAdd = true;
+                            roadtype = v;
                         }
                     } else if (k.equals("oneway")) {
                         oneway = v.equals("yes");
                     } else if (k.equals("oneway:bicycle")) {
                         onewayBicycle = v.equals("yes");
-                    } else if (k.equals("bicycle") && v.equals("yes")) {
-                        cycleable = true;
-                        shouldAdd = true;
+                    } else if (k.equals("bicycle")) {
+                        if (cycleTags.contains(v)) {
+                            cycleable = true;
+                            shouldAdd = true;
+                            roadtype = v;
+                        }
                     }
 
                 } else if (name.equals("nd")) {
