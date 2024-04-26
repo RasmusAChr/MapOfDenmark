@@ -46,8 +46,6 @@ public class Relation implements Serializable {
     public List<Member> addToOrderedNodes (){
         List<Member> leftOverMembers = new ArrayList<>();
 
-        // Get the last node in the list
-
         // Use iterator to iterate over members list
         // Using iterator because you cant manipulate a normal list.
         ListIterator<Member> iterator = members.listIterator();
@@ -92,23 +90,6 @@ public class Relation implements Serializable {
         return leftOverMembers;
     }
 
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public List<Member> getMember() {
-        return members;
-    }
-
-    public void setMember(List<Member> member) {
-        this.members = member;
-    }
-
     public void Draw(GraphicsContext gc, double zoom, boolean darkMode) {
         gc.setFill(Color.PINK);
         gc.setFillRule(FillRule.EVEN_ODD);
@@ -128,7 +109,6 @@ public class Relation implements Serializable {
             for (int i = 0; i < xPoints.length; i++){
                 gc.lineTo(xPoints[i],yPoints[i]);
             }
-            //gc.fill();
 
             // For inner
             if(!innerWays.isEmpty())
@@ -138,36 +118,11 @@ public class Relation implements Serializable {
                     for (int i = 2 ; i < coords.length ; i += 2) {
                         gc.lineTo(coords[i], coords[i+1]);
                     }
-
-                    /*List<Node> nodes = W.getNodes();
-                    double[] xPointsInner = new double[nodes.size()];
-                    double[] yPointsInner = new double[nodes.size()];*/
-                    System.out.println("inner");
-                    /*for (int i = 0; i < nodes.size(); i++){
-                        var node = nodes.get(i);
-                        xPointsInner[i] = 0.56 * node.getLon();
-                        yPointsInner[i] = -node.getLat();
-                    }
-                    gc.moveTo(xPointsInner[0],yPointsInner[0]);
-
-
-                    for (int i = 0; i < xPointsInner.length; i++){
-                        gc.lineTo(xPointsInner[i],yPointsInner[i]);
-                    }*/
-
-                    // Draw the seperated ways for the inners.
-                /*gc.setFill(Color.GREEN);
-                W.draw(gc, zoom, darkMode);
-                gc.fill();*/
                 }
 
             gc.fill();
             gc.stroke();
         }
-
-
-        System.out.println("--------------------------");
-
     }
 
     public List<Node> reverseNodes(Member mem){
@@ -178,10 +133,5 @@ public class Relation implements Serializable {
         }
         return reversOfNodes;
     }
-
-
-
-
-
 }
 
