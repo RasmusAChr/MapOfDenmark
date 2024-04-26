@@ -183,6 +183,7 @@ public class Model implements Serializable {
         var building = false;
         var coast = false;
         var place = "";
+        var buildingRelation = "";
         String roadtype = "";
         String RelationsType = "";
         boolean shouldAdd = false;
@@ -208,6 +209,7 @@ public class Model implements Serializable {
             insideRelation = true;
             RelationsType = "";
             place = "";
+            buildingRelation = "";
             parsedFirstRelation = true;
         }
         //}
@@ -249,6 +251,7 @@ public class Model implements Serializable {
                     insideRelation = true;
                     RelationsType = "";
                     place = "";
+                    buildingRelation = "";
                 } else if (insideRelation && name.equals("member")) {
                     // parse Ref
                     var ref = Long.parseLong(input1.getAttributeValue(null,"ref"));
@@ -264,6 +267,8 @@ public class Model implements Serializable {
                         RelationsType = v;
                     } else if (k.equals("place")){
                         place = v;
+                    } else if (k.equals("building")) {
+                        buildingRelation = v;
                     }
                 }
 
@@ -326,7 +331,7 @@ public class Model implements Serializable {
                 else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
-                        if (place.equals("islet")) {
+                        if (place.equals("islet") || buildingRelation.equals("apartments")) {
                             Relations.add(new Relation(RelationsType,relationsMembers));
                         }
                     }
