@@ -14,6 +14,8 @@ public class Relation implements Serializable {
     private List<Member> members;
     private List<Node> orderedNodes;
     private List<Way> innerWays;
+    private List<Member> nonRelatedMembers;
+    private Set<Double> allCords;
     boolean drawable;
     Node lastNode = null;
 
@@ -24,12 +26,10 @@ public class Relation implements Serializable {
         this.members = memberRefs;
         this.drawable = true;
         this.innerWays = new ArrayList<>();
+        this.nonRelatedMembers = new ArrayList<>();
+        this.allCords = new HashSet<>();
         orderNodes();
     }
-    // lav en tom arraylist af coords
-    // tjek arraylist. size for sidste coords
-    // tjek med den nye memeber om den matcher de sidste endte normalt eller reversed til føj dernæst alle coords til listen
-    // hvis memberen ikke passer i rækkegølgen gå igenem igen senere.
 
     public void orderNodes(){
         orderedNodes = new ArrayList<>();
@@ -37,10 +37,42 @@ public class Relation implements Serializable {
         //Member firstmember = members.get(0);
         //orderedNodes.addAll(firstmember.getWay().getNodes());
 
-        if (addToOrderedNodes() == null) return;
+        if (addToOrderedNodes() == null) {
+            drawable = false;
+            return;
+        }
+
+        // Add all coordinates to a set
+        for (Member m : members){
+            double[] memberCoords = m.getWay().getCoords();
+            for (double coord : memberCoords) allCords.add(coord);
+        }
+
+        // Check if a node appears 2 times. If not place the way with that node in another list.
+        for (Member m : members) {
+            if (hasDuplicateCoordinates(m)) {
+                nonRelatedMembers.add(m);
+            }
+        }
+
+        // Remove the collected members after the iteration
+        members.removeAll(nonRelatedMembers);
+
 
         while (!addToOrderedNodes().isEmpty()) addToOrderedNodes();
 
+
+
+    }
+
+    public boolean hasDuplicateCoordinates(Member member) {
+        Set<Double> encounteredCoordinates = new HashSet<>();
+        for (double coord : member.getWay().getCoords()) {
+            if (!encounteredCoordinates.add(coord)) {
+                return true; // Coordinate encountered more than once
+            }
+        }
+        return false; // No coordinate encountered more than once
     }
 
     public List<Member> addToOrderedNodes (){
@@ -110,15 +142,27 @@ public class Relation implements Serializable {
                 gc.lineTo(xPoints[i],yPoints[i]);
             }
 
-            // For inner
+            // FOR INNER
             if(!innerWays.isEmpty())
-                for(Way W : innerWays){
-                    double[] coords = W.getCoords();
+                for(Way w : innerWays){
+                    double[] coords = w.getCoords();
                     gc.moveTo(coords[0], coords[1]);
                     for (int i = 2 ; i < coords.length ; i += 2) {
                         gc.lineTo(coords[i], coords[i+1]);
                     }
                 }
+
+            // FOR NON RELATED MEMBERS
+            if (!nonRelatedMembers.isEmpty()){
+                for (Member m : nonRelatedMembers){
+                    Way w = m.getWay();
+                    double[] coords = w.getCoords();
+                    gc.moveTo(coords[0], coords[1]);
+                    for (int i = 2 ; i < coords.length ; i += 2) {
+                        gc.lineTo(coords[i], coords[i+1]);
+                    }
+                }
+            }
 
             gc.fill();
             gc.stroke();
