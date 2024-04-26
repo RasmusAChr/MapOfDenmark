@@ -37,9 +37,8 @@ public class Relation implements Serializable {
         //Member firstmember = members.get(0);
         //orderedNodes.addAll(firstmember.getWay().getNodes());
 
+        if (addToOrderedNodes() == null) return;
 
-
-        // call fhjksdhfsjk with all members
         while (!addToOrderedNodes().isEmpty()) addToOrderedNodes();
 
     }
