@@ -28,8 +28,8 @@ public class Line implements Serializable {
         for (int i = 2 ; i < coords.length ; i += 2) {
             gc.lineTo(coords[i], coords[i+1]);
         }
-        gc.setStroke(Color.RED);
-        gc.setLineWidth(0.00003);
+        gc.setStroke(Color.BLUE);
+        gc.setLineWidth(0.0001);
         gc.stroke();
     }
 

@@ -74,6 +74,8 @@ public class Model implements Serializable {
         roadIdSet.put("living_street", 2.5);
         roadIdSet.put("track", 1.25);
         roadIdSet.put("service", 1.0);
+        roadIdSet.put("pedestrian", 10.0);
+        roadIdSet.put("path", 10.0);
         this.cycleTags = new HashSet<String>(List.of(
                 "primary",
                 "secondary",
@@ -92,7 +94,9 @@ public class Model implements Serializable {
                 "optional_sidepath",
                 "permissive",
                 "destination",
-                "private"));
+                "private",
+                "pedestrian",
+                "footway"));
         this.DigraphNodeToIndex = new HashMap<>();
         this.DigraphIndexToNode = new HashMap<>();
         this.id2way = new HashMap<>();
@@ -213,6 +217,7 @@ public class Model implements Serializable {
         boolean onewayBicycle = false;
         boolean insideRelation = false;
         boolean access = false;
+        boolean acccesPostBollean = false;
         long wayid = 0;
         int vertexIndex = -1;
 
@@ -231,15 +236,13 @@ public class Model implements Serializable {
                         if (roadIdSet.containsKey(v)) {
                             drivable = true;
                             shouldAdd = true;
-                        } else if (v.equals("service")) {
+                        } if (v.equals("service") || v.equals("path")) {
                             if (access) {
                                 shouldAdd = true;
                                 cycleable = true;
                                 drivable = true;
                             } else {
-                                shouldAdd = false;
-                                cycleable = false;
-                                drivable = false;
+                                acccesPostBollean = true;
                             }
                         }
                         if (cycleTags.contains(v)) {
@@ -257,6 +260,10 @@ public class Model implements Serializable {
                         }
                     } else if (k.equals("access")) {
                         access = cycleTags.contains(v);
+                    } else if (k.equals("motor_vehicle") && acccesPostBollean && cycleTags.contains(v))  {
+                        shouldAdd = true;
+                        cycleable = true;
+                        drivable = true;
                     }
 
                 } else if (name.equals("nd")) {
@@ -305,10 +312,10 @@ public class Model implements Serializable {
                             double weight_cycle = 0.5;
                             // calculate the weight depending on tags
                             if(!cycleable){
-                                 weight_cycle = Integer.MAX_VALUE;
+                                 weight_cycle = 500000.0;
                             }
                             if (!drivable) {
-                                weight_car = Integer.MAX_VALUE;
+                                weight_car = 500000.0;
                             } else if(roadIdSet.containsKey(name)){
                                 weight_car = weight_without_modifier * roadIdSet.get(name);
                             }
@@ -317,7 +324,7 @@ public class Model implements Serializable {
                                     EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
                                 } else {
                                     EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
-                                    EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_cycle, Integer.MAX_VALUE ));
+                                    EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_cycle, 500000.0 ));
                                 }
                             } else {
                                 EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
@@ -339,6 +346,7 @@ public class Model implements Serializable {
                     onewayBicycle = false;
                     vertexIndex = -1;
                     access = false;
+                    acccesPostBollean = false;
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     Relations.add(new Relation(RelationsType,relationsMembers));
