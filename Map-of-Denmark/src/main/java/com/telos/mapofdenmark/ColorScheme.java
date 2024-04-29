@@ -16,13 +16,19 @@ public class ColorScheme implements Serializable{
 
     public Color getColor(String type, boolean dark){
         String hex = null;
-       if(!dark){
-           hex = colors.get(type);
-       }
-       else {
-           hex = darkColors.get(type);
-       }
-        return Color.web(hex);
+        try{
+            if(!dark){
+                hex = colors.get(type);
+            }
+            else {
+                hex = darkColors.get(type);
+            }
+            return Color.web(hex);
+        } catch (NullPointerException e) {
+            if (!type.isEmpty()) System.out.println(type);
+            return getDefaultColor(dark);
+        }
+
     }
 
     public boolean findKeyC(String b) {
@@ -30,12 +36,54 @@ public class ColorScheme implements Serializable{
     }
 
     public Color getDefaultColor(boolean dark){
-        if(dark) return Color.web("#d3d3d3");
-        return Color.web("#FFFFFF");
+        if(dark) return Color.web("#ff0000");
+        return Color.web("#ff0000");
     }
     // Scheme for all the colors
     public void defaultScheme(){
         colors.clear();
+
+        // Relations
+        // Natural
+        colors.put("islet", "#f2efe9");
+
+        colors.put("island", "#f2efe9");
+
+        colors.put("peninsula","#f2efe9");
+
+        colors.put("hamlet", "#f5dcba");
+
+
+        // Leisure
+        colors.put("park", "#c8facc");
+
+        colors.put("marina","#90c5ee");
+
+        colors.put("golf_course", "#d9d0c9");
+
+        // Amenity
+        colors.put("parking", "#eeeeee");
+
+        colors.put("university", "#ffffe5");
+
+        // Building
+        colors.put("apartments", "#d8d0c9");
+
+        colors.put("dormitory", "#d8d0c9");
+
+        colors.put("office", "#d8d0c9");
+
+        colors.put("school", "#d8d0c9");
+
+        colors.put("college", "#ffffe5");
+
+        colors.put("hospital", "#ffffe5");
+
+        colors.put("retail", "#fecac5");
+
+        colors.put("square", "#d8d0c9");
+
+        colors.put("hotel", "#d8d0c9");
 
         //Roads
         colors.put("default", "#000000");
@@ -114,7 +162,6 @@ public class ColorScheme implements Serializable{
         colors.put("hot_spring","#a8d5ed");
         colors.put("isthmus","#45ed7d");
         colors.put("mud","#332702");
-        colors.put("peninsula","#45ed7d");
         colors.put("shoal","#f2db68");
         colors.put("spring","#7daaff");
         colors.put("strait","#7daaff");

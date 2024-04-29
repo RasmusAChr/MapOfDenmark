@@ -10,6 +10,8 @@ import java.util.*;
 
 public class Relation implements Serializable {
     private String type;
+    private String landform;
+
     private List<Member> members;
     private List<Node> orderedNodes;
     private List<Way> innerWays;
@@ -17,11 +19,13 @@ public class Relation implements Serializable {
     private Set<Double> allCords;
     boolean drawable;
     Node lastNode = null;
+    ColorScheme cs = new ColorScheme();
 
 
-    public Relation(String type, List<Member> memberRefs) {
+    public Relation(String type, List<Member> memberRefs, String landform) {
         ColorScheme cs = new ColorScheme();
         this.type = type;
+        this.landform = landform;
         this.members = memberRefs;
         this.drawable = true;
         this.innerWays = new ArrayList<>();
@@ -96,33 +100,28 @@ public class Relation implements Serializable {
                 orderedNodes.addAll(m.getWay().getNodes());
                 lastNode = orderedNodes.get(orderedNodes.size()-1);
                 iterator.remove();
-                System.out.println("first line added");
             }
             // If the last node in list is the same as the first node in current member
             else if (lastNode.equals(currentFirstNode)) {
                 orderedNodes.addAll(m.getWay().getNodes());
                 lastNode = orderedNodes.get(orderedNodes.size()-1);
                 iterator.remove(); // Remove the current member using the iterator
-                System.out.println("normal added");
             }
             // Else if the last node in list is the same as the last node in current member
             else if (lastNode.equals(reverseNodes(m).get(0))) {
                 orderedNodes.addAll(reverseNodes(m));
                 lastNode = orderedNodes.get(orderedNodes.size()-1);
                 iterator.remove(); // Remove the current member using the iterator
-                System.out.println("reversed added");
             }
             else {
                 leftOverMembers.add(m);
-                System.out.println("else");
-                System.out.println(m.getRef());
             }
         }
         return leftOverMembers;
     }
 
     public void Draw(GraphicsContext gc, double zoom, boolean darkMode) {
-        gc.setFill(Color.PINK);
+        gc.setFill(cs.getColor(landform,darkMode));
         gc.setFillRule(FillRule.EVEN_ODD);
         gc.beginPath();
 

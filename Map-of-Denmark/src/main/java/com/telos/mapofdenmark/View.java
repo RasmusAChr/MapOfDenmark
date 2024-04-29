@@ -80,13 +80,14 @@ public class View {
 
     void redraw() {
         gc.setTransform(new Affine());
-        if(dark) {
+        /*if(dark) {
             gc.setStroke(Color.WHITE);
             gc.setFill(Color.AQUA);
         } else{
             gc.setFill(Color.AQUA);
             gc.setStroke(Color.BLACK);
-        }
+        }*/
+        gc.setFill(cs.getColor("water", dark));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
        // double zoomValue = 1/Math.sqrt(trans.determinant());
@@ -104,7 +105,6 @@ public class View {
 
         // Drawing relations
         for (var relation : model.Relations) {
-            System.out.println("relations " + relation);
             relation.Draw(gc,slider_value,dark);
         }
 

@@ -54,6 +54,7 @@ public class Model implements Serializable {
     Set<String> uniqueWayTypes = new HashSet<>();
     Map<String, Double> roadIdSet;
     HashSet<String> cycleTags;
+    Set<String> allowedRelationTypes;
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
             try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
@@ -113,6 +114,7 @@ public class Model implements Serializable {
         this.addressList = new ArrayList<>();
         this.address = new Address();
         this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
+        this.allowedRelationTypes = new HashSet<>(Arrays.asList("place", "building", "natural", "leisure", "amenity"));
         if (filename.endsWith(".osm.zip")) {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
@@ -216,6 +218,8 @@ public class Model implements Serializable {
         var building = false;
         var coast = false;
         var place = "";
+        var relationLandform = "";
+        var validRelation = false;
         var buildingRelation = "";
         String roadtype = "";
         String RelationsType = "";
@@ -245,6 +249,7 @@ public class Model implements Serializable {
             insideRelation = true;
             RelationsType = "";
             place = "";
+            relationLandform = "";
             buildingRelation = "";
             parsedFirstRelation = true;
         }
@@ -309,6 +314,8 @@ public class Model implements Serializable {
                     insideRelation = true;
                     RelationsType = "";
                     place = "";
+                    relationLandform = "";
+                    validRelation = false;
                     buildingRelation = "";
                 } else if (insideRelation && name.equals("member")) {
                     // parse Ref
@@ -323,11 +330,14 @@ public class Model implements Serializable {
 
                     if(k.equals("type")){
                         RelationsType = v;
-                    } else if (k.equals("place")){
-                        place = v;
-                    } else if (k.equals("building")) {
-                        buildingRelation = v;
+                    } else if (allowedRelationTypes.contains(k)) {
+                        validRelation = true;
+                        relationLandform = v;
                     }
+                    /*else if (k.equals("place") || k.equals("building") || k.equals("natural") || k.equals("leisure") ||
+                               k.equals("amenity") || k.equals("surface")){
+                        relationLandform = v;
+                    }*/
                 }
 
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
@@ -393,9 +403,11 @@ public class Model implements Serializable {
                     vertexIndex = -1;
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
-                        if (place.equals("islet") || buildingRelation.equals("apartments")) {
-                            Relations.add(new Relation(RelationsType,relationsMembers));
+                        //if (relationLandform.equals("islet") || relationLandform.equals("apartments")) {
+                        if (validRelation) {
+                            Relations.add(new Relation(RelationsType,relationsMembers,relationLandform));
                         }
+                        //}
                     }
                 }
             }
