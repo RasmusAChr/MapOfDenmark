@@ -309,7 +309,7 @@ public class Model implements Serializable {
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
                         if (shouldAdd && vertexIndex > -1) {
-                            double weight_without_modifier = 1.0;
+                            double weight_without_modifier = 8.0;
                             double weight_car = 1.0;
                             double weight_cycle = 0.5;
                             // calculate the weight depending on tags
