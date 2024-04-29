@@ -257,6 +257,8 @@ public class Model implements Serializable {
                         if (cycleTags.contains(v)) {
                             cycleable = true;
                             shouldAdd = true;
+                        } else {
+                            cycleable = false;
                         }
                     } else if (k.equals("access")) {
                         access = cycleTags.contains(v);
@@ -316,8 +318,8 @@ public class Model implements Serializable {
                             }
                             if (!drivable) {
                                 weight_car = 500000.0;
-                            } else if(roadIdSet.containsKey(name)){
-                                weight_car = weight_without_modifier * roadIdSet.get(name);
+                            } else if(roadIdSet.containsKey(roadtype)){
+                                weight_car = weight_without_modifier * roadIdSet.get(roadtype);
                             }
                             if (oneway) {
                                 if (onewayBicycle) {
@@ -358,6 +360,7 @@ public class Model implements Serializable {
 
     //Dijkstra implementation
     public void StartDijkstra(Node startaddress,boolean vehicle){
+        list.clear();
         this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(findNodeByID(nodeList, "697814")),vehicle); // this starts the dijkstra search from the index that refferes to a node
     }
 
