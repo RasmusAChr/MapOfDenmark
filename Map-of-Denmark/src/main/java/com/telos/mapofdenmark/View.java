@@ -148,4 +148,17 @@ public class View {
     public void Current_Slider_value(double value){
         slider_value = value;
     }
+
+    void POI(Double lastx, Double lasty) {
+//        Point2D point = mousetoModel(lastx,lasty);
+//        double lon = point.getX();
+//        double lat = point.getY();
+//        System.out.println("Lat: " + lat + ", Lon: " + lon);
+//        // Get nearest neighbor to selected
+//        Node nodeOfInterest = model.kdTree.getNearestNeighbor(lon, lat, false);
+//        nodeOfInterest.setPointOfInterest(true);
+//        System.out.println("Attempted to set returned node as point of interest!");
+//        nodeOfInterest.getWay().addPointOfInterest(nodeOfInterest.lon, nodeOfInterest.lat);
+//        redraw();
+    }
 }
