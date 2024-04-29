@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.ZipInputStream;
+import java.util.Comparator;
 import javax.xml.stream.*;
 
 import com.telos.mapofdenmark.KDTreeClasses.KDTree;
@@ -21,9 +22,13 @@ import com.telos.mapofdenmark.Shortest_Route.EdgeWeightedDigraph;
 import com.telos.mapofdenmark.Shortest_Route.SP;
 import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
+import javafx.geometry.Point2D;
+import javafx.scene.transform.Affine;
+import javafx.scene.transform.NonInvertibleTransformException;
 
 public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
+
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
@@ -45,6 +50,8 @@ public class Model implements Serializable {
     HashMap<Long, Way> id2way;
     int roadCount;
     int indexForCenterPoints = 0;
+    long wayid = 0;
+    Set<String> uniqueWayTypes = new HashSet<>();
     Map<String, Double> roadIdSet;
     HashSet<String> cycleTags;
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
@@ -116,6 +123,8 @@ public class Model implements Serializable {
         save(filename+".obj");
         this.trie = deserializeTrie("data/.obj");
         this.kdTree = new KDTree();
+        for (String s : uniqueWayTypes) System.out.println(s);
+
         // Populates the KDTree using all nodes from .osm
 //        kdTree.populate(nodeList);
         // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
@@ -163,13 +172,10 @@ public class Model implements Serializable {
                             parseAddressFromOSM(v, k);
                         }
                     }
-                    case "way" -> {
+                    case "way","relation" -> {
                         EWD = new EdgeWeightedDigraph(roadCountX);
-                        parseWaysAndRelations(input, tagKind);
-                        return;
-                    }
-                    case "relation" -> {
-                        parseWaysAndRelations(input,tagKind);
+                        wayid = Long.parseLong(input.getAttributeValue(null,"id"));
+                        parseWaysAndRelations(input, tagKind); // First way element ???? input.getname = way
                         return;
                     }
                 }
@@ -207,7 +213,10 @@ public class Model implements Serializable {
 
     private void parseWaysAndRelations(XMLStreamReader input1, int tagKind) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         var way = new ArrayList<Node>();
+        var building = false;
         var coast = false;
+        var place = "";
+        var buildingRelation = "";
         String roadtype = "";
         String RelationsType = "";
         boolean shouldAdd = false;
@@ -220,6 +229,26 @@ public class Model implements Serializable {
         boolean acccesPostBollean = false;
         long wayid = 0;
         int vertexIndex = -2;
+        boolean parsedFirstWay = false;
+        boolean parsedFirstRelation = false;
+
+        //if (!parsedFirstWay){
+
+        if (input1.getLocalName().equals("way")){
+            wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
+            parsedFirstWay = true;
+        }
+        //}
+        //if (!parsedFirstRelation){
+        if (input1.getLocalName().equals("relation")){
+            relationsMembers = new ArrayList<>();
+            insideRelation = true;
+            RelationsType = "";
+            place = "";
+            buildingRelation = "";
+            parsedFirstRelation = true;
+        }
+        //}
 
         while (input1.hasNext()) {
             tagKind = input1.next();
@@ -228,6 +257,8 @@ public class Model implements Serializable {
                 if (name.equals("way")) {
                     wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
                     way.clear();
+                    building = false;
+                    coast = false;
                 } else if (!insideRelation && name.equals("tag")) {
                     var v = input1.getAttributeValue(null, "v");
                     var k = input1.getAttributeValue(null, "k");
@@ -266,17 +297,19 @@ public class Model implements Serializable {
                         shouldAdd = true;
                         cycleable = true;
                         drivable = true;
-                    }
+                    } else if (k.equals("building")) building = true;
+                    else if (v.equals("coastline")) coast = true;
 
                 } else if (name.equals("nd")) {
                     var ref = Long.parseLong(input1.getAttributeValue(null, "ref"));
                     var node = id2node.get(ref);
                     way.add(node);
                 } else if (name.equals("relation")) {
-                    
+                    relationsMembers = new ArrayList<>();
                     insideRelation = true;
-                    relationsMembers.clear();
                     RelationsType = "";
+                    place = "";
+                    buildingRelation = "";
                 } else if (insideRelation && name.equals("member")) {
                     // parse Ref
                     var ref = Long.parseLong(input1.getAttributeValue(null,"ref"));
@@ -290,6 +323,10 @@ public class Model implements Serializable {
 
                     if(k.equals("type")){
                         RelationsType = v;
+                    } else if (k.equals("place")){
+                        place = v;
+                    } else if (k.equals("building")) {
+                        buildingRelation = v;
                     }
                 }
 
@@ -305,6 +342,7 @@ public class Model implements Serializable {
                         Way tmpWay = new Way(way);
                         ways.add(tmpWay);
                         addToCenterPointNodes(way, tmpWay, false);
+                        if(building || coast) ways.add(new Way(way));
                     }
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
@@ -351,12 +389,24 @@ public class Model implements Serializable {
                     insideRelation = false;
                     RelationsType = "";
                 } else if (name.equals("relation") && insideRelation) {
+                    vertexIndex = -1;
+                }
+                else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
-                    Relations.add(new Relation(RelationsType,relationsMembers));
-//                    System.out.println("Relation added");
+                    if (RelationsType.equals("multipolygon")) {
+                        if (place.equals("islet") || buildingRelation.equals("apartments")) {
+                            Relations.add(new Relation(RelationsType,relationsMembers));
+                        }
+                    }
                 }
             }
         }
+    }
+
+    private int weightCalculate() {
+        //calculate the weight of the edge, based on different factors.
+
+        return 20;
     }
 
     //Dijkstra implementation
@@ -399,7 +449,6 @@ public class Model implements Serializable {
              }
 
          }
-         System.out.println(path);
          return path;
     }
     //
@@ -420,15 +469,6 @@ public class Model implements Serializable {
         return null;
     }
 
-
-    /*private void parseTXT(String filename) throws FileNotFoundException {
-        File f = new File(filename);
-        try (Scanner s = new Scanner(f)) {
-            while (s.hasNext()) {
-                list.add(new Line(s.nextLine()));
-            }
-        }
-    }*/
     public void parseAddressFromOSM(String v, String k){
         // Assuming you have a Trie instance called 'trie'
 //        trie.insert(fullAddress);

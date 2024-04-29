@@ -21,5 +21,8 @@ public class Member implements Serializable{
     public void setWay(Way way){
         this.way=way;
     }
+    public Way getWay(){
+        return way;
+    }
 
 }

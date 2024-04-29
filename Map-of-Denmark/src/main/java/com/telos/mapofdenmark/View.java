@@ -82,9 +82,9 @@ public class View {
         gc.setTransform(new Affine());
         if(dark) {
             gc.setStroke(Color.WHITE);
-            gc.setFill(Color.web("#212F3D"));
+            gc.setFill(Color.AQUA);
         } else{
-            gc.setFill(Color.WHITE);
+            gc.setFill(Color.AQUA);
             gc.setStroke(Color.BLACK);
         }
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -109,9 +109,14 @@ public class View {
             }
         }
 
+        for (var relation : model.Relations){
+            relation.Draw(gc,slider_value,dark);
+        }
+
         for (var line : model.list) {
             line.draw(gc);
         }
+
     }
 
     void pan(double dx, double dy) {
