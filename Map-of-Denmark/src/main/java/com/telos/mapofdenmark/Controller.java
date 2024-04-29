@@ -4,6 +4,7 @@ package com.telos.mapofdenmark;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
@@ -67,7 +68,9 @@ public class Controller {
             if(e.getButton() == MouseButton.PRIMARY && POI_MODE){
                 System.out.println("Point called");
                 System.out.println("lastX: " + lastX + " lastY: " + lastY);
-                view.POI(lastX, lastY);
+                Point2D modelPoint = view.mousetoModel(lastX, lastY);
+                model.addPOI(modelPoint.getX(), modelPoint.getY());
+                view.redraw();
             }
         });
         view.canvas.setOnMouseDragged(e -> {
