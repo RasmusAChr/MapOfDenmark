@@ -56,6 +56,8 @@ public class Controller {
     private ImageView searchImage;
     private int  searchBarCounter = 0;
 
+    private Node lastPannedToAddress;
+
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
@@ -290,15 +292,21 @@ public class Controller {
     }
 
     private void panToAddress(String selectedAddress){
-        if(model.getAddressIdMap().get(selectedAddress) != null){
+        if(model.getAddressIdMap().get(selectedAddress) != null && lastPannedToAddress != model.getAddressIdMap().get(selectedAddress)){
             Node addressNode = model.getAddressIdMap().get(selectedAddress);
+            lastPannedToAddress = addressNode;
+            double addressX = addressNode.getLon() * 0.56;
+            double addressY = -addressNode.getLat();
 
-            double addressX = addressNode.getLon();
-            double addressY = addressNode.getLat();
-            view.pan(addressX * 0.56,-addressY);
+            view.pan(addressX, addressY);
+
+
         }
-        else{
-            System.out.println("not a valid Address");
+        else if (model.getAddressIdMap().get(selectedAddress) == null){
+            System.out.println("Not a valid Address");
+        }
+        else if(lastPannedToAddress == model.getAddressIdMap().get(selectedAddress)){
+            System.out.println("Already panned to this address");
         }
     }
 
