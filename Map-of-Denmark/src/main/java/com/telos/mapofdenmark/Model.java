@@ -388,10 +388,9 @@ public class Model implements Serializable {
                     acccesPostBollean = false;
                     insideRelation = false;
                     RelationsType = "";
-                } else if (name.equals("relation") && insideRelation) {
-                    vertexIndex = -1;
                 }
                 else if (name.equals("relation") && insideRelation) {
+                    vertexIndex = -1;
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
                         if (place.equals("islet") || buildingRelation.equals("apartments")) {

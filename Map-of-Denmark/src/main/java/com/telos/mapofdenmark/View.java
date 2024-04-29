@@ -101,16 +101,20 @@ public class View {
         System.out.println("Size of KDTree: " + model.kdTree.size());
         Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         // rangeSearch(x1,x2,y1,y2)
+
+        // Drawing relations
+        for (var relation : model.Relations) {
+            System.out.println("relations " + relation);
+            relation.Draw(gc,slider_value,dark);
+        }
+
+        // Drawing ways
         for (Node nodeSpatial : nodesFromKD) {
             Way way = nodeSpatial.getWay();
             if (way != null) {
                 gc.setStroke(Color.BLACK);
                 way.draw(gc, slider_value, dark);
             }
-        }
-
-        for (var relation : model.Relations){
-            relation.Draw(gc,slider_value,dark);
         }
 
         for (var line : model.list) {

@@ -124,6 +124,7 @@ public class Relation implements Serializable {
     public void Draw(GraphicsContext gc, double zoom, boolean darkMode) {
         gc.setFill(Color.PINK);
         gc.setFillRule(FillRule.EVEN_ODD);
+        gc.beginPath();
 
         if (drawable){
             // FOR OUTER
