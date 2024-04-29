@@ -89,7 +89,7 @@ public class View {
         }
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
-       // double zoomValue = 1/Math.sqrt(trans.determinant());
+        // double zoomValue = 1/Math.sqrt(trans.determinant());
         gc.setLineWidth(0.000005);
 //        for (var way : model.ways) {
 //            way.draw(gc, slider_value, dark);
@@ -102,6 +102,9 @@ public class View {
         Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         // rangeSearch(x1,x2,y1,y2)
         for (Node nodeSpatial : nodesFromKD) {
+            if(nodeSpatial.isPointOfInterest()){
+                drawPOIs(nodeSpatial);
+            }
             Way way = nodeSpatial.getWay();
             if (way != null) {
                 gc.setStroke(Color.BLACK);
@@ -111,17 +114,14 @@ public class View {
         for (var line : model.list) {
             line.draw(gc);
         }
-        drawPOIs();
     }
 
-    private void drawPOIs() {
+    private void drawPOIs(Node pointOfInterest) {
         gc.setFill(Color.RED);
-        for (Node pointOfInterest : model.getPOIList()) {
-            double x = pointOfInterest.lon*0.56;
-            double y = -pointOfInterest.lat;
-            System.out.println("Drawing at: " + x + ", " + y);
-            gc.fillOval(x, y, 2, 2);
-        }
+        double x = pointOfInterest.lon*0.56;
+        double y = -pointOfInterest.lat;
+        System.out.println("Drawing at: " + x + ", " + y);
+        gc.fillOval(x, y, 10, 10);
     }
 
     void pan(double dx, double dy) {
@@ -154,7 +154,7 @@ public class View {
             throw new RuntimeException(e);
         }
     }
-    
+
     public void Current_Slider_value(double value){
         slider_value = value;
     }

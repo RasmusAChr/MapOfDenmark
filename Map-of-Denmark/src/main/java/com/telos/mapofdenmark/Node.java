@@ -8,6 +8,7 @@ public class Node implements Serializable {
     public double lat, lon;
     Way way;
     boolean isPartOfRoad;
+    boolean isPointOfInterest;
 
     public Node(long id, double lat, double lon) {
         this.id = id;
@@ -15,6 +16,7 @@ public class Node implements Serializable {
         this.lon = lon;
         this.way = null;
         this.isPartOfRoad = false;
+        this.isPointOfInterest = false;
     }
 
     public double getLat(){
@@ -47,5 +49,12 @@ public class Node implements Serializable {
 
     public void setPartOfRoad(boolean partOfRoad) {
         isPartOfRoad = partOfRoad;
+    }
+
+    public boolean isPointOfInterest() {
+        return isPointOfInterest;
+    }
+    public void setPointOfInterest(boolean pointOfInterest) {
+        isPointOfInterest = pointOfInterest;
     }
 }

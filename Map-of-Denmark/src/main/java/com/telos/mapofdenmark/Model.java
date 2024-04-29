@@ -30,8 +30,6 @@ public class Model implements Serializable {
     List<Relation> Relations = new ArrayList<>();
     // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
     List<Node> centerPointNodes = new ArrayList<>();
-    // Collection used to store nodes of interest
-    private List<Node> pointOfInterestList = new ArrayList<>();
     SP Dijkstra = null;
     private Trie trie;
     double minlat, maxlat, minlon, maxlon;
@@ -544,17 +542,14 @@ public class Model implements Serializable {
     }
 
     public void addPOI(double lon, double lat) {
+        System.out.println("lon: " + lon + ", lat: " + lat);
         Node nearestNode = kdTree.getNearestNeighbor(lon, lat, false);
         if (nearestNode != null) {
-            pointOfInterestList.add(nearestNode);
+//            pointOfInterestList.add(nearestNode);
+            nearestNode.setPointOfInterest(true);
+            kdTree.put(lon, lat, nearestNode);
         }
     }
-
-    public List<Node> getPOIList() {
-        return pointOfInterestList;
-    }
-
-
 }
 
 
