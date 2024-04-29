@@ -219,7 +219,7 @@ public class Model implements Serializable {
         boolean access = false;
         boolean acccesPostBollean = false;
         long wayid = 0;
-        int vertexIndex = -1;
+        int vertexIndex = -2;
 
         while (input1.hasNext()) {
             tagKind = input1.next();
@@ -308,7 +308,7 @@ public class Model implements Serializable {
                     }
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
-                        if (shouldAdd && vertexIndex != -1) {
+                        if (shouldAdd && vertexIndex > -1) {
                             double weight_without_modifier = 1.0;
                             double weight_car = 1.0;
                             double weight_cycle = 0.5;
@@ -333,9 +333,8 @@ public class Model implements Serializable {
                                 EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_cycle, weight_car ));
                             }
 
-                        } else {
-                            vertexIndex = DigraphNodeToIndex.get(node);
                         }
+                        vertexIndex = DigraphNodeToIndex.get(node);
                     }
                     Way newWay = new Way(way);
                     id2way.put(wayid,newWay);
@@ -346,9 +345,11 @@ public class Model implements Serializable {
                     cycleable = false;
                     oneway = false;
                     onewayBicycle = false;
-                    vertexIndex = -1;
+                    vertexIndex = -2;
                     access = false;
                     acccesPostBollean = false;
+                    insideRelation = false;
+                    RelationsType = "";
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     Relations.add(new Relation(RelationsType,relationsMembers));
@@ -360,8 +361,11 @@ public class Model implements Serializable {
 
     //Dijkstra implementation
     public void StartDijkstra(Node startaddress,boolean vehicle){
+        double x = startaddress.getLon();
+        double y = startaddress.getLat();
+        Node tmpNode = kdTree.getNearestNeighbor(x,y,true).getWay().getArbitraryNode();
         list.clear();
-        this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(findNodeByID(nodeList, "697814")),vehicle); // this starts the dijkstra search from the index that refferes to a node
+        this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(tmpNode),vehicle); // this starts the dijkstra search from the index that refferes to a node
     }
 
 
@@ -379,9 +383,13 @@ public class Model implements Serializable {
      *
      * */
     public List<Node> getDijkstraPath(Node Endaddress) {
+        double x = Endaddress.getLon();
+        double y = Endaddress.getLat();
+        Node tmpNode = kdTree.getNearestNeighbor(x,y,true).getWay().getArbitraryNode();
+
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
-         for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(findNodeByID(nodeList, "92994313")))) {
+        for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(tmpNode))) {
              if(!NodeAdded.contains(DigraphIndexToNode.get(i.to()))){
                  NodeAdded.add(DigraphIndexToNode.get(i.to()));
                  path.add(DigraphIndexToNode.get(i.to()));

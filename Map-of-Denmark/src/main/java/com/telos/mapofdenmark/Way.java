@@ -7,14 +7,17 @@ import javafx.scene.canvas.GraphicsContext;
 
 public class Way implements Serializable {
     double[] coords;
+    Node refNode;
 
     public Way(ArrayList<Node> way) {
         coords = new double[way.size() * 2];
         for (int i = 0 ; i < way.size() ; ++i) {
             var node = way.get(i);
+            node.setWay(this);
             coords[2 * i] = 0.56 * node.lon;
             coords[2 * i + 1] = -node.lat;
         }
+        this.refNode = way.get(0);
     }
 
     public void draw(GraphicsContext gc, double zoom, boolean darkMode) {
@@ -25,6 +28,10 @@ public class Way implements Serializable {
             gc.lineTo(coords[i], coords[i+1]);
         }
         gc.stroke();
+    }
+
+    public Node getArbitraryNode(){
+        return refNode;
     }
 
 }
