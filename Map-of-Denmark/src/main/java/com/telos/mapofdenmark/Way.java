@@ -8,8 +8,9 @@ import javafx.scene.canvas.GraphicsContext;
 public class Way implements Serializable {
     double[] coords;
     Node refNode;
+    double zoom_scale;
 
-    public Way(ArrayList<Node> way) {
+    public Way(ArrayList<Node> way, double zoom_scale) {
         coords = new double[way.size() * 2];
         for (int i = 0 ; i < way.size() ; ++i) {
             var node = way.get(i);
@@ -18,6 +19,7 @@ public class Way implements Serializable {
             coords[2 * i + 1] = -node.lat;
         }
         this.refNode = way.get(0);
+        this.zoom_scale = zoom_scale;
     }
 
     public void draw(GraphicsContext gc, double zoom, boolean darkMode) {
@@ -32,6 +34,9 @@ public class Way implements Serializable {
 
     public Node getArbitraryNode(){
         return refNode;
+    }
+    public double getZoom_scale() {
+        return zoom_scale;
     }
 
 }

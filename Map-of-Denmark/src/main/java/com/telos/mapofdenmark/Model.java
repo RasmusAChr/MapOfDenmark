@@ -220,6 +220,8 @@ public class Model implements Serializable {
         boolean acccesPostBollean = false;
         long wayid = 0;
         int vertexIndex = -2;
+        double zoom_scale = -2;
+        double max_speed = -1.0;
 
         while (input1.hasNext()) {
             tagKind = input1.next();
@@ -233,6 +235,7 @@ public class Model implements Serializable {
                     var k = input1.getAttributeValue(null, "k");
                     if (k.equals("highway")) {
                         roadtype = v;
+                        zoom_scale = 0.0;
                         if (roadIdSet.containsKey(v)) {
                             drivable = true;
                             shouldAdd = true;
@@ -266,6 +269,10 @@ public class Model implements Serializable {
                         shouldAdd = true;
                         cycleable = true;
                         drivable = true;
+                    } else if (k.equals("building")) {
+                        zoom_scale = 0.0;
+                    } else if (k.equals("maxspeed")) {
+                        max_speed = Double.parseDouble(v);
                     }
 
                 } else if (name.equals("nd")) {
@@ -297,21 +304,28 @@ public class Model implements Serializable {
                 var name = input1.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name.equals("way")) {
+                    if (max_speed > 0) {
+
+                    }
                     if (!roadtype.isEmpty()) {
-                        Road tmpRoad = new Road(way,roadtype);
+                        Road tmpRoad = new Road(way,roadtype, zoom_scale);
                         ways.add(tmpRoad);
                         addToCenterPointNodes(way, tmpRoad, true);
+                        id2way.put(wayid,tmpRoad);
                     } else {
-                        Way tmpWay = new Way(way);
+                        Way tmpWay = new Way(way, zoom_scale);
                         ways.add(tmpWay);
                         addToCenterPointNodes(way, tmpWay, false);
+                        id2way.put(wayid,tmpWay);
                     }
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
                         if (shouldAdd && vertexIndex > -1) {
-                            double weight_without_modifier = 8.0;
+                            Node fromNode = DigraphIndexToNode.get(vertexIndex);
+                            int toIndex = DigraphNodeToIndex.get(node);
+                            double weight_distance_modifier = distance(fromNode.lat, node.lat, fromNode.lon, node.lon);
                             double weight_car = 1.0;
-                            double weight_cycle = 0.5;
+                            double weight_cycle = distance(fromNode.lat, node.lat, fromNode.lon, node.lon);
                             // calculate the weight depending on tags
                             if(!cycleable){
                                  weight_cycle = 500000.0;
@@ -319,25 +333,27 @@ public class Model implements Serializable {
                             if (!drivable) {
                                 weight_car = 500000.0;
                             } else if(roadIdSet.containsKey(roadtype)){
-                                weight_car = weight_without_modifier * roadIdSet.get(roadtype);
+                                if (max_speed > 0) {
+                                    weight_car = weight_distance_modifier * (max_speed/50.0);
+                                } else {
+                                    weight_car = weight_distance_modifier * roadIdSet.get(roadtype);
+                                }
                             }
                             if (oneway) {
                                 if (onewayBicycle) {
-                                    EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
+                                    EWD.addEdge(new DirectedEdge(vertexIndex, toIndex, weight_cycle, weight_car ));
                                 } else {
-                                    EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
-                                    EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_cycle, 500000.0 ));
+                                    EWD.addEdge(new DirectedEdge(vertexIndex, toIndex, weight_cycle, weight_car ));
+                                    EWD.addEdge(new DirectedEdge(toIndex, vertexIndex, weight_cycle, 500000.0 ));
                                 }
                             } else {
-                                EWD.addEdge(new DirectedEdge(vertexIndex, DigraphNodeToIndex.get(node), weight_cycle, weight_car ));
-                                EWD.addEdge(new DirectedEdge(DigraphNodeToIndex.get(node), vertexIndex, weight_cycle, weight_car ));
+                                EWD.addEdge(new DirectedEdge(vertexIndex, toIndex, weight_cycle, weight_car ));
+                                EWD.addEdge(new DirectedEdge(toIndex, vertexIndex, weight_cycle, weight_car ));
                             }
 
                         }
                         vertexIndex = DigraphNodeToIndex.get(node);
                     }
-                    Way newWay = new Way(way);
-                    id2way.put(wayid,newWay);
                     way.clear();
                     roadtype = "";
                     shouldAdd = false;
@@ -350,6 +366,8 @@ public class Model implements Serializable {
                     acccesPostBollean = false;
                     insideRelation = false;
                     RelationsType = "";
+                    zoom_scale = -2;
+                    max_speed = -1.0;
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     Relations.add(new Relation(RelationsType,relationsMembers));
@@ -403,23 +421,6 @@ public class Model implements Serializable {
          return path;
     }
     //
-
-
-
-
-
-    // used for test
-    public Node findNodeByID(List<Node> nodeList, String id) {
-
-        for (Node node : nodeList) {
-            if(node.getId().equals(id)){
-                return node;
-            }
-        }
-        System.out.println("yes");
-        return null;
-    }
-
 
     /*private void parseTXT(String filename) throws FileNotFoundException {
         File f = new File(filename);

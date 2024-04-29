@@ -10,8 +10,8 @@ public class Road extends Way{
     ColorScheme cs = new ColorScheme();
     LineThickness lt = new LineThickness();
     String roadType;
-    public Road(ArrayList<Node> way, String roadType) {
-        super(way);
+    public Road(ArrayList<Node> way, String roadType, double zoom_scale) {
+        super(way, zoom_scale);
         this.roadType = roadType;
     }
 

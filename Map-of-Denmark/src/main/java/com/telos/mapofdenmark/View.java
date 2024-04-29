@@ -103,7 +103,7 @@ public class View {
         // rangeSearch(x1,x2,y1,y2)
         for (Node nodeSpatial : nodesFromKD) {
             Way way = nodeSpatial.getWay();
-            if (way != null) {
+            if (way != null && way.getZoom_scale() < -1.0) {
                 gc.setStroke(Color.BLACK);
                 way.draw(gc, slider_value, dark);
             }
