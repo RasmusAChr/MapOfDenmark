@@ -75,7 +75,7 @@
                            <font>
                               <Font name="Bodoni MT" size="25.0" />
                            </font></TextField>
-                        <TextField fx:id="searchBar1" layoutX="360.0" layoutY="17.0" onInputMethodTextChanged="#StopSearch" prefHeight="54.0" prefWidth="334.0" promptText="FROM" style="-fx-background-radius: 50;">
+                        <TextField fx:id="searchBar1" layoutX="22.0" layoutY="80.0" onInputMethodTextChanged="#StopSearch" prefHeight="54.0" prefWidth="334.0" promptText="FROM" style="-fx-background-radius: 50;">
                            <font>
                               <Font name="Bodoni MT" size="25.0" />
                            </font>
@@ -88,7 +88,7 @@
                               <Image url="@GUI%20Icons/icons8-search-500.png" />
                            </image>
                         </ImageView>
-                        <ListView fx:id="suggestionsBox" layoutX="24.0" layoutY="77.0" prefHeight="291.0" prefWidth="331.0" visible="false" />
+                        <ListView fx:id="suggestionsBox" layoutX="24.0" layoutY="140.0" prefHeight="94.0" prefWidth="331.0" visible="false" />
                      </children>
                   </Pane>
                </center>

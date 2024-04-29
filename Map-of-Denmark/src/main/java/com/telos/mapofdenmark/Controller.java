@@ -54,6 +54,7 @@ public class Controller {
 
     @FXML
     private ImageView searchImage;
+    private int  searchBarCounter = 0;
 
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
@@ -93,12 +94,16 @@ public class Controller {
         suggestionsBox.setOnMouseClicked(event ->{
             if(!suggestionsBox.getSelectionModel().getSelectedItem().isEmpty()){
                 String chosenSelection = suggestionsBox.getSelectionModel().getSelectedItem();
-
-                searchBar.setText(chosenSelection);
-
+                // Puts the text into the first searchbar
+                if(searchBarCounter == 0){
+                    searchBar.setText(chosenSelection);
+                    panToAddress(chosenSelection);
+                }
+                // Puts it into the second searchbar
+                else{
+                    searchBar1.setText(chosenSelection);
+                }
                 suggestionsBox.setVisible(false);
-
-                panToAddress(chosenSelection);
             }
 
         });
@@ -113,8 +118,15 @@ public class Controller {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar.getText().isEmpty())) {
                 System.out.println(searchBar.getText());
                 addressParsing(trie, searchBar.getText());
+                searchBarCounter = 0;
             }
-            testEncodingWithUI();
+        });
+        searchBar1.setOnKeyPressed(event -> {
+            if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar1.getText().isEmpty())) {
+                System.out.println(searchBar1.getText());
+                addressParsing(trie, searchBar1.getText());
+                searchBarCounter = 1;
+            }
         });
 
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) ->{
