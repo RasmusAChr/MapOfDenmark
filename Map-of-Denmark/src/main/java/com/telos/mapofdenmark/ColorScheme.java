@@ -71,21 +71,25 @@ public class ColorScheme implements Serializable{
 
         colors.put("house", "#d8d0c9");
 
+        colors.put("residential", "#d8d0c9");
+
         colors.put("dormitory", "#d8d0c9");
 
         colors.put("office", "#d8d0c9");
 
         colors.put("school", "#d8d0c9");
 
-        colors.put("college", "#ffffe5");
+        colors.put("college", "#d8d0c9");
 
-        colors.put("hospital", "#ffffe5");
+        colors.put("hospital", "#d8d0c9");
 
-        colors.put("retail", "#fecac5");
+        colors.put("retail", "#d8d0c9");
 
         colors.put("square", "#d8d0c9");
 
         colors.put("hotel", "#d8d0c9");
+
+        colors.put("yes", "#d8d0c9");
 
         //Roads
         colors.put("default", "#000000");
@@ -102,8 +106,6 @@ public class ColorScheme implements Serializable{
         darkColors.put("tertiary", "#C0392B");
         colors.put("unclassified", "#566573");
         darkColors.put("unclassified", "#FFFFFF");
-        colors.put("residential", "#808B96");
-        darkColors.put("residential", "#FFFFFF");
         colors.put("motorway_link", "#808B96");
         darkColors.put("motorway_link", "#FFFFFF");
         colors.put("trunk_link", "#808B96");
@@ -120,8 +122,6 @@ public class ColorScheme implements Serializable{
         darkColors.put("track", "#FFFFFF");
         colors.put("cycleway", "#808B96");
         darkColors.put("cycleway", "#FFFFFF");
-        colors.put("yes", "#808B96");
-        darkColors.put("yes", "#FFFFFF");
         colors.put("designated", "#808B96");
         darkColors.put("designated", "#FFFFFF");
         colors.put("use_sidepath", "#808B96");

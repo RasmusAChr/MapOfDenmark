@@ -1,5 +1,6 @@
 package com.telos.mapofdenmark;
 
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.FillRule;
@@ -55,6 +56,7 @@ public class Relation implements Serializable {
         for (Member m : members) {
             if (hasDuplicateCoordinates(m)) {
                 nonRelatedMembers.add(m);
+                System.out.println("non related added: " + m.getRef());
             }
         }
 
@@ -69,9 +71,11 @@ public class Relation implements Serializable {
     }
 
     public boolean hasDuplicateCoordinates(Member member) {
-        Set<Double> encounteredCoordinates = new HashSet<>();
-        for (double coord : member.getWay().getCoords()) {
-            if (!encounteredCoordinates.add(coord)) {
+        //Set<Double> encounteredCoordinates = new HashSet<>();
+        Set<Point2D> encounteredCoordinates = new HashSet<>();
+        for (int i = 0; i < member.getWay().getCoords().length; i += 2) {
+            //for (double coord : member.getWay().getCoords()) {
+            if (!encounteredCoordinates.add(new Point2D(member.getWay().getCoords()[i], member.getWay().getCoords()[i+1]))) {
                 return true; // Coordinate encountered more than once
             }
         }
@@ -114,6 +118,7 @@ public class Relation implements Serializable {
                 iterator.remove(); // Remove the current member using the iterator
             }
             else {
+                System.out.println("https://www.openstreetmap.org/way/" + m.getRef() + "#map=11/55.1424/14.9641");
                 leftOverMembers.add(m);
             }
         }
