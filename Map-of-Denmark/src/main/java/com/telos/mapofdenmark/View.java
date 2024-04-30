@@ -105,6 +105,25 @@ public class View {
         for (var line : model.list) {
             line.draw(gc);
         }
+        drawPOI();
+    }
+    private void drawPOI() {
+        if (!model.getPointsOfInterest().isEmpty()) {
+            for (Point2D pointOfInterest : model.getPointsOfInterest()) {
+                System.out.println("Attempted to draw POI at: " + pointOfInterest.getX() + ", " + pointOfInterest.getY());
+
+                // Calculate the visible size of the POI on the canvas
+                double radius = 0.0001;  // Radius of the circle in pixels
+                double x = pointOfInterest.getX();
+                double y = pointOfInterest.getY();
+
+                // Draw a filled circle centered on the point
+                gc.setFill(Color.RED);  // Set the fill color for the circle
+                gc.fillOval(x - radius, y - radius, 2 * radius, 2 * radius);
+                gc.setFill(Color.BLACK);  // Set the fill color for the circle
+                gc.fillOval(x - radius+0.000025, y - radius+0.000025, 1.5 * radius, 1.5 * radius);
+            }
+        }
     }
 
     void pan(double dx, double dy) {

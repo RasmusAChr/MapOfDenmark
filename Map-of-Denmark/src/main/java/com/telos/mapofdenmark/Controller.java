@@ -4,9 +4,11 @@ package com.telos.mapofdenmark;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,7 @@ public class Controller {
     private Model model;
     private View view;
     private Trie trie;
+    private boolean POI_MODE = false;
     @FXML
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
     @FXML
@@ -65,6 +68,15 @@ public class Controller {
         view.canvas.setOnMousePressed(e -> {
             lastX = e.getX();
             lastY = e.getY();
+
+            if(e.getButton() == MouseButton.PRIMARY && POI_MODE){
+                System.out.println("Point called");
+                System.out.println("lastX: " + lastX + " lastY: " + lastY);
+                Point2D modelPoint = view.mousetoModel(lastX, lastY);
+//                System.out.println(modelPoint.getX()+","+modelPoint.getY());
+                model.addPOI(modelPoint);
+                view.redraw();
+            }
         });
         view.canvas.setOnMouseDragged(e -> {
 
@@ -196,8 +208,13 @@ public class Controller {
     }
     @FXML
     private void placeInterest(){
-        System.out.println("You clicked the interest button");
-    }
+        if(POI_MODE){
+            POI_MODE = false;
+            System.out.println("Leaving POI MODE");
+        } else {
+            POI_MODE = true;
+            System.out.println("Started POI MODE");
+        }    }
     @FXML
     public double getPanWidth(){
        return backgroundPane.getWidth();
