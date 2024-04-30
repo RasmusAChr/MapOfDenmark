@@ -69,6 +69,8 @@ public class ColorScheme implements Serializable{
         // Building
         colors.put("apartments", "#d8d0c9");
 
+        colors.put("house", "#d8d0c9");
+
         colors.put("dormitory", "#d8d0c9");
 
         colors.put("office", "#d8d0c9");
@@ -141,8 +143,8 @@ public class ColorScheme implements Serializable{
 
         // NATURALS
         colors.put("fell","#48a160");
-        colors.put("grassland","#68bf60");
-        colors.put("heath","#45ed7d");
+        colors.put("grassland","#f2efe9");
+        colors.put("heath","#eaf0d6");
         colors.put("moor","#45ed7d");
         colors.put("scrub","#93ad6a");
         colors.put("scrubbery","#93ad6a");
@@ -151,7 +153,7 @@ public class ColorScheme implements Serializable{
         colors.put("tree_stump","#5c2606");
         colors.put("tundra","#48a160");
         colors.put("wood","#188f40");
-        colors.put("bay","#a8d5ed");
+        colors.put("bay","#90c5ee");
         colors.put("beach","#f2db68");
         colors.put("blowhole","#f2db68");
         colors.put("cape","#f2db68");
