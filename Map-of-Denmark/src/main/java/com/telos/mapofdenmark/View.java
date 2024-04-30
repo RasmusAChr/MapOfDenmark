@@ -20,7 +20,7 @@ import java.util.Objects;
 import java.util.Queue;
 
 public class View {
-    Canvas canvas = new Canvas(1091.0, 638.0);
+    Canvas canvas = new Canvas(1120.0, 638.0);
     GraphicsContext gc = canvas.getGraphicsContext2D();
     double x1 = 100;
     double y1 = 100;

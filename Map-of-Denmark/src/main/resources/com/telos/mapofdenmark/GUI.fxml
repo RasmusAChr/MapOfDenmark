@@ -73,7 +73,7 @@
                <center>
                   <Pane fx:id="backgroundPane" prefHeight="200.0" prefWidth="1018.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Pane fx:id="mapPane" blendMode="SRC_ATOP" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="638.0" prefWidth="1003.0" />
+                        <Pane fx:id="mapPane" blendMode="SRC_ATOP" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="638.0" prefWidth="1120.0" />
                         <TextField fx:id="searchBar" layoutX="22.0" layoutY="17.0" onInputMethodTextChanged="#StartSearch" prefHeight="54.0" prefWidth="334.0" promptText="TO" style="-fx-background-radius: 50;">
                            <font>
                               <Font name="Bodoni MT" size="25.0" />
@@ -96,7 +96,7 @@
                   </Pane>
                </center>
                <right>
-                  <VBox prefHeight="638.0" prefWidth="91.0" BorderPane.alignment="CENTER">
+                  <VBox prefHeight="638.0" prefWidth="76.0" BorderPane.alignment="CENTER">
                      <children>
                         <Slider fx:id="zoomSlider" orientation="VERTICAL" prefHeight="578.0" prefWidth="30.0" VBox.vgrow="ALWAYS">
                            <padding>
