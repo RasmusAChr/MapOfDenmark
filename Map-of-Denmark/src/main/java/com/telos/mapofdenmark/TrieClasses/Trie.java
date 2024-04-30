@@ -25,18 +25,6 @@ public class Trie implements Serializable {
         }
         String input = inputWord.toLowerCase();
         rootNode.insert(input); // Leverage the insert method in TrieNode
-
-//        TrieNode currentNode = rootNode; // We start the traversal from the rootnode
-//
-//        // We traverse through each character from the inputWord
-//        for (char character: input.toCharArray()){
-//            if(!currentNode.children.containsKey(character)){
-//                currentNode.children.put(character, new TrieNode());
-//                // We move to the next node
-//                currentNode = currentNode.children.get(character);
-//            }
-//        }
-//        currentNode.endOfWord = true; // The last node of the inserted word will be marked as the character that is at the end of the word
     }
 
 

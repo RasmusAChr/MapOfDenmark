@@ -1,10 +1,7 @@
 package com.telos.mapofdenmark;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-
-import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 

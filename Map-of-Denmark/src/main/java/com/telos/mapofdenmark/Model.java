@@ -150,7 +150,7 @@ public class Model implements Serializable {
                         DigraphNodeToIndex.put(node, roadCountX);
                         DigraphIndexToNode.put(roadCountX, node);
                         roadCountX++;
-//                    address = new Address(); // Reset for new node
+
                     }
                     case "tag" -> {
                         var v = input.getAttributeValue(null, "v");
@@ -353,7 +353,7 @@ public class Model implements Serializable {
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     Relations.add(new Relation(RelationsType,relationsMembers));
-//                    System.out.println("Relation added");
+
                 }
             }
         }
@@ -402,8 +402,6 @@ public class Model implements Serializable {
 
     public void parseAddressFromOSM(String v, String k){
         // Assuming you have a Trie instance called 'trie'
-//        trie.insert(fullAddress);
-//        adressList.add(fullAdress);
         if(address.getStreet().equals(null) || address.getStreet().isEmpty()) {
             if (k.contains("street")) {
                 address.setStreet(v);

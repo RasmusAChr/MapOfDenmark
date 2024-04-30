@@ -37,7 +37,7 @@ public class Controller_Boot {
     }
 
 
-
+    // Loads the custim file when pressing Yes
     @FXML
     private void readFile() throws XMLStreamException, IOException, ClassNotFoundException {
         System.out.println("Attempting to show read file dialog");
@@ -69,6 +69,7 @@ public class Controller_Boot {
         runMap(primaryStage,userFile);
 
     }
+    // Loads the dault file when pressing no
     @FXML
     private void default_path() throws XMLStreamException, IOException, ClassNotFoundException {
         // Using default file

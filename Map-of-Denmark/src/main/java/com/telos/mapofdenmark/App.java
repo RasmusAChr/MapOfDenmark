@@ -10,7 +10,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        var View_Boot = new View_Boot(primaryStage);
+        var View_Boot = new View_Boot(primaryStage); // creates the boot loader
     }
 }
 
