@@ -233,48 +233,62 @@ public class Model implements Serializable {
                 } else if (!insideRelation && name.equals("tag")) {
                     var v = input1.getAttributeValue(null, "v");
                     var k = input1.getAttributeValue(null, "k");
-                    if (k.equals("highway")) {
-                        roadtype = v;
-                        zoom_scale = 0.0;
-                        if (roadIdSet.containsKey(v)) {
-                            drivable = true;
-                            shouldAdd = true;
-                        } if (v.equals("service") || v.equals("path")) {
-                            if (access) {
+                    switch (k) {
+                        case "highway":
+                            roadtype = v;
+                            zoom_scale = 0.0;
+                            if (roadIdSet.containsKey(v)) {
+                                drivable = true;
+                                shouldAdd = true;
+                            }
+                            if (v.equals("service") || v.equals("path")) {
+                                if (access) {
+                                    shouldAdd = true;
+                                    cycleable = true;
+                                    drivable = true;
+                                } else {
+                                    acccesPostBollean = true;
+                                }
+                            }
+                            if (cycleTags.contains(v)) {
+                                cycleable = true;
+                                shouldAdd = true;
+                            }
+                            break;
+                        case "oneway":
+                            oneway = v.equals("yes");
+                            break;
+                        case "oneway:bicycle":
+                            onewayBicycle = v.equals("yes");
+                            break;
+                        case "bicycle":
+                            if (cycleTags.contains(v)) {
+                                cycleable = true;
+                                shouldAdd = true;
+                            } else {
+                                cycleable = false;
+                            }
+                            break;
+                        case "access":
+                            access = cycleTags.contains(v);
+                            break;
+                        case "motor_vehicle":
+                            if (acccesPostBollean && cycleTags.contains(v)) {
                                 shouldAdd = true;
                                 cycleable = true;
                                 drivable = true;
-                            } else {
-                                acccesPostBollean = true;
                             }
-                        }
-                        if (cycleTags.contains(v)) {
-                            cycleable = true;
-                            shouldAdd = true;
-                        }
-                    } else if (k.equals("oneway")) {
-                        oneway = v.equals("yes");
-                    } else if (k.equals("oneway:bicycle")) {
-                        onewayBicycle = v.equals("yes");
-                    } else if (k.equals("bicycle")) {
-                        if (cycleTags.contains(v)) {
-                            cycleable = true;
-                            shouldAdd = true;
-                        } else {
-                            cycleable = false;
-                        }
-                    } else if (k.equals("access")) {
-                        access = cycleTags.contains(v);
-                    } else if (k.equals("motor_vehicle") && acccesPostBollean && cycleTags.contains(v))  {
-                        shouldAdd = true;
-                        cycleable = true;
-                        drivable = true;
-                    } else if (k.equals("building")) {
-                        zoom_scale = 0.0;
-                    } else if (k.equals("maxspeed")) {
-                        max_speed = Double.parseDouble(v);
+                            break;
+                        case "maxspeed":
+                            max_speed = Double.parseDouble(v);
+                            break;
+                        case "building", "barrier", "tourism", "tunnel", "water", "waterway", "area", "route", "shop",
+                             "bridge", "power", "railway", "public_transport", "office", "natural", "leisure",
+                             "landuse", "cycleway", "footway":
+                            zoom_scale = 0.0;break;
+                        default:
+                            System.out.println(k);
                     }
-
                 } else if (name.equals("nd")) {
                     var ref = Long.parseLong(input1.getAttributeValue(null, "ref"));
                     var node = id2node.get(ref);
@@ -304,9 +318,6 @@ public class Model implements Serializable {
                 var name = input1.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name.equals("way")) {
-                    if (max_speed > 0) {
-
-                    }
                     if (!roadtype.isEmpty()) {
                         Road tmpRoad = new Road(way,roadtype, zoom_scale);
                         ways.add(tmpRoad);
@@ -323,9 +334,10 @@ public class Model implements Serializable {
                         if (shouldAdd && vertexIndex > -1) {
                             Node fromNode = DigraphIndexToNode.get(vertexIndex);
                             int toIndex = DigraphNodeToIndex.get(node);
-                            double weight_distance_modifier = distance(fromNode.lat, node.lat, fromNode.lon, node.lon);
+                            double dist = distance(fromNode.lat, node.lat, fromNode.lon, node.lon);
+                            double weight_distance_modifier = dist;
                             double weight_car = 1.0;
-                            double weight_cycle = distance(fromNode.lat, node.lat, fromNode.lon, node.lon);
+                            double weight_cycle = dist;
                             // calculate the weight depending on tags
                             if(!cycleable){
                                  weight_cycle = 500000.0;
