@@ -17,7 +17,6 @@ public class Relation implements Serializable {
     private List<Node> orderedNodes;
     private List<Way> innerWays;
     private List<Member> nonRelatedMembers;
-    private Set<Double> allCords;
     boolean drawable;
     Node lastNode = null;
     ColorScheme cs = new ColorScheme();
@@ -31,32 +30,30 @@ public class Relation implements Serializable {
         this.drawable = true;
         this.innerWays = new ArrayList<>();
         this.nonRelatedMembers = new ArrayList<>();
-        this.allCords = new HashSet<>();
         orderNodes();
     }
 
     public void orderNodes(){
         orderedNodes = new ArrayList<>();
-        // Add first member to list
-        //Member firstmember = members.get(0);
-        //orderedNodes.addAll(firstmember.getWay().getNodes());
 
         if (addToOrderedNodes() == null) {
+            System.out.println("EMPTY");
             drawable = false;
             return;
         }
 
-        // Add all coordinates to a set
-        for (Member m : members){
-            double[] memberCoords = m.getWay().getCoords();
-            for (double coord : memberCoords) allCords.add(coord);
-        }
-
         // Check if a node appears 2 times. If not place the way with that node in another list.
         for (Member m : members) {
+            //System.out.println(m.getRef());
             if (hasDuplicateCoordinates(m)) {
+                //System.out.println(m.getRef());
                 nonRelatedMembers.add(m);
-                System.out.println("non related added: " + m.getRef());
+                System.out.println("lastNode: " + lastNode.id + "    node: " + m.getWay().getNodes().get(m.getWay().getNodes().size()-1).id);
+                if (lastNode.equals(m.getWay().getNodes().get(m.getWay().getNodes().size()-1))){
+                    lastNode = null;
+                    orderedNodes.clear();
+                }
+
             }
         }
 
@@ -64,9 +61,11 @@ public class Relation implements Serializable {
         members.removeAll(nonRelatedMembers);
 
 
+
+        //orderedNodes.clear();
+        //lastNode = null;
         while (!addToOrderedNodes().isEmpty()) addToOrderedNodes();
-
-
+        System.out.println("------------------------------");
 
     }
 
@@ -74,7 +73,6 @@ public class Relation implements Serializable {
         //Set<Double> encounteredCoordinates = new HashSet<>();
         Set<Point2D> encounteredCoordinates = new HashSet<>();
         for (int i = 0; i < member.getWay().getCoords().length; i += 2) {
-            //for (double coord : member.getWay().getCoords()) {
             if (!encounteredCoordinates.add(new Point2D(member.getWay().getCoords()[i], member.getWay().getCoords()[i+1]))) {
                 return true; // Coordinate encountered more than once
             }
@@ -101,6 +99,7 @@ public class Relation implements Serializable {
                 iterator.remove();
             }
             else if (lastNode == null){
+                System.out.println("First node " + m.getRef());
                 orderedNodes.addAll(m.getWay().getNodes());
                 lastNode = orderedNodes.get(orderedNodes.size()-1);
                 iterator.remove();
@@ -118,7 +117,7 @@ public class Relation implements Serializable {
                 iterator.remove(); // Remove the current member using the iterator
             }
             else {
-                System.out.println("https://www.openstreetmap.org/way/" + m.getRef() + "#map=11/55.1424/14.9641");
+                //System.out.println("https://www.openstreetmap.org/way/" + m.getRef() + "#map=11/55.1424/14.9641");
                 leftOverMembers.add(m);
             }
         }
