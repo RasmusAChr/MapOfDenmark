@@ -95,16 +95,11 @@ public class Controller {
         // Sets the visuals of the theme toggle
         themeToggleBtn.getStyleClass().add("root-light");
 
-// Ensure the ImageView starts at the correct position corresponding to the slider's initial value
+        // Ensure the ImageView starts at the correct position corresponding to the slider's initial value
         updateImageViewPosition(zoomSlider.getValue());
         // Add a listener to the slider's value
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()
         ));
-//        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
-//            addressParsing(trie, newValue);
-//        });
-       // zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> ));
-
         suggestionsBox.setOnMouseClicked(event ->{
             if(!suggestionsBox.getSelectionModel().getSelectedItem().isEmpty()){
                 String chosenSelection = suggestionsBox.getSelectionModel().getSelectedItem();
@@ -123,8 +118,6 @@ public class Controller {
         });
 
         searchImage.setOnMouseClicked(event -> {
-            // Call panToAddress method when searchImage is clicked
-
             panToAddress(searchBar.getText());
         });
 
@@ -232,20 +225,6 @@ public class Controller {
     }
     @FXML
     private void updateImageViewPosition(double sliderValue){
-        // This portion changes the location of imageview
-        // Calculate the percentage position of the thumb on the slider
-       // double thumbPositionPercentage = (sliderValue - zoomSlider.getMin()) / (zoomSlider.getMax() - zoomSlider.getMin());
-
-        // Adjust the formula to correctly map the value to the Y position
-      //  double sliderTrackHeight = zoomSlider.getPrefHeight(); // The full height of the slider
-
-        // Calculate the newY position for the ImageView
-        //double newY = zoomSlider.getLayoutY() + sliderTrackHeight * (1 - thumbPositionPercentage) - sliderEmoji.getFitHeight() * thumbPositionPercentage;
-
-       // sliderEmoji.setLayoutY(newY);
-
-
-
         // This portion changes image the image itself
         // Note this loads the image everytime so it may be faster to store all images in seperate image variables but may cost more memory
         String imagePath;

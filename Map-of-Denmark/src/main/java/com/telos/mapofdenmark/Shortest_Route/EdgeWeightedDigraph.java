@@ -1,7 +1,6 @@
 package com.telos.mapofdenmark.Shortest_Route;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class EdgeWeightedDigraph implements Serializable {
     private final int V;
@@ -12,20 +11,6 @@ public class EdgeWeightedDigraph implements Serializable {
         adj = (Bag<DirectedEdge>[]) new Bag[V];
         for (int v = 0; v < V; v++)
             adj[v] = new Bag<DirectedEdge>();
-
-
-        /*
-        this.V = V;
-        adj = (Bag<DirectedEdge>[]) new Bag[V];
-        int i = 0;
-        for (ArrayList<DirectedEdge> road : roads) {
-            adj[i] = new Bag<>();
-            for (DirectedEdge e : road) {
-                adj[i].add(e);
-
-            }
-            i++;
-        }*/
     }
     public void addEdge(DirectedEdge e)
     {

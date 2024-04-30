@@ -89,17 +89,11 @@ public class View {
         }
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
-       // double zoomValue = 1/Math.sqrt(trans.determinant());
         gc.setLineWidth(0.000005);
-//        for (var way : model.ways) {
-//            way.draw(gc, slider_value, dark);
-//        }
-
         // Logic for drawing ways from KDTree instead of all ways
         Point2D canvasTopLeft =  mousetoModel(0,0);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
         Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-        // rangeSearch(x1,x2,y1,y2)
         for (Node nodeSpatial : nodesFromKD) {
             Way way = nodeSpatial.getWay();
             if (way != null) {

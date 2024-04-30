@@ -1,5 +1,6 @@
 package com.telos.mapofdenmark.Shortest_Route;
 //Class aquired from slides from algo
+// Credit algs4 sedgewick and wayne
 
 import java.io.Serializable;
 
