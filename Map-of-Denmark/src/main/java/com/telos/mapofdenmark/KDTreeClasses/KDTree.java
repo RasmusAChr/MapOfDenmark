@@ -3,14 +3,18 @@ package com.telos.mapofdenmark.KDTreeClasses;
 import com.telos.mapofdenmark.Node;
 import com.telos.mapofdenmark.Way;
 
+import java.io.Serializable;
 import java.util.*;
 
 // Inspiration to KDTree from https://www.geeksforgeeks.org/search-and-insertion-in-k-dimensional-tree/
 // We also utilized code from chapter 3 in Algorithms 4 by Wayne and Sedgewick ch 3.2
-public class KDTree
+public class KDTree implements Serializable
 {
+    final static long serialVersionUID = 12851802756812749L;
     private KDNode root; // root of BST
-    private class KDNode {
+    private class KDNode implements Serializable{
+        final static long serialVersionUID = 3254120512025412L;
+
         //        private Key key; // Primitive key is no longer needed in KDTree as coordinates will be used as key instead.
         double x, y; // Coordinates of the point which will be used for the line that will be drawn to create half planes
         private Node val;

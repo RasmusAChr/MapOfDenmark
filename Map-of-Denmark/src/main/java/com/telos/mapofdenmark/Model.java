@@ -49,9 +49,10 @@ public class Model implements Serializable {
     HashSet<String> cycleTags;
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
-            try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
+            try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) { // good code
                 return (Model) in.readObject();
             }
+
         }
         return new Model(filename);
     }
@@ -106,20 +107,19 @@ public class Model implements Serializable {
         this.addressList = new ArrayList<>();
         this.address = new Address();
         this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
+
         if (filename.endsWith(".osm.zip")) {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
             parseRouteNet(filename);
-        } /*else {
-            parseTXT(filename);
-        }*/
-        save(filename+".obj");
-        this.trie = deserializeTrie("data/.obj");
+        }
+        this.trie = new Trie();
+        for(Address address : addressList){
+            trie.insert(address.getFullAdress());
+        }
         this.kdTree = new KDTree();
-        // Populates the KDTree using all nodes from .osm
-//        kdTree.populate(nodeList);
-        // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
         kdTree.populate(centerPointNodes);
+        save(filename+".obj");
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -367,9 +367,6 @@ public class Model implements Serializable {
         list.clear();
         this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(tmpNode),vehicle); // this starts the dijkstra search from the index that refferes to a node
     }
-
-
-
     /**
      * Since it iterates backwards from the end goal to the front that won't matter since the distance/ drawn area will be the same
      * This will then create a Hashset to check if the node has already been added since it is constant time O(1)
@@ -402,33 +399,7 @@ public class Model implements Serializable {
          System.out.println(path);
          return path;
     }
-    //
 
-
-
-
-
-    // used for test
-    public Node findNodeByID(List<Node> nodeList, String id) {
-
-        for (Node node : nodeList) {
-            if(node.getId().equals(id)){
-                return node;
-            }
-        }
-        System.out.println("yes");
-        return null;
-    }
-
-
-    /*private void parseTXT(String filename) throws FileNotFoundException {
-        File f = new File(filename);
-        try (Scanner s = new Scanner(f)) {
-            while (s.hasNext()) {
-                list.add(new Line(s.nextLine()));
-            }
-        }
-    }*/
     public void parseAddressFromOSM(String v, String k){
         // Assuming you have a Trie instance called 'trie'
 //        trie.insert(fullAddress);
@@ -473,58 +444,6 @@ public class Model implements Serializable {
 
     public Map<String, Node> getAddressIdMap() {
         return addressIdMap;
-    }
-    private Trie loadCityNames() {
-        Trie trie = new Trie();
-//        String path = System.getProperty("user.dir"); // gets which directory the project is placed
-//        String filename = path+"\\data\\citynames.txt";
-//
-//        try (BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"))) {
-//            String line;
-//            while ((line = bReader.readLine()) != null) {
-//                trie.insert(line.trim().toLowerCase());
-//            }
-//        } catch (IOException e) {
-//            System.out.println(e.getMessage());
-//        }
-        for(Address address : addressList){
-            trie.insert(address.getFullAdress());
-        }
-        serializeTrie(trie, "data/trie.obj");
-        return trie;
-    }
-
-
-
-    private void serializeTrie(Trie trie, String filepath) {
-        try (
-                FileOutputStream fileOut = new FileOutputStream(filepath); // Open a file output stream to the specified file.
-                ObjectOutputStream out = new ObjectOutputStream(fileOut) // Wrap the file output stream in an ObjectOutputStream.
-        ) {
-            out.writeObject(trie); // Serialize the Trie object and write it to the file.
-        } catch (IOException i) {
-            i.printStackTrace(); // Handle potential IO exceptions.
-        }
-        System.out.println("Created serializable file");
-    }
-    private Trie deserializeTrie(String filepath) {
-        Trie trie = null;
-        try (
-                FileInputStream fileIn = new FileInputStream(filepath); // Open a file input stream to the specified file.
-                ObjectInputStream in = new ObjectInputStream(fileIn) // Wrap the file input stream in an ObjectInputStream.
-        ) {
-            trie = (Trie) in.readObject(); // Deserialize the object read from the file and cast it to a Trie.
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
-        // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
-        if(!(trie == null))  {
-
-            System.out.println("Serializable file was found");
-            return trie; // Return the deserialized Trie object.
-        }
-        // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
-        else return loadCityNames();
     }
     public List<String> getSuggestionList(String input){
         return trie.getAddressSuggestions(input.toLowerCase(), 4);

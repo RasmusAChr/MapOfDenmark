@@ -98,7 +98,6 @@ public class View {
         // Logic for drawing ways from KDTree instead of all ways
         Point2D canvasTopLeft =  mousetoModel(0,0);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
-        System.out.println("Size of KDTree: " + model.kdTree.size());
         Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         // rangeSearch(x1,x2,y1,y2)
         for (Node nodeSpatial : nodesFromKD) {

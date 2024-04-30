@@ -3,6 +3,7 @@ package com.telos.mapofdenmark.TrieClasses;
 import java.io.Serializable;
 
 public class Address implements Serializable {
+    final static long serialVersionUID = 241241251241L;
     String street;
     String houseNumber;
     String city;

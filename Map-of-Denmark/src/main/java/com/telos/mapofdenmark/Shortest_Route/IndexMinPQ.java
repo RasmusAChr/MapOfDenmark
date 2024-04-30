@@ -1,4 +1,5 @@
 package com.telos.mapofdenmark.Shortest_Route;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -31,7 +32,7 @@ import java.util.NoSuchElementException;
  *
  *  @param <Key> the generic type of key on this priority queue
  */
-public class IndexMinPQ<Key extends Comparable<Key>> implements Iterable<Integer> {
+public class IndexMinPQ<Key extends Comparable<Key>> implements Iterable<Integer>, Serializable {
     private int maxN;        // maximum number of elements on PQ
     private int n;           // number of elements on PQ
     private int[] pq;        // binary heap using 1-based indexing

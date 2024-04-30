@@ -1,8 +1,10 @@
 package com.telos.mapofdenmark.KDTree_OLD;
 
+import java.io.Serializable;
+
 //Code taken from 398-399 in Algorithms FOURTH EDITION by Sedgewick and Wayne
 //Modeled after a BST (Binary Search Tree)
-public class KDTree<Value> {
+public class KDTree<Value> implements Serializable {
     private static final int K = 2; // Number of dimensions, set to 2 for 2D space
 
     private class KDNode {
