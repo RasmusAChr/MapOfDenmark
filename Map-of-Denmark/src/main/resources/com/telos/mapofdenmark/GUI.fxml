@@ -15,6 +15,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Text?>
 <HBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.telos.mapofdenmark.Controller">
    <children>
       <VBox HBox.hgrow="ALWAYS">
@@ -89,6 +91,9 @@
                            </image>
                         </ImageView>
                         <ListView fx:id="suggestionsBox" layoutX="24.0" layoutY="140.0" prefHeight="94.0" prefWidth="331.0" visible="false" />
+
+                        <Line fx:id="distanceLine" startX="100" startY="100" endX="300" endY="100" stroke="BLACK"/>
+                        <Text fx:id="distanceLabel" x="300" y="95" text="0 m" stroke="BLACK"/>
                      </children>
                   </Pane>
                </center>
