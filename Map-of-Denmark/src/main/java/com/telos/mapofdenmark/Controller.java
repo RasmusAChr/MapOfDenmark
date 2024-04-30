@@ -69,7 +69,8 @@ public class Controller {
                 System.out.println("Point called");
                 System.out.println("lastX: " + lastX + " lastY: " + lastY);
                 Point2D modelPoint = view.mousetoModel(lastX, lastY);
-                model.addPOI(modelPoint.getX(), modelPoint.getY());
+//                System.out.println(modelPoint.getX()+","+modelPoint.getY());
+                model.addPOI(modelPoint);
                 view.redraw();
             }
         });

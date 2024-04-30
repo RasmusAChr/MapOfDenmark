@@ -21,6 +21,7 @@ import com.telos.mapofdenmark.Shortest_Route.EdgeWeightedDigraph;
 import com.telos.mapofdenmark.Shortest_Route.SP;
 import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
+import javafx.geometry.Point2D;
 
 public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
@@ -30,6 +31,8 @@ public class Model implements Serializable {
     List<Relation> Relations = new ArrayList<>();
     // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
     List<Node> centerPointNodes = new ArrayList<>();
+    // Collection used for storing points of interest
+    List<Point2D> pointsOfInterest = new ArrayList<>();
     SP Dijkstra = null;
     private Trie trie;
     double minlat, maxlat, minlon, maxlon;
@@ -541,14 +544,19 @@ public class Model implements Serializable {
         indexForCenterPoints++;
     }
 
-    public void addPOI(double lon, double lat) {
-        System.out.println("lon: " + lon + ", lat: " + lat);
-        Node nearestNode = kdTree.getNearestNeighbor(lon, lat, false);
-        if (nearestNode != null) {
-//            pointOfInterestList.add(nearestNode);
-            nearestNode.setPointOfInterest(true);
-            kdTree.put(lon, lat, nearestNode);
-        }
+    public void addPOI(Point2D POI) {
+        pointsOfInterest.add(POI);
+//        System.out.println("lon: " + lon + ", lat: " + lat);
+//        Node nearestNode = kdTree.getNearestNeighbor(lon, lat, false);
+//        if (nearestNode != null) {
+////            pointOfInterestList.add(nearestNode);
+//            nearestNode.setPointOfInterest(true);
+//            kdTree.put(lon, lat, nearestNode);
+//        }
+    }
+
+    public List<Point2D> getPointsOfInterest() {
+        return pointsOfInterest;
     }
 }
 
