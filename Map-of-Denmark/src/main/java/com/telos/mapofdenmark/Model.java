@@ -118,7 +118,7 @@ public class Model implements Serializable {
         }
         this.trie = new Trie();
         for(Address address : addressList){
-            trie.insert(address.getFullAdress());
+            trie.insert(address.getFullAddress());
         }
         this.kdTree = new KDTree();
         kdTree.populate(centerPointNodes);
@@ -182,7 +182,7 @@ public class Model implements Serializable {
                     if (address != null && !address.getStreet().isBlank()) {
                         addressList.add(address);
                         //System.out.println(addressId);
-                        addressIdMap.put(address.getFullAdress().toLowerCase(), id2node.get(addressId));
+                        addressIdMap.put(address.getFullAddress().toLowerCase(), id2node.get(addressId));
                         addressId = 0;
                         address = null; // Reset for the next address
                     }

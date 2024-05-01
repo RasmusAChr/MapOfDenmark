@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The "Trie" data structure is a prefix tree data structure, that is able to find suggestions based on a prefix.
@@ -44,7 +46,9 @@ public class Trie implements Serializable {
 
         // Collect suggestions recursively through the collectAddressSuggestions method, which starts from this current node
         collectAddressSuggestions(currentNode, prefix, addressSuggestions, limit);
-        return addressSuggestions;
+//        return addressSuggestions;
+        // instead of just returning the collected strings we format them before returning
+        return formatAddressSuggestions(addressSuggestions);
     }
 
     // A recursive method that collects suggestions from the given node
@@ -66,6 +70,55 @@ public class Trie implements Serializable {
             }
             collectAddressSuggestions(node.children.get(character), prefix + character, addressSuggestions, limit);
         }
+    }
+
+    //Logic for formatting the output of the TRIE
+    private List<String> formatAddressSuggestions(List<String> suggestions) {
+        List<String> formattedSuggestions = new ArrayList<>();
+        // Compile a regex pattern to extract components of the address. The pattern captures:
+        // Group 1: characters for the street
+        // Group 2: Digits for the house number
+        // Group 3: characters for the city
+        // Group 4: characters for the municipality
+        // Group 5: characters for the country
+        Pattern pattern = Pattern.compile("^(\\D+)(\\d+)\\s+(\\D+)\\s+(\\D+)\\s+(\\D+)$");
+
+        for (String suggestion : suggestions) {
+            // Create a matcher for the suggestion based on the compiled pattern
+            Matcher matcher = pattern.matcher(suggestion);
+            if (matcher.find()) {
+                // Format the extracted groups and capitalize appropriate parts
+                String formatted = String.format("%s %s, %s, %s, %s",
+                        capitalizeWord(matcher.group(1).trim()), // Street
+                        matcher.group(2).trim(), // House number
+                        capitalizeWord(matcher.group(3).trim()), // City
+                        capitalizeWord(matcher.group(4).trim()), // Municipality
+                        matcher.group(5).trim().toUpperCase()); // Country
+
+                // Add the formatted address to the list of formatted suggestions
+                formattedSuggestions.add(formatted);
+            }
+        }
+        return formattedSuggestions;
+    }
+
+    // Helper method to capitalize the first letter of each word in a string
+    // More complex than initially thought as street names can be one or more words
+    private String capitalizeWord(String input) {
+        // Split the input string into words based on whitespace
+        String[] words = input.split("\\s+");
+
+        // StringBuilder to build the capitalized string
+        StringBuilder result = new StringBuilder();
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                // Append the word to the result, capitalizing the first letter and making the rest of the letters lowercase
+                result.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1).toLowerCase())
+                        .append(" ");
+            }
+        }
+        return result.toString().trim();
     }
 }
 

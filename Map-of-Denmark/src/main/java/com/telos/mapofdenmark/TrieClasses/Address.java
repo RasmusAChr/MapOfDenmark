@@ -18,6 +18,14 @@ public class Address implements Serializable {
         this.country = "";
     }
 
+    public Address(String street, String houseNumber, String city, String municipality, String country){
+        this.street = street;
+        this.houseNumber = street;
+        this.city = city;
+        this.municipality = municipality;
+        this.country = country;
+    }
+
     public void setStreet(String street) {
         this.street = street;
     }
@@ -37,16 +45,21 @@ public class Address implements Serializable {
     public void setCountry(String country) {
         this.country = country;
     }
-    public String getFullAdress(){
+    public String getFullAddress(){
         return street+" "+houseNumber+" "+city+" "+municipality+" "+country;
     }
-        public Address(String street, String houseNumber, String city, String municipality, String country){
-        this.street = street;
-        this.houseNumber = street;
-        this.city = city;
-        this.municipality = municipality;
-        this.country = country;
-    }
+
+//    public String getFullAddress() {
+//        return capitalizeWords(street) + " " + houseNumber + ", " +
+//                capitalizeWords(city) + ", " +
+//                capitalizeWords(municipality) + ", " +
+//                capitalizeWords(country);
+//    }
+//
+//    // Helper method to capitalize each word in a string
+//    private String capitalizeWords(String input) {
+//        return input.substring(0, 1).toUpperCase() + input.substring(1);
+//    }
 
     public String getStreet() {
         return street;
