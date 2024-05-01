@@ -314,6 +314,7 @@ public class Controller {
         }
     }
 
+    //Inspiration for math formula found at https://www.movable-type.co.uk/scripts/latlong.html
     @FXML
     private void CalculateDistance(Point2D startPoint, Point2D endPoint){
         double lat1 = startPoint.getX();
