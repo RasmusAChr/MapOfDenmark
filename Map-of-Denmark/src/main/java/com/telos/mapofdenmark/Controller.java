@@ -15,6 +15,7 @@ import java.util.List;
 
 
 import javafx.scene.image.ImageView;
+import javafx.scene.text.Text;
 
 public class Controller {
     //JavaFX requires a non-parameter constructor to load and run the FXML file.
@@ -31,7 +32,10 @@ public class Controller {
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
     @FXML
     private Pane backgroundPane;
-
+    @FXML
+    private javafx.scene.shape.Line distanceLine;
+    @FXML
+    private Text distanceLabel;
     @FXML
     private ToggleButton themeToggleBtn;
     @FXML
@@ -151,6 +155,10 @@ public class Controller {
             // Apply zoom
             view.zoom(dx, dy, Math.pow(1.07, zoomDirection * deltaFactor));
             view.Current_Slider_value(newVal.doubleValue());
+
+            Point2D lineStart = view.mousetoModel(distanceLine.getStartX(), distanceLine.getStartY());
+            Point2D lineEnd = view.mousetoModel(distanceLine.getEndX(), distanceLine.getEndY());
+            CalculateDistance(lineStart, lineEnd);
           });
     }
     @FXML
@@ -306,4 +314,23 @@ public class Controller {
         }
     }
 
+    @FXML
+    private void CalculateDistance(Point2D startPoint, Point2D endPoint){
+        double lat1 = startPoint.getX();
+        double lon1 = startPoint.getY();
+        double lat2 = endPoint.getX();
+        double lon2 = endPoint.getY();
+
+        final int R = 6371; // Radius of the earth
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+
+        distanceLabel.setText(String.format("%.0f m", distance));  // Setting the distance text directly formatted
+    }
 }
