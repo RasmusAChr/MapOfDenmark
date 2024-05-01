@@ -40,6 +40,8 @@ public class Controller_Boot {
     // Loads the custim file when pressing Yes
     @FXML
     private void readFile() throws XMLStreamException, IOException, ClassNotFoundException {
+
+
         System.out.println("Attempting to show read file dialog");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open .Obj or .OSM File");
@@ -60,8 +62,10 @@ public class Controller_Boot {
             userFilename = file.getName();
 
         } else  {
-            System.out.println("Error: File not selected or found."); // or something else
-            // Using default file
+            System.out.println("Error: File not selected or found.");
+            System.out.println("Using default");
+            default_path();
+            return;
         }
         chosen = true;
         view.setPath(userFile);
