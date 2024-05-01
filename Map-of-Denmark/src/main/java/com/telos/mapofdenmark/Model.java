@@ -114,7 +114,7 @@ public class Model implements Serializable {
         this.addressList = new ArrayList<>();
         this.address = new Address();
         this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
-        this.allowedRelationTypes = new HashSet<>(Arrays.asList("place", "building", "natural", "leisure", "amenity"));
+        this.allowedRelationTypes = new HashSet<>(Arrays.asList("place", "building"));//, "building", "natural", "leisure", "amenity"));
         if (filename.endsWith(".osm.zip")) {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {

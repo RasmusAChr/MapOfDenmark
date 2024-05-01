@@ -36,28 +36,33 @@ public class Relation implements Serializable {
 
     public void orderNodes(){
 
-        if (addToOrderedNodes() == null) {
-            System.out.println("EMPTY");
-            drawable = false;
-            return;
-        }
+
 
         // Check if a node appears 2 times. If not place the way with that node in another list.
+        System.out.println("non related members:");
         for (Member m : members) {
+            if (m.getWay() == null) {
+                drawable = false;
+                return;
+            }
             if (hasDuplicateCoordinates(m)) {
                 nonRelatedMembers.add(m);
-                System.out.println("lastNode: " + lastNode.id + "    node: " + m.getWay().getNodes().get(m.getWay().getNodes().size()-1).id);
-
+                System.out.println(m.getRef());
+                //System.out.println("lastNode: " + lastNode.id + "    node: " + m.getWay().getNodes().get(m.getWay().getNodes().size()-1).id);
             }
         }
 
         // Remove the collected members after the iteration
         members.removeAll(nonRelatedMembers);
 
+        if (addToOrderedNodes() == null) {
+            System.out.println("EMPTY");
+            drawable = false;
+            return;
+        }
 
 
-        //orderedNodes.clear();
-        //lastNode = null;
+
         while (!addToOrderedNodes().isEmpty()) addToOrderedNodes();
         System.out.println("------------------------------");
 
@@ -125,18 +130,20 @@ public class Relation implements Serializable {
 
         if (drawable){
             // FOR OUTER
-            double[] xPoints = new double[orderedNodes.size()];
-            double[] yPoints = new double[orderedNodes.size()];
-            for (int i = 0; i < orderedNodes.size(); i++){
-                var node = orderedNodes.get(i);
-                xPoints[i] = 0.56 * node.getLon();
-                yPoints[i] = -node.getLat();
-            }
-            // Moves to start coordinates
-            gc.moveTo(xPoints[0], yPoints[0]);
-            // Creates a not visible line to next coordinate (to create selection).
-            for (int i = 0; i < xPoints.length; i++){
-                gc.lineTo(xPoints[i],yPoints[i]);
+            if (!orderedNodes.isEmpty()){
+                double[] xPoints = new double[orderedNodes.size()];
+                double[] yPoints = new double[orderedNodes.size()];
+                for (int i = 0; i < orderedNodes.size(); i++) {
+                    var node = orderedNodes.get(i);
+                    xPoints[i] = 0.56 * node.getLon();
+                    yPoints[i] = -node.getLat();
+                }
+                // Moves to start coordinates
+                gc.moveTo(xPoints[0], yPoints[0]);
+                // Creates a not visible line to next coordinate (to create selection).
+                for (int i = 0; i < xPoints.length; i++) {
+                    gc.lineTo(xPoints[i], yPoints[i]);
+                }
             }
 
             // FOR INNER
