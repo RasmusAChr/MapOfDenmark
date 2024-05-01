@@ -32,7 +32,9 @@ public class Model implements Serializable {
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
-    List<Relation> Relations = new ArrayList<>();
+    List<Relation> RelationsPlace = new ArrayList<>();
+    List<Relation> RelationsBuilding = new ArrayList<>();
+    List<Relation> RelationsNatural = new ArrayList<>();
     // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
     List<Node> centerPointNodes = new ArrayList<>();
     SP Dijkstra = null;
@@ -55,6 +57,7 @@ public class Model implements Serializable {
     Map<String, Double> roadIdSet;
     HashSet<String> cycleTags;
     Set<String> allowedRelationTypes;
+
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
             try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
@@ -114,7 +117,7 @@ public class Model implements Serializable {
         this.addressList = new ArrayList<>();
         this.address = new Address();
         this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
-        this.allowedRelationTypes = new HashSet<>(Arrays.asList("place", "building"));//, "building", "natural", "leisure", "amenity"));
+        this.allowedRelationTypes = new HashSet<>(Arrays.asList("place", "building", "natural", "leisure", "amenity"));
         if (filename.endsWith(".osm.zip")) {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
@@ -217,10 +220,8 @@ public class Model implements Serializable {
         var way = new ArrayList<Node>();
         var building = false;
         var coast = false;
-        var place = "";
         var relationLandform = "";
         var validRelation = false;
-        var buildingRelation = "";
         String roadtype = "";
         String RelationsType = "";
         boolean shouldAdd = false;
@@ -233,14 +234,12 @@ public class Model implements Serializable {
         boolean acccesPostBollean = false;
         long wayid = 0;
         int vertexIndex = -2;
-        boolean parsedFirstWay = false;
-        boolean parsedFirstRelation = false;
+        String relationKey = "";
 
         //if (!parsedFirstWay){
 
         if (input1.getLocalName().equals("way")){
             wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
-            parsedFirstWay = true;
         }
         //}
         //if (!parsedFirstRelation){
@@ -248,10 +247,8 @@ public class Model implements Serializable {
             relationsMembers = new ArrayList<>();
             insideRelation = true;
             RelationsType = "";
-            place = "";
             relationLandform = "";
-            buildingRelation = "";
-            parsedFirstRelation = true;
+            relationKey = "";
         }
         //}
 
@@ -313,10 +310,9 @@ public class Model implements Serializable {
                     relationsMembers = new ArrayList<>();
                     insideRelation = true;
                     RelationsType = "";
-                    place = "";
                     relationLandform = "";
+                    relationKey = "";
                     validRelation = false;
-                    buildingRelation = "";
                 } else if (insideRelation && name.equals("member")) {
                     // parse Ref
                     var ref = Long.parseLong(input1.getAttributeValue(null,"ref"));
@@ -332,6 +328,7 @@ public class Model implements Serializable {
                         RelationsType = v;
                     } else if (allowedRelationTypes.contains(k)) {
                         validRelation = true;
+                        relationKey = k;
                         relationLandform = v;
                     }
                     /*else if (k.equals("place") || k.equals("building") || k.equals("natural") || k.equals("leisure") ||
@@ -403,11 +400,15 @@ public class Model implements Serializable {
                     vertexIndex = -1;
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
-                        //if (relationLandform.equals("islet") || relationLandform.equals("apartments")) {
                         if (validRelation) {
-                            Relations.add(new Relation(RelationsType,relationsMembers,relationLandform));
+                            if (relationKey.equals("place")) {
+                                RelationsPlace.add(new Relation(RelationsType,relationsMembers,relationLandform));
+                            } else if (relationKey.equals("building")) {
+                                RelationsBuilding.add(new Relation(RelationsType,relationsMembers,relationLandform));
+                            } else if (relationKey.equals("natural")) {
+                                RelationsNatural.add(new Relation(RelationsType,relationsMembers,relationLandform));
+                            }
                         }
-                        //}
                     }
                 }
             }

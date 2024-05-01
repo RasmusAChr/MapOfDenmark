@@ -2,14 +2,12 @@ package com.telos.mapofdenmark;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.FillRule;
 
-import javax.security.auth.login.AccountNotFoundException;
 import java.io.Serializable;
 import java.util.*;
 
-public class Relation implements Serializable {
+public class RelationTwo implements Serializable {
     private String type;
     private String landform;
 
@@ -20,9 +18,9 @@ public class Relation implements Serializable {
     boolean drawable;
     Node lastNode = null;
     ColorScheme cs = new ColorScheme();
+    long tempM = 0;
 
-
-    public Relation(String type, List<Member> memberRefs, String landform) {
+    public RelationTwo(String type, List<Member> memberRefs, String landform) {
         ColorScheme cs = new ColorScheme();
         this.type = type;
         this.landform = landform;
@@ -62,7 +60,6 @@ public class Relation implements Serializable {
         }
 
 
-
         while (!addToOrderedNodes().isEmpty()) addToOrderedNodes();
         //System.out.println("------------------------------");
 
@@ -98,7 +95,8 @@ public class Relation implements Serializable {
                 iterator.remove();
             }
             else if (lastNode == null){
-                //System.out.println("First node " + m.getRef());
+                System.out.println("First node " + m.getRef());
+                tempM = m.getRef();
                 orderedNodes.addAll(m.getWay().getNodes());
                 lastNode = orderedNodes.get(orderedNodes.size()-1);
                 iterator.remove();
@@ -116,7 +114,8 @@ public class Relation implements Serializable {
                 iterator.remove(); // Remove the current member using the iterator
             }
             else {
-                //System.out.println("https://www.openstreetmap.org/way/" + m.getRef() + "#map=11/55.1424/14.9641");
+                System.out.println("First way " + tempM);
+                System.out.println("https://www.openstreetmap.org/way/" + m.getRef() + "#map=11/55.1424/14.9641");
                 leftOverMembers.add(m);
             }
         }

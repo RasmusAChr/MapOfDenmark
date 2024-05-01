@@ -104,7 +104,13 @@ public class View {
         // rangeSearch(x1,x2,y1,y2)
 
         // Drawing relations
-        for (var relation : model.Relations) {
+        for (var relation : model.RelationsPlace) {
+            relation.Draw(gc,slider_value,dark);
+        }
+        for (var relation : model.RelationsBuilding) {
+            relation.Draw(gc,slider_value,dark);
+        }
+        for (var relation : model.RelationsNatural) {
             relation.Draw(gc,slider_value,dark);
         }
 

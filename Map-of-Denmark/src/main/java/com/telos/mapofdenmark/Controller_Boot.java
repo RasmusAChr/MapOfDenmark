@@ -33,7 +33,7 @@ public class Controller_Boot {
         this.view = view;
         this.primaryStage = primaryStage;
         this.path = System.getProperty("user.dir"); // gets which directory the project is placed
-        this.userFile = path + "/data/bornholm.osm"; // To be Looked at
+        this.userFile = path + "/data/mon.osm"; // To be Looked at
     }
 
 
