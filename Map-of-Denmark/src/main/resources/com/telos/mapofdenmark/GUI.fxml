@@ -113,10 +113,13 @@
                         </ImageView>
                         <VBox prefHeight="41.0" prefWidth="102.0">
                            <children>
-                              <Text fx:id="distanceLabel" stroke="BLACK" text="0 m" x="300" y="95">
+                              <Text fx:id="distanceLabel" stroke="BLACK" text="Line Scale" x="300" y="95">
                                  <VBox.margin>
-                                    <Insets left="40.0" />
-                                 </VBox.margin></Text>
+                                    <Insets />
+                                 </VBox.margin>
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font></Text>
                         
                                                                         <Line fx:id="distanceLine" endX="90.0" endY="100" startY="100.0" stroke="BLACK" strokeWidth="2.0" />
                            </children>
