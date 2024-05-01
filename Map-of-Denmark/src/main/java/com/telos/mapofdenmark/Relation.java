@@ -30,11 +30,11 @@ public class Relation implements Serializable {
         this.drawable = true;
         this.innerWays = new ArrayList<>();
         this.nonRelatedMembers = new ArrayList<>();
+        this.orderedNodes = new ArrayList<>();
         orderNodes();
     }
 
     public void orderNodes(){
-        orderedNodes = new ArrayList<>();
 
         if (addToOrderedNodes() == null) {
             System.out.println("EMPTY");
@@ -44,15 +44,9 @@ public class Relation implements Serializable {
 
         // Check if a node appears 2 times. If not place the way with that node in another list.
         for (Member m : members) {
-            //System.out.println(m.getRef());
             if (hasDuplicateCoordinates(m)) {
-                //System.out.println(m.getRef());
                 nonRelatedMembers.add(m);
                 System.out.println("lastNode: " + lastNode.id + "    node: " + m.getWay().getNodes().get(m.getWay().getNodes().size()-1).id);
-                if (lastNode.equals(m.getWay().getNodes().get(m.getWay().getNodes().size()-1))){
-                    lastNode = null;
-                    orderedNodes.clear();
-                }
 
             }
         }
