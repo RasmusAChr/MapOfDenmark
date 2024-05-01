@@ -118,9 +118,9 @@ public class View {
                 double y = pointOfInterest.getY();
 
                 // Draw a filled circle centered on the point
-                gc.setFill(Color.RED);  // Set the fill color for the circle
-                gc.fillOval(x - radius, y - radius, 2 * radius, 2 * radius);
                 gc.setFill(Color.BLACK);  // Set the fill color for the circle
+                gc.fillOval(x - radius, y - radius, 2 * radius, 2 * radius);
+                gc.setFill(Color.RED);  // Set the fill color for the circle
                 gc.fillOval(x - radius+0.000025, y - radius+0.000025, 1.5 * radius, 1.5 * radius);
             }
         }

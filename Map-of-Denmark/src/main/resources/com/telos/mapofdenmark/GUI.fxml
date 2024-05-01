@@ -118,7 +118,7 @@
                                     <Insets />
                                  </VBox.margin>
                                  <font>
-                                    <Font size="11.0" />
+                                    <Font size="10.0" />
                                  </font></Text>
                         
                                                                         <Line fx:id="distanceLine" endX="90.0" endY="100" startY="100.0" stroke="BLACK" strokeWidth="2.0" />
