@@ -53,18 +53,23 @@ public class Model implements Serializable {
     HashSet<String> cycleTags;
     ColorScheme cs;
     LineThickness lt;
-    static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
-        if (filename.endsWith(".obj")) {
-            try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) { // good code
+    static Model load(InputStream inputStream, String fileName) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
+        if(fileName.endsWith(".obj")){
+            try (var in = new ObjectInputStream(new BufferedInputStream(inputStream))) {
                 return (Model) in.readObject();
+            } catch (Exception e) {
+                // Close the input stream if an exception occurs
+                inputStream.close();
+                throw e;
             }
-
         }
-        return new Model(filename);
+        else{
+            return new Model(inputStream, fileName);
+        }
     }
 
 
-    public Model(String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
+    public Model(InputStream inputStream, String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
         cs = new ColorScheme();
         lt = new LineThickness();
         this.roadIdSet = new HashMap<String, Double>(Map.of(
@@ -141,9 +146,9 @@ public class Model implements Serializable {
         this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
 
         if (filename.endsWith(".osm.zip")) {
-            parseZIP(filename);
+            parseZIP(inputStream);
         } else if (filename.endsWith(".osm")) {
-            parseRouteNet(filename);
+            parseRouteNet(inputStream);
         }
         this.trie = new Trie();
         for(Address address : addressList){
@@ -219,8 +224,8 @@ public class Model implements Serializable {
         }
     }
 
-    private void parseRouteNet(String filename) throws IOException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
-        parseNodeNet(new FileInputStream(filename));
+    private void parseRouteNet(InputStream inputStream) throws IOException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
+        parseNodeNet(inputStream);
     }
 
     void save(String filename) throws FileNotFoundException, IOException {
@@ -229,8 +234,8 @@ public class Model implements Serializable {
         }
     }
 
-    private void parseZIP(String filename) throws IOException, XMLStreamException, FactoryConfigurationError {
-        var input = new ZipInputStream(new FileInputStream(filename));
+    private void parseZIP(InputStream inputStream) throws IOException, XMLStreamException, FactoryConfigurationError {
+        var input = new ZipInputStream(inputStream);
         input.getNextEntry();
         parseNodeNet(input);
     }

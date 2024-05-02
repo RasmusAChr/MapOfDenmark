@@ -9,7 +9,9 @@ import javafx.stage.Stage;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class Controller_Boot {
 
@@ -38,7 +40,7 @@ public class Controller_Boot {
         this.view = view;
         this.primaryStage = primaryStage;
         this.path = System.getProperty("user.dir"); // gets which directory the project is placed
-        this.userFile = path + "/data/kbh.osm"; // To be Looked at
+        this.userFile = path + "/kbh.osm"; // To be Looked at
     }
 
 
@@ -62,35 +64,47 @@ public class Controller_Boot {
         Stage stage = (Stage) btn_YES.getScene().getWindow();
         File file = fileChooser.showOpenDialog(stage);
 
-
         if (file != null) {
-            userFile = file.getPath();
+            System.out.println("This is the file name" + file.getName());
             userFilename = file.getName();
-
-        } else  {
-            System.out.println("Error: File not selected or found.");
-            System.out.println("Using default");
+            try (InputStream inputStream = new FileInputStream(file)) {
+                chosen = true;
+                view.setPath(userFilename);
+                view.setChosen(chosen);
+                runMap(primaryStage, inputStream, userFilename);
+            } catch (IOException e) {
+                System.err.println("Error: Failed to read file.");
+                e.printStackTrace();
+            }
+        } else {
+            // If no file has been selected, pick the default map
             default_path();
-            return;
         }
-        chosen = true;
-        view.setPath(userFile);
-        view.setChosen(chosen);
-        runMap(primaryStage,userFile);
 
     }
     // Loads the dault file when pressing no
     @FXML
     private void default_path() throws XMLStreamException, IOException, ClassNotFoundException {
         // Using default file
-        chosen = true;
-        view.setPath(userFile);
-        view.setChosen(chosen);
-        runMap(primaryStage,userFile);
-
+        InputStream mapInputStream = loadDefaultFile();
+        if (mapInputStream != null) {
+            chosen = true;
+            view.setPath("kbh.osm"); // Set the path to the default filename
+            view.setChosen(chosen);
+            userFilename = userFile;
+            runMap(primaryStage, mapInputStream, userFilename);
+        } else {
+            System.err.println("Error: Failed to load default file.");
+        }
     }
-    private void runMap(Stage primaryStage,String path) throws XMLStreamException, IOException, ClassNotFoundException {
-        var model = Model.load(path);
+
+    private InputStream loadDefaultFile() {
+        InputStream inputStream = Controller_Boot.class.getResourceAsStream("/kbh.osm");
+        System.out.println("Loaded default file: " + inputStream); // Print loaded file for debugging
+        return inputStream;
+    }
+    private void runMap(Stage primaryStage,InputStream inputStream, String userFilename) throws XMLStreamException, IOException, ClassNotFoundException {
+        var model = Model.load(inputStream, userFilename);
         var view = new View(model, primaryStage);
 
     }
