@@ -148,6 +148,8 @@ public class Model implements Serializable {
         System.out.println("size of building collection: "+centerPointNodesBuilding.size());
         kdTreeBuildings.populate(centerPointNodesBuilding);
        System.out.println("Size of building KDTree: " + kdTreeBuildings.size());
+       kdTreeNaturals.populate(centerPointNodesNaturals);
+       System.out.println("Size of building Naturals: " + kdTreeNaturals.size());
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -358,11 +360,15 @@ public class Model implements Serializable {
                     if (!roadtype.isEmpty()) {
                         Road tmpRoad = new Road(way,roadtype);
                         ways.add(tmpRoad);
+                        id2way.put(wayid, tmpRoad);
+//                        System.out.println("added way with id: " + wayid + " to id2way");
                         addToCenterPointNodes(way, tmpRoad, true);
                     } else {
                         Way tmpWay = new Way(way);
                         ways.add(tmpWay);
                         addToCenterPointNodes(way, tmpWay, false);
+                        id2way.put(wayid, tmpWay);
+//                        System.out.println("added way with id: " + wayid + " to id2way");
                         if(building || coast) ways.add(new Way(way));
                     }
                     // Ensuring that every node has a ref to the way it is apart of
@@ -395,8 +401,8 @@ public class Model implements Serializable {
                         }
                         vertexIndex = DigraphNodeToIndex.get(node);
                     }
-                    Way newWay = new Way(way);
-                    id2way.put(wayid,newWay);
+//                    Way newWay = new Way(way);
+//                    id2way.put(wayid,newWay);
                     way.clear();
                     roadtype = "";
                     shouldAdd = false;
@@ -418,7 +424,7 @@ public class Model implements Serializable {
                             if (relationKey.equals("place")) {
                                 RelationsPlace.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
                             } else if (relationKey.equals("building")) {
-                                RelationTwo tmpRelation = new RelationTwo(RelationsType,relationsMembers,relationLandform);
+                                RelationTwo tmpRelation = new RelationTwo(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform);
                                 RelationsBuilding.add(tmpRelation);
                                 // for loop to find center point from member
                                 List<Node> nListe = new ArrayList<>();
@@ -427,10 +433,18 @@ public class Model implements Serializable {
                                         nListe.addAll(member.getWay().getNodes());
                                     }
                                 }
-                                System.out.println("nList size: " + nListe.size());
-                                addToCenterPointNodesRelation(nListe, tmpRelation);
+                                addToCenterPointNodesRelation(nListe, tmpRelation, "building");
                             } else if (relationKey.equals("natural")) {
-                                RelationsNatural.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
+                                RelationTwo tmpRelation = new RelationTwo(RelationsType, new ArrayList<>(relationsMembers), relationLandform);
+                                RelationsNatural.add(tmpRelation);
+                                // for loop to find center point from member
+                                List<Node> nListe = new ArrayList<>();
+                                for(Member member : relationsMembers){
+                                    if(member.getWay() != null){
+                                        nListe.addAll(member.getWay().getNodes());
+                                    }
+                                }
+                                addToCenterPointNodesRelation(nListe, tmpRelation, "natural");
                             }
                         }
                     }
@@ -626,7 +640,7 @@ public class Model implements Serializable {
     }
 
     // finds the center lat and lon among a collection of nodes
-    public void addToCenterPointNodesRelation(List<Node> nodes, RelationTwo refRelation){
+    public void addToCenterPointNodesRelation(List<Node> nodes, RelationTwo refRelation, String type){
         double sumLat = 0;
         double sumLon = 0;
         for(Node node : nodes){
@@ -637,7 +651,15 @@ public class Model implements Serializable {
         double centerLon = sumLon / nodes.size();
         Node centeredNode = new Node(indexForCenterPoints, centerLat, centerLon);
         centeredNode.setRefRelation(refRelation);
-        centerPointNodesBuilding.add(centeredNode);
+        switch (type) {
+            case "building":
+                centerPointNodesBuilding.add(centeredNode);
+                break;
+            case "natural":
+                centerPointNodesNaturals.add(centeredNode);
+            default:
+                break;
+        }
         indexForCenterPoints++;
     }
 
