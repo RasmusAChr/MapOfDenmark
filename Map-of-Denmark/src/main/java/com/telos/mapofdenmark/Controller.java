@@ -4,15 +4,18 @@ package com.telos.mapofdenmark;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import java.util.ArrayList;
 import java.util.List;
 
 
 import javafx.scene.image.ImageView;
+import javafx.scene.text.Text;
 
 public class Controller {
     //JavaFX requires a non-parameter constructor to load and run the FXML file.
@@ -24,11 +27,15 @@ public class Controller {
     private Model model;
     private View view;
     private Trie trie;
+    private boolean POI_MODE = false;
     @FXML
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
     @FXML
     private Pane backgroundPane;
-
+    @FXML
+    private javafx.scene.shape.Line distanceLine;
+    @FXML
+    private Text distanceLabel;
     @FXML
     private ToggleButton themeToggleBtn;
     @FXML
@@ -65,6 +72,15 @@ public class Controller {
         view.canvas.setOnMousePressed(e -> {
             lastX = e.getX();
             lastY = e.getY();
+
+            if(e.getButton() == MouseButton.PRIMARY && POI_MODE){
+                System.out.println("Point called");
+                System.out.println("lastX: " + lastX + " lastY: " + lastY);
+                Point2D modelPoint = view.mousetoModel(lastX, lastY);
+//                System.out.println(modelPoint.getX()+","+modelPoint.getY());
+                model.addPOI(modelPoint);
+                view.redraw();
+            }
         });
         view.canvas.setOnMouseDragged(e -> {
 
@@ -83,16 +99,11 @@ public class Controller {
         // Sets the visuals of the theme toggle
         themeToggleBtn.getStyleClass().add("root-light");
 
-// Ensure the ImageView starts at the correct position corresponding to the slider's initial value
+        // Ensure the ImageView starts at the correct position corresponding to the slider's initial value
         updateImageViewPosition(zoomSlider.getValue());
         // Add a listener to the slider's value
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()
         ));
-//        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
-//            addressParsing(trie, newValue);
-//        });
-       // zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> ));
-
         suggestionsBox.setOnMouseClicked(event ->{
             if(!suggestionsBox.getSelectionModel().getSelectedItem().isEmpty()){
                 String chosenSelection = suggestionsBox.getSelectionModel().getSelectedItem();
@@ -111,8 +122,6 @@ public class Controller {
         });
 
         searchImage.setOnMouseClicked(event -> {
-            // Call panToAddress method when searchImage is clicked
-
             panToAddress(searchBar.getText());
         });
 
@@ -146,6 +155,10 @@ public class Controller {
             // Apply zoom
             view.zoom(dx, dy, Math.pow(1.07, zoomDirection * deltaFactor));
             view.Current_Slider_value(newVal.doubleValue());
+
+            Point2D lineStart = view.mousetoModel(distanceLine.getStartX(), distanceLine.getStartY());
+            Point2D lineEnd = view.mousetoModel(distanceLine.getEndX(), distanceLine.getEndY());
+            CalculateDistance(lineStart, lineEnd);
           });
     }
     @FXML
@@ -203,8 +216,13 @@ public class Controller {
     }
     @FXML
     private void placeInterest(){
-        System.out.println("You clicked the interest button");
-    }
+        if(POI_MODE){
+            POI_MODE = false;
+            System.out.println("Leaving POI MODE");
+        } else {
+            POI_MODE = true;
+            System.out.println("Started POI MODE");
+        }    }
     @FXML
     public double getPanWidth(){
        return backgroundPane.getWidth();
@@ -215,20 +233,6 @@ public class Controller {
     }
     @FXML
     private void updateImageViewPosition(double sliderValue){
-        // This portion changes the location of imageview
-        // Calculate the percentage position of the thumb on the slider
-       // double thumbPositionPercentage = (sliderValue - zoomSlider.getMin()) / (zoomSlider.getMax() - zoomSlider.getMin());
-
-        // Adjust the formula to correctly map the value to the Y position
-      //  double sliderTrackHeight = zoomSlider.getPrefHeight(); // The full height of the slider
-
-        // Calculate the newY position for the ImageView
-        //double newY = zoomSlider.getLayoutY() + sliderTrackHeight * (1 - thumbPositionPercentage) - sliderEmoji.getFitHeight() * thumbPositionPercentage;
-
-       // sliderEmoji.setLayoutY(newY);
-
-
-
         // This portion changes image the image itself
         // Note this loads the image everytime so it may be faster to store all images in seperate image variables but may cost more memory
         String imagePath;
@@ -310,4 +314,24 @@ public class Controller {
         }
     }
 
+    //Inspiration for math formula found at https://www.movable-type.co.uk/scripts/latlong.html
+    @FXML
+    private void CalculateDistance(Point2D startPoint, Point2D endPoint){
+        double lat1 = startPoint.getX();
+        double lon1 = startPoint.getY();
+        double lat2 = endPoint.getX();
+        double lon2 = endPoint.getY();
+
+        final int R = 6371; // Radius of the earth
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+
+        distanceLabel.setText(String.format("Scale of line : %.0f m", distance));  // Setting the distance text directly formatted
+    }
 }

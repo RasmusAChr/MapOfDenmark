@@ -21,6 +21,7 @@ import com.telos.mapofdenmark.Shortest_Route.EdgeWeightedDigraph;
 import com.telos.mapofdenmark.Shortest_Route.SP;
 import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
+import javafx.geometry.Point2D;
 
 public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
@@ -30,6 +31,8 @@ public class Model implements Serializable {
     List<Relation> Relations = new ArrayList<>();
     // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
     List<Node> centerPointNodes = new ArrayList<>();
+    // Collection used for storing points of interest
+    List<Point2D> pointsOfInterest = new ArrayList<>();
     SP Dijkstra = null;
     private Trie trie;
     double minlat, maxlat, minlon, maxlon;
@@ -49,9 +52,10 @@ public class Model implements Serializable {
     HashSet<String> cycleTags;
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
-            try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
+            try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) { // good code
                 return (Model) in.readObject();
             }
+
         }
         return new Model(filename);
     }
@@ -106,20 +110,19 @@ public class Model implements Serializable {
         this.addressList = new ArrayList<>();
         this.address = new Address();
         this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
+
         if (filename.endsWith(".osm.zip")) {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
             parseRouteNet(filename);
-        } /*else {
-            parseTXT(filename);
-        }*/
-        save(filename+".obj");
-        this.trie = deserializeTrie("data/.obj");
+        }
+        this.trie = new Trie();
+        for(Address address : addressList){
+            trie.insert(address.getFullAddress());
+        }
         this.kdTree = new KDTree();
-        // Populates the KDTree using all nodes from .osm
-//        kdTree.populate(nodeList);
-        // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
         kdTree.populate(centerPointNodes);
+        save(filename+".obj");
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -150,7 +153,7 @@ public class Model implements Serializable {
                         DigraphNodeToIndex.put(node, roadCountX);
                         DigraphIndexToNode.put(roadCountX, node);
                         roadCountX++;
-//                    address = new Address(); // Reset for new node
+
                     }
                     case "tag" -> {
                         var v = input.getAttributeValue(null, "v");
@@ -179,7 +182,7 @@ public class Model implements Serializable {
                     if (address != null && !address.getStreet().isBlank()) {
                         addressList.add(address);
                         //System.out.println(addressId);
-                        addressIdMap.put(address.getFullAdress().toLowerCase(), id2node.get(addressId));
+                        addressIdMap.put(address.getFullAddress().toLowerCase(), id2node.get(addressId));
                         addressId = 0;
                         address = null; // Reset for the next address
                     }
@@ -289,6 +292,7 @@ public class Model implements Serializable {
                         default:
                             System.out.println(k);
                     }
+
                 } else if (name.equals("nd")) {
                     var ref = Long.parseLong(input1.getAttributeValue(null, "ref"));
                     var node = id2node.get(ref);
@@ -366,6 +370,8 @@ public class Model implements Serializable {
                         }
                         vertexIndex = DigraphNodeToIndex.get(node);
                     }
+                    Way newWay = new Way(way);
+                    id2way.put(wayid,newWay);
                     way.clear();
                     roadtype = "";
                     shouldAdd = false;
@@ -383,7 +389,7 @@ public class Model implements Serializable {
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     Relations.add(new Relation(RelationsType,relationsMembers));
-//                    System.out.println("Relation added");
+
                 }
             }
         }
@@ -429,23 +435,11 @@ public class Model implements Serializable {
              }
 
          }
-         System.out.println(path);
          return path;
     }
-    //
 
-    /*private void parseTXT(String filename) throws FileNotFoundException {
-        File f = new File(filename);
-        try (Scanner s = new Scanner(f)) {
-            while (s.hasNext()) {
-                list.add(new Line(s.nextLine()));
-            }
-        }
-    }*/
     public void parseAddressFromOSM(String v, String k){
         // Assuming you have a Trie instance called 'trie'
-//        trie.insert(fullAddress);
-//        adressList.add(fullAdress);
         if(address.getStreet().equals(null) || address.getStreet().isEmpty()) {
             if (k.contains("street")) {
                 address.setStreet(v);
@@ -487,58 +481,6 @@ public class Model implements Serializable {
     public Map<String, Node> getAddressIdMap() {
         return addressIdMap;
     }
-    private Trie loadCityNames() {
-        Trie trie = new Trie();
-//        String path = System.getProperty("user.dir"); // gets which directory the project is placed
-//        String filename = path+"\\data\\citynames.txt";
-//
-//        try (BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"))) {
-//            String line;
-//            while ((line = bReader.readLine()) != null) {
-//                trie.insert(line.trim().toLowerCase());
-//            }
-//        } catch (IOException e) {
-//            System.out.println(e.getMessage());
-//        }
-        for(Address address : addressList){
-            trie.insert(address.getFullAdress());
-        }
-        serializeTrie(trie, "data/trie.obj");
-        return trie;
-    }
-
-
-
-    private void serializeTrie(Trie trie, String filepath) {
-        try (
-                FileOutputStream fileOut = new FileOutputStream(filepath); // Open a file output stream to the specified file.
-                ObjectOutputStream out = new ObjectOutputStream(fileOut) // Wrap the file output stream in an ObjectOutputStream.
-        ) {
-            out.writeObject(trie); // Serialize the Trie object and write it to the file.
-        } catch (IOException i) {
-            i.printStackTrace(); // Handle potential IO exceptions.
-        }
-        System.out.println("Created serializable file");
-    }
-    private Trie deserializeTrie(String filepath) {
-        Trie trie = null;
-        try (
-                FileInputStream fileIn = new FileInputStream(filepath); // Open a file input stream to the specified file.
-                ObjectInputStream in = new ObjectInputStream(fileIn) // Wrap the file input stream in an ObjectInputStream.
-        ) {
-            trie = (Trie) in.readObject(); // Deserialize the object read from the file and cast it to a Trie.
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
-        // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
-        if(!(trie == null))  {
-
-            System.out.println("Serializable file was found");
-            return trie; // Return the deserialized Trie object.
-        }
-        // If a serializable file does not exist we will populate the trie ourselves and create a serializable file
-        else return loadCityNames();
-    }
     public List<String> getSuggestionList(String input){
         return trie.getAddressSuggestions(input.toLowerCase(), 4);
 
@@ -561,9 +503,20 @@ public class Model implements Serializable {
         centerPointNodes.add(centeredNode);
         indexForCenterPoints++;
     }
+    public void addPOI(Point2D POI) {
+        pointsOfInterest.add(POI);
+//        System.out.println("lon: " + lon + ", lat: " + lat);
+//        Node nearestNode = kdTree.getNearestNeighbor(lon, lat, false);
+//        if (nearestNode != null) {
+////            pointOfInterestList.add(nearestNode);
+//            nearestNode.setPointOfInterest(true);
+//            kdTree.put(lon, lat, nearestNode);
+//        }
+    }
 
-
-
+    public List<Point2D> getPointsOfInterest() {
+        return pointsOfInterest;
+    }
 }
 
 

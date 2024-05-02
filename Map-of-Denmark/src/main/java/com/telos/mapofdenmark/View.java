@@ -20,7 +20,7 @@ import java.util.Objects;
 import java.util.Queue;
 
 public class View {
-    Canvas canvas = new Canvas(1091.0, 638.0);
+    Canvas canvas = new Canvas(1120.0, 638.0);
     GraphicsContext gc = canvas.getGraphicsContext2D();
     double x1 = 100;
     double y1 = 100;
@@ -89,18 +89,11 @@ public class View {
         }
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
-       // double zoomValue = 1/Math.sqrt(trans.determinant());
         gc.setLineWidth(0.000005);
-//        for (var way : model.ways) {
-//            way.draw(gc, slider_value, dark);
-//        }
-
         // Logic for drawing ways from KDTree instead of all ways
         Point2D canvasTopLeft =  mousetoModel(0,0);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
-        System.out.println("Size of KDTree: " + model.kdTree.size());
         Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-        // rangeSearch(x1,x2,y1,y2)
         for (Node nodeSpatial : nodesFromKD) {
             Way way = nodeSpatial.getWay();
             if (way != null && way.getZoom_scale() < -1.0) {
@@ -111,6 +104,25 @@ public class View {
 
         for (var line : model.list) {
             line.draw(gc);
+        }
+        drawPOI();
+    }
+    private void drawPOI() {
+        if (!model.getPointsOfInterest().isEmpty()) {
+            for (Point2D pointOfInterest : model.getPointsOfInterest()) {
+                System.out.println("Attempted to draw POI at: " + pointOfInterest.getX() + ", " + pointOfInterest.getY());
+
+                // Calculate the visible size of the POI on the canvas
+                double radius = 0.0001;  // Radius of the circle in pixels
+                double x = pointOfInterest.getX();
+                double y = pointOfInterest.getY();
+
+                // Draw a filled circle centered on the point
+                gc.setFill(Color.BLACK);  // Set the fill color for the circle
+                gc.fillOval(x - radius, y - radius, 2 * radius, 2 * radius);
+                gc.setFill(Color.RED);  // Set the fill color for the circle
+                gc.fillOval(x - radius+0.000025, y - radius+0.000025, 1.5 * radius, 1.5 * radius);
+            }
         }
     }
 

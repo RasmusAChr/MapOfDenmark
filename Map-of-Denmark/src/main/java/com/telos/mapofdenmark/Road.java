@@ -3,9 +3,10 @@ package com.telos.mapofdenmark;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Road extends Way{
+public class Road extends Way implements Serializable {
 
     ColorScheme cs = new ColorScheme();
     LineThickness lt = new LineThickness();

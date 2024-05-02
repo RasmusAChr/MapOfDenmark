@@ -24,6 +24,10 @@ tasks.withType(JavaCompile) {
   options.encoding = 'UTF-8'
 }
 
+tasks.withType(JavaExec) {
+  jvmArgs = ['-Xmx28g']
+}
+
 application {
   mainModule = 'com.telos.mapofdenmark'
   mainClass = 'com.telos.mapofdenmark.App'

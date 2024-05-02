@@ -3,15 +3,17 @@ package com.telos.mapofdenmark.KDTreeClasses;
 import com.telos.mapofdenmark.Node;
 import com.telos.mapofdenmark.Way;
 
+import java.io.Serializable;
 import java.util.*;
 
 // Inspiration to KDTree from https://www.geeksforgeeks.org/search-and-insertion-in-k-dimensional-tree/
 // We also utilized code from chapter 3 in Algorithms 4 by Wayne and Sedgewick ch 3.2
-public class KDTree
+public class KDTree implements Serializable
 {
+    final static long serialVersionUID = 12851802756812749L;
     private KDNode root; // root of BST
-    private class KDNode {
-        //        private Key key; // Primitive key is no longer needed in KDTree as coordinates will be used as key instead.
+    private class KDNode implements Serializable{
+        final static long serialVersionUID = 3254120512025412L;
         double x, y; // Coordinates of the point which will be used for the line that will be drawn to create half planes
         private Node val;
         private KDNode left, right; // links to the left and right subtrees
@@ -43,23 +45,8 @@ public class KDTree
         // Public method to insert a key-value pair; updates if key exists
         // Put method arguments change to acommodate nodes new attributes
         root = put(root, x, y, val, 0);
-//        System.out.println("lon: " + (x*-0.56) + " lat: " + y);
     }
     private KDNode put(KDNode x, double xCoord, double yCoord, Node val, int depth) {
-        // Recursively inserts a key-value pair into the BST
-        // Change key’s value to val if key in subtree rooted at x.
-        // Otherwise, add new node to subtree associating key with val.
-//        if (x == null) return new Node(key, val, 1);
-//        int cmp = key.compareTo(x.key);
-//        if (cmp < 0) x.left = put(x.left, key, val);
-//        else if (cmp > 0) x.right = put(x.right, key, val);
-//        else x.val = val;
-//        x.size = size(x.left) + size(x.right) + 1;
-//        return x;
-
-        //System.out.println("Put this node with a ref to this way: " + val.getWay());
-
-        // New put adapted to KDTree
         if (x == null) return new KDNode(xCoord, yCoord, val, 1);
         // Perform comparison based on the determined axis
         int cmp;
@@ -95,11 +82,9 @@ public class KDTree
             if(axis == 0){
                 int cmp = Double.compare(yCoord, x.x);
                 if (cmp < 0){
-                    //depth++; depth should not be called from conditional as an asymmetric depth could happen
                     x = x.left;
                 }
                 else if (cmp > 0) {
-                    //depth++;
                     x = x.right;
                 }
                 else return x.val;
@@ -107,17 +92,15 @@ public class KDTree
             else {
                 int cmp = Double.compare(xCoord, x.y);
                 if (cmp < 0){
-                    //depth++;
                     x = x.left;
                 }
                 else if (cmp > 0) {
-                    //depth++;
                     x = x.right;
                 }
                 else return x.val;
             }
         }
-        xDepth++; // Increment depth at each step to alternate comparison axis
+        // Increment depth at each step to alternate comparison axis
         return null;
     }
 
@@ -125,36 +108,8 @@ public class KDTree
         // Removes the node with the smallest key in a subtree
         if (x.left == null) return x.right;
         x.left = deleteMin(x.left);
-        //x.N = size(x.left) + size(x.right) + 1; // Changes the overall size of the BST
         return x;
     }
-
-    // Not being used atm. and has to be reworked
-    /*public void delete(Double key) {
-        // Deletes a node with a given key from the BST
-        root = delete(root, key);
-    }*/
-
-
-    /*private KDNode delete(KDNode x, Double key) {
-        // Recursive method to delete a node with a given key
-        if (x == null) return null;
-        int cmp = key.compareTo(x.key);
-        if (cmp < 0) x.left = delete(x.left, key);
-        else if (cmp > 0) x.right = delete(x.right, key);
-        else
-        {
-            if (x.right == null) return x.left;
-            if (x.left == null) return x.right;
-            KDNode t = x;
-            x = min(t.right); // See page 407.
-            x.right = deleteMin(t.right);
-            x.left = t.left;
-        }
-        x.size = size(x.left) + size(x.right) + 1; // Changes the overall size of the BST
-        return x;
-    }*/
-
     public void inOrderTraverse(){
         inOrderTraverse(root);
     }
@@ -163,7 +118,6 @@ public class KDTree
         if (x == null) return;
         inOrderTraverse(x.left);
         System.out.println(x.x + " " + x.y);
-        //StdOut.println(x.key);
         inOrderTraverse(x.right);
     }
 
@@ -182,7 +136,6 @@ public class KDTree
 
     public Double getRootX() {
         return root.x;
-        //return root;
     }
 
     // Method to populate a kdtree and making it balanced with data from an array
