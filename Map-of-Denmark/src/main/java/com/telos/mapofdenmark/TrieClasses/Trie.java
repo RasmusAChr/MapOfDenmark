@@ -88,7 +88,8 @@ public class Trie implements Serializable {
             Matcher matcher = pattern.matcher(suggestion);
             if (matcher.find()) {
                 // Format the extracted groups and capitalize appropriate parts
-                String formatted = String.format("%s %s, %s, %s, %s",
+                // "," could be added in front of "%s" but would create exception when running djikstra
+                String formatted = String.format("%s %s %s %s %s",
                         capitalizeWord(matcher.group(1).trim()), // Street
                         matcher.group(2).trim(), // House number
                         capitalizeWord(matcher.group(3).trim()), // City
