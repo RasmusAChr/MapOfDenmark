@@ -37,12 +37,21 @@ public class Model implements Serializable {
     List<RelationTwo> RelationsNatural = new ArrayList<>();
     // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
     List<Node> centerPointNodes = new ArrayList<>();
+    // Collection used for storing center points for building relations
+    List<Node> centerPointNodesBuilding = new ArrayList<>();
+    // Collection used for storing cennter points for natural relations
+    List<Node> centerPointNodesNaturals = new ArrayList<>();
     SP Dijkstra = null;
     private Trie trie;
     double minlat, maxlat, minlon, maxlon;
     List<Address> addressList;
     Map<String, Node> addressIdMap;
+    // This KDTree holds all ways
     KDTree kdTree;
+    // This KDTree holds all building relations
+    KDTree kdTreeBuildings;
+    // This KDTree holds all building relations
+    KDTree kdTreeNaturals;
     Address address;
     EdgeWeightedDigraph EWD;
     HashMap<Node, Integer> DigraphNodeToIndex;
@@ -128,12 +137,17 @@ public class Model implements Serializable {
         save(filename+".obj");
         this.trie = deserializeTrie("data/.obj");
         this.kdTree = new KDTree();
+        this.kdTreeBuildings = new KDTree();
+        this.kdTreeNaturals = new KDTree();
         for (String s : uniqueWayTypes) System.out.println(s);
 
         // Populates the KDTree using all nodes from .osm
 //        kdTree.populate(nodeList);
         // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
         kdTree.populate(centerPointNodes);
+        System.out.println("size of building collection: "+centerPointNodesBuilding.size());
+        kdTreeBuildings.populate(centerPointNodesBuilding);
+       System.out.println("Size of building KDTree: " + kdTreeBuildings.size());
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -404,7 +418,17 @@ public class Model implements Serializable {
                             if (relationKey.equals("place")) {
                                 RelationsPlace.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
                             } else if (relationKey.equals("building")) {
-                                RelationsBuilding.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
+                                RelationTwo tmpRelation = new RelationTwo(RelationsType,relationsMembers,relationLandform);
+                                RelationsBuilding.add(tmpRelation);
+                                // for loop to find center point from member
+                                List<Node> nListe = new ArrayList<>();
+                                for(Member member : relationsMembers){
+                                    if(member.getWay() != null){
+                                        nListe.addAll(member.getWay().getNodes());
+                                    }
+                                }
+                                System.out.println("nList size: " + nListe.size());
+                                addToCenterPointNodesRelation(nListe, tmpRelation);
                             } else if (relationKey.equals("natural")) {
                                 RelationsNatural.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
                             }
@@ -601,6 +625,21 @@ public class Model implements Serializable {
         indexForCenterPoints++;
     }
 
+    // finds the center lat and lon among a collection of nodes
+    public void addToCenterPointNodesRelation(List<Node> nodes, RelationTwo refRelation){
+        double sumLat = 0;
+        double sumLon = 0;
+        for(Node node : nodes){
+            sumLat += node.getLat();
+            sumLon += node.getLon();
+        }
+        double centerLat = sumLat / nodes.size();
+        double centerLon = sumLon / nodes.size();
+        Node centeredNode = new Node(indexForCenterPoints, centerLat, centerLon);
+        centeredNode.setRefRelation(refRelation);
+        centerPointNodesBuilding.add(centeredNode);
+        indexForCenterPoints++;
+    }
 
 
 }

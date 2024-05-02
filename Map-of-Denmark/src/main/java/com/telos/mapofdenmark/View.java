@@ -102,26 +102,31 @@ public class View {
         System.out.println("Size of KDTree: " + model.kdTree.size());
         Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         // rangeSearch(x1,x2,y1,y2)
+        Queue<Node> buildingNodesFromKD = model.kdTreeBuildings.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
 
-        // Drawing relations
-        for (var relation : model.RelationsPlace) {
+        for(Node buildingNode : buildingNodesFromKD){
+            RelationTwo relation = buildingNode.getRefRelation();
             relation.Draw(gc,slider_value,dark);
         }
-        for (var relation : model.RelationsBuilding) {
-            relation.Draw(gc,slider_value,dark);
-        }
-        for (var relation : model.RelationsNatural) {
-            relation.Draw(gc,slider_value,dark);
-        }
+//        // Drawing relations
+//        for (var relation : model.RelationsPlace) {
+//            relation.Draw(gc,slider_value,dark);
+//        }
+//        for (var relation : model.RelationsBuilding) {
+//            relation.Draw(gc,slider_value,dark);
+//        }
+//        for (var relation : model.RelationsNatural) {
+//            relation.Draw(gc,slider_value,dark);
+//        }
 
         // Drawing ways
-        for (Node nodeSpatial : nodesFromKD) {
-            Way way = nodeSpatial.getWay();
-            if (way != null) {
-                gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark);
-            }
-        }
+//        for (Node nodeSpatial : nodesFromKD) {
+//            Way way = nodeSpatial.getWay();
+//            if (way != null) {
+//                gc.setStroke(Color.BLACK);
+//                way.draw(gc, slider_value, dark);
+//            }
+//        }
 
         for (var line : model.list) {
             line.draw(gc);

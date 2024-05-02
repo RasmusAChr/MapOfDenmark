@@ -13,7 +13,7 @@ public class Way implements Serializable {
     ArrayList<Node> nodesInWay;
 
     public Way(ArrayList<Node> way) {
-        nodesInWay = new ArrayList<>();
+        this.nodesInWay = new ArrayList<>();
         nodesInWay.addAll(way);
         coords = new double[way.size() * 2];
         for (int i = 0 ; i < way.size() ; ++i) {
@@ -44,5 +44,4 @@ public class Way implements Serializable {
     public Node getArbitraryNode(){
         return refNode;
     }
-
 }
