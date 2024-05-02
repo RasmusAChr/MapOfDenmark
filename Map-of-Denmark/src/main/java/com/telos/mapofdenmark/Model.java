@@ -312,7 +312,7 @@ public class Model implements Serializable {
                             }
                             break;
                         case "maxspeed":
-                            max_speed = Double.parseDouble(v);
+                            //max_speed = Double.parseDouble(v); Dum Bornholm way
                     }
 
                 } else if (name.equals("nd")) {
