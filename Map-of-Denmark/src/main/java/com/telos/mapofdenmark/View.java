@@ -99,7 +99,7 @@ public class View {
         // Logic for drawing ways from KDTree instead of all ways
         Point2D canvasTopLeft =  mousetoModel(0,0);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
-        System.out.println("Size of KDTree: " + model.kdTree.size());
+        //System.out.println("Size of KDTree: " + model.kdTree.size());
         Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         // rangeSearch(x1,x2,y1,y2)
 
@@ -107,12 +107,16 @@ public class View {
         for (var relation : model.RelationsPlace) {
             relation.Draw(gc,slider_value,dark);
         }
-        for (var relation : model.RelationsBuilding) {
-            relation.Draw(gc,slider_value,dark);
-        }
         for (var relation : model.RelationsNatural) {
             relation.Draw(gc,slider_value,dark);
         }
+        for (var relation : model.RelationsLanduse) {
+            relation.Draw(gc,slider_value,dark);
+        }
+        for (var relation : model.RelationsBuilding) {
+            relation.Draw(gc,slider_value,dark);
+        }
+
 
         // Drawing ways
         for (Node nodeSpatial : nodesFromKD) {

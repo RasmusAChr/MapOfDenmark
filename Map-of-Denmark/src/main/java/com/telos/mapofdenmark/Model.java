@@ -33,8 +33,10 @@ public class Model implements Serializable {
     List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
     List<RelationTwo> RelationsPlace = new ArrayList<>();
-    List<RelationTwo> RelationsBuilding = new ArrayList<>();
     List<RelationTwo> RelationsNatural = new ArrayList<>();
+    List<RelationTwo> RelationsLanduse = new ArrayList<>();
+    List<RelationTwo> RelationsBuilding = new ArrayList<>();
+
     // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
     List<Node> centerPointNodes = new ArrayList<>();
     SP Dijkstra = null;
@@ -117,7 +119,7 @@ public class Model implements Serializable {
         this.addressList = new ArrayList<>();
         this.address = new Address();
         this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
-        this.allowedRelationTypes = new HashSet<>(Arrays.asList("place", "building", "natural", "leisure", "amenity"));
+        this.allowedRelationTypes = new HashSet<>(Arrays.asList("place", "natural", "landuse", "building"));
         if (filename.endsWith(".osm.zip")) {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
@@ -403,10 +405,12 @@ public class Model implements Serializable {
                         if (validRelation) {
                             if (relationKey.equals("place")) {
                                 RelationsPlace.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
-                            } else if (relationKey.equals("building")) {
-                                RelationsBuilding.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
                             } else if (relationKey.equals("natural")) {
                                 RelationsNatural.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
+                            } else if(relationKey.equals("landuse")){
+                                RelationsLanduse.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
+                            }else if (relationKey.equals("building")) {
+                                RelationsBuilding.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
                             }
                         }
                     }
