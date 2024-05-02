@@ -86,6 +86,7 @@ public class Controller {
 
                 double dx = e.getX() - lastX;
                 double dy = e.getY() - lastY;
+            System.out.println("x is: " + dx + " and y is: " + dy);
                 view.pan(dx, dy);
 
             lastX = e.getX();
@@ -303,10 +304,16 @@ public class Controller {
             double addressX = addressNode.getLon() * 0.56;
             double addressY = -addressNode.getLat();
 
-            view.pan(addressX, addressY);
+            Point2D canvasCenterAsPixels = view.getCanvasCenterPoint();
+
+            Point2D addressAsPixels = view.convertGeoCoordsToPixels(addressX, addressY);
+
+            double dx = canvasCenterAsPixels.getX() - addressAsPixels.getX();
+            double dy = canvasCenterAsPixels.getY() - addressAsPixels.getY();
+
+            view.pan(dx, dy);
 
             view.drawCircle(addressX,addressY);
-
         }
         else if (model.getAddressIdMap().get(selectedAddress) == null){
             System.out.println("Not a valid Address");

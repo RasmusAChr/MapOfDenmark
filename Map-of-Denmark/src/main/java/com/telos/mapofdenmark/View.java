@@ -161,6 +161,11 @@ public class View {
         }
 
     }
+    public Point2D convertGeoCoordsToPixels(double lon, double lat){
+        Point2D transformedGeoPoint = trans.transform(lon, lat);
+
+        return transformedGeoPoint;
+    }
     public void Current_Slider_value(double value){
         slider_value = value;
     }
@@ -171,7 +176,7 @@ public class View {
 
         Point2D canvasCoordsTransformed = mousetoModel(centerX, centerY);
 
-        return canvasCoordsTransformed;
+        return new Point2D(centerX,centerY);
     }
     public double getScale() {
         // Get the transformation matrix
