@@ -370,8 +370,6 @@ public class Model implements Serializable {
                         }
                         vertexIndex = DigraphNodeToIndex.get(node);
                     }
-                    Way newWay = new Way(way);
-                    id2way.put(wayid,newWay);
                     way.clear();
                     roadtype = "";
                     shouldAdd = false;
