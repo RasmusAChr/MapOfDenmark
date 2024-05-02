@@ -15,6 +15,7 @@ repositories {
 
 ext {
   junitVersion = '5.10.0'
+  javaFxVersion = '17.0.10'
 }
 
 sourceCompatibility = '17'
@@ -30,7 +31,7 @@ tasks.withType(JavaExec) {
 
 application {
   mainModule = 'com.telos.mapofdenmark'
-  mainClass = 'com.telos.mapofdenmark.App'
+  mainClass = 'com.telos.mapofdenmark.Launcher'
 }
 
 javafx {
@@ -41,7 +42,22 @@ javafx {
 dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+  implementation group: 'org.openjfx', name: 'javafx-base', version: javaFxVersion, classifier: 'win'
+  implementation group: 'org.openjfx', name: 'javafx-base', version: javaFxVersion, classifier: 'mac'
+  implementation group: 'org.openjfx', name: 'javafx-base', version: javaFxVersion, classifier: 'linux'
+  implementation group: 'org.openjfx', name: 'javafx-controls', version: javaFxVersion, classifier: 'win'
+  implementation group: 'org.openjfx', name: 'javafx-controls', version: javaFxVersion, classifier: 'mac'
+  implementation group: 'org.openjfx', name: 'javafx-controls', version: javaFxVersion, classifier: 'linux'
+  implementation group: 'org.openjfx', name: 'javafx-fxml', version: javaFxVersion, classifier: 'win'
+  implementation group: 'org.openjfx', name: 'javafx-fxml', version: javaFxVersion, classifier: 'mac'
+  implementation group: 'org.openjfx', name: 'javafx-fxml', version: javaFxVersion, classifier: 'linux'
+  implementation group: 'org.openjfx', name: 'javafx-graphics', version: javaFxVersion, classifier: 'win'
+  implementation group: 'org.openjfx', name: 'javafx-graphics', version: javaFxVersion, classifier: 'mac'
+  implementation group: 'org.openjfx', name: 'javafx-graphics', version: javaFxVersion, classifier: 'linux'
 }
+
+
+
 
 test {
 useJUnitPlatform()}
