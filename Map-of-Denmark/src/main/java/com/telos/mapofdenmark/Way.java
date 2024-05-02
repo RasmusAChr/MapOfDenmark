@@ -20,7 +20,7 @@ public class Way implements Serializable {
         this.refNode = way.get(0);
     }
 
-    public void draw(GraphicsContext gc, double zoom, boolean darkMode) {
+    public void draw(GraphicsContext gc, double zoom, boolean darkMode, ColorScheme cs) {
         gc.beginPath();
         gc.moveTo(coords[0], coords[1]);
         for (int i = 2 ; i < coords.length ; i += 2) {

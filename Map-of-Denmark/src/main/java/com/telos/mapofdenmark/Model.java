@@ -50,6 +50,8 @@ public class Model implements Serializable {
     int indexForCenterPoints = 0;
     Map<String, Double> roadIdSet;
     HashSet<String> cycleTags;
+    ColorScheme cs;
+    LineThickness lt;
     static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
             try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) { // good code
@@ -62,6 +64,8 @@ public class Model implements Serializable {
 
 
     public Model(String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
+        cs = new ColorScheme();
+        lt = new LineThickness();
         this.roadIdSet = new HashMap<String, Double>(Map.of(
                 "motorway",0.4545,
                 "trunk", 0.625,
@@ -301,7 +305,7 @@ public class Model implements Serializable {
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name.equals("way")) {
                     if (!roadtype.isEmpty()) {
-                        Road tmpRoad = new Road(way,roadtype);
+                        Road tmpRoad = new Road(way,roadtype,lt);
                         ways.add(tmpRoad);
                         addToCenterPointNodes(way, tmpRoad, true);
                     } else {
@@ -480,6 +484,9 @@ public class Model implements Serializable {
 
     public List<Point2D> getPointsOfInterest() {
         return pointsOfInterest;
+    }
+    public ColorScheme getColorScheme() {
+        return cs;
     }
 }
 

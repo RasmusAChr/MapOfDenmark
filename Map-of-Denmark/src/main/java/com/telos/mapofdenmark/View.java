@@ -30,10 +30,8 @@ public class View {
     double slider_value;
 
     Affine trans = new Affine();
-
     Model model;
-    ColorScheme cs = new ColorScheme();
-    LineThickness lt = new LineThickness();
+
 
     boolean dark;
 
@@ -98,7 +96,7 @@ public class View {
             Way way = nodeSpatial.getWay();
             if (way != null) {
                 gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
             }
         }
 
