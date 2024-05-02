@@ -44,6 +44,7 @@ public class Model implements Serializable {
     HashMap<Node, Integer> DigraphNodeToIndex;
     HashMap<Integer, Node> DigraphIndexToNode;
     HashMap<Long, Node> id2node;
+    HashMap<String, Double> tagToScaleValue;
     List<Member> relationsMembers;
     HashMap<Long, Way> id2way;
     int roadCount;
@@ -80,7 +81,7 @@ public class Model implements Serializable {
         roadIdSet.put("service", 1.0);
         roadIdSet.put("pedestrian", 10.0);
         roadIdSet.put("path", 10.0);
-        this.cycleTags = new HashSet<String>(List.of(
+        this.cycleTags = new HashSet<>(List.of(
                 "primary",
                 "secondary",
                 "tertiary",
@@ -103,6 +104,30 @@ public class Model implements Serializable {
                 "footway"));
         this.DigraphNodeToIndex = new HashMap<>();
         this.DigraphIndexToNode = new HashMap<>();
+        this.tagToScaleValue = new HashMap<>();
+        /*
+        tagToScaleValue.put("building", 70.0);
+        tagToScaleValue.put("shop", 70.0);
+        tagToScaleValue.put("barrier", 70.0);
+        tagToScaleValue.put("tourism", 70.0);
+        tagToScaleValue.put("public_transport", 100.0);
+        tagToScaleValue.put("power", 100.0);
+        tagToScaleValue.put("tunnel", 100.0);
+        tagToScaleValue.put("route", 100.0);
+        tagToScaleValue.put("bridge", 50.0);
+        tagToScaleValue.put("motorway", 0.1);
+        tagToScaleValue.put("primary", 20.0);
+        tagToScaleValue.put("secondary", 30.0);
+        tagToScaleValue.put("tertiary", 40.0);
+        tagToScaleValue.put("railway", 40.0);
+        tagToScaleValue.put("living_street", 60.0);
+        tagToScaleValue.put("residential", 60.0);
+                        case "building":
+                            zoom_scale = 80.0;
+                        case "building", "barrier", "tourism", "tunnel", "water", "waterway", "area", "route", "shop",
+                             "bridge", "power", "railway", "public_transport", "office", "natural", "leisure",
+                             "landuse", "cycleway", "footway":
+                            //zoom_scale = 0.1;break;*/
         this.id2way = new HashMap<>();
         this.id2node = new HashMap<>();
         this.relationsMembers = new ArrayList<>();
@@ -128,8 +153,6 @@ public class Model implements Serializable {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         long addressId = 0;
         int roadCountX = 0;
-
-
         while (input.hasNext()) {
 
             var tagKind = input.next();
@@ -223,7 +246,7 @@ public class Model implements Serializable {
         boolean acccesPostBollean = false;
         long wayid = 0;
         int vertexIndex = -2;
-        double zoom_scale = -2;
+        double zoom_scale = -1.0;
         double max_speed = -1.0;
 
         while (input1.hasNext()) {
@@ -236,10 +259,12 @@ public class Model implements Serializable {
                 } else if (!insideRelation && name.equals("tag")) {
                     var v = input1.getAttributeValue(null, "v");
                     var k = input1.getAttributeValue(null, "k");
+                    if (tagToScaleValue.containsKey(k)) zoom_scale = tagToScaleValue.get(k);
                     switch (k) {
                         case "highway":
+                            if (tagToScaleValue.containsKey(v)) zoom_scale = tagToScaleValue.get(v);
                             roadtype = v;
-                            zoom_scale = 0.0;
+                            //zoom_scale = 0.0;
                             if (roadIdSet.containsKey(v)) {
                                 drivable = true;
                                 shouldAdd = true;
@@ -284,13 +309,6 @@ public class Model implements Serializable {
                             break;
                         case "maxspeed":
                             max_speed = Double.parseDouble(v);
-                            break;
-                        case "building", "barrier", "tourism", "tunnel", "water", "waterway", "area", "route", "shop",
-                             "bridge", "power", "railway", "public_transport", "office", "natural", "leisure",
-                             "landuse", "cycleway", "footway":
-                            zoom_scale = 0.0;break;
-                        default:
-                            System.out.println(k);
                     }
 
                 } else if (name.equals("nd")) {
@@ -382,7 +400,7 @@ public class Model implements Serializable {
                     acccesPostBollean = false;
                     insideRelation = false;
                     RelationsType = "";
-                    zoom_scale = -2;
+                    zoom_scale = -1.0;
                     max_speed = -1.0;
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;

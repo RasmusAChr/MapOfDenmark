@@ -96,14 +96,14 @@ public class View {
         Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         for (Node nodeSpatial : nodesFromKD) {
             Way way = nodeSpatial.getWay();
-            if (way != null && way.getZoom_scale() < -1.0) {
+            if (way != null && way.getZoom_scale() < slider_value) {
                 gc.setStroke(Color.BLACK);
                 way.draw(gc, slider_value, dark);
             }
         }
 
         for (var line : model.list) {
-            line.draw(gc);
+            line.draw(gc, dark);
         }
         drawPOI();
     }
