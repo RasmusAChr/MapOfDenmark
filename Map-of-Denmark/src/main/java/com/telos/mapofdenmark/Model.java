@@ -32,9 +32,9 @@ public class Model implements Serializable {
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
-    List<Relation> RelationsPlace = new ArrayList<>();
-    List<Relation> RelationsBuilding = new ArrayList<>();
-    List<Relation> RelationsNatural = new ArrayList<>();
+    List<RelationTwo> RelationsPlace = new ArrayList<>();
+    List<RelationTwo> RelationsBuilding = new ArrayList<>();
+    List<RelationTwo> RelationsNatural = new ArrayList<>();
     // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
     List<Node> centerPointNodes = new ArrayList<>();
     SP Dijkstra = null;
@@ -402,11 +402,11 @@ public class Model implements Serializable {
                     if (RelationsType.equals("multipolygon")) {
                         if (validRelation) {
                             if (relationKey.equals("place")) {
-                                RelationsPlace.add(new Relation(RelationsType,relationsMembers,relationLandform));
+                                RelationsPlace.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
                             } else if (relationKey.equals("building")) {
-                                RelationsBuilding.add(new Relation(RelationsType,relationsMembers,relationLandform));
+                                RelationsBuilding.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
                             } else if (relationKey.equals("natural")) {
-                                RelationsNatural.add(new Relation(RelationsType,relationsMembers,relationLandform));
+                                RelationsNatural.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
                             }
                         }
                     }
