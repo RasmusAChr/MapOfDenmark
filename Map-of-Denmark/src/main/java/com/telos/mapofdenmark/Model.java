@@ -345,7 +345,7 @@ public class Model implements Serializable {
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name.equals("way")) {
                     if (!roadtype.isEmpty()) {
-                        Road tmpRoad = new Road(way,roadtype,zoom_scale, lt);
+                        Road tmpRoad = new Road(way, roadtype, zoom_scale, lt);
                         ways.add(tmpRoad);
                         addToCenterPointNodes(way, tmpRoad, true);
                         id2way.put(wayid,tmpRoad);
