@@ -86,7 +86,7 @@ public class Controller {
 
                 double dx = e.getX() - lastX;
                 double dy = e.getY() - lastY;
-            System.out.println("x is: " + dx + " and y is: " + dy);
+
                 view.pan(dx, dy);
 
             lastX = e.getX();
@@ -314,6 +314,8 @@ public class Controller {
             view.pan(dx, dy);
 
             view.drawCircle(addressX,addressY);
+
+            view.setTempAddressPoint(addressX,addressY);
         }
         else if (model.getAddressIdMap().get(selectedAddress) == null){
             System.out.println("Not a valid Address");

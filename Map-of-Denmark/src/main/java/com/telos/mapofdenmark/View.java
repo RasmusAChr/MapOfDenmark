@@ -42,6 +42,8 @@ public class View {
     @FXML
     private Pane backgroundPane;
 
+    Point2D tempAddressPoint;
+
     public View(Model model, Stage primaryStage) throws IOException {
         this.model = model;
 
@@ -106,6 +108,9 @@ public class View {
             line.draw(gc);
         }
         drawPOI();
+        if(tempAddressPoint != null){
+            drawCircle(tempAddressPoint.getX(),tempAddressPoint.getY());
+        }
     }
     private void drawPOI() {
         if (!model.getPointsOfInterest().isEmpty()) {
@@ -178,13 +183,13 @@ public class View {
 
         return new Point2D(centerX,centerY);
     }
-    public double getScale() {
-        // Get the transformation matrix
-        double[] matrix = trans.toArray(null);
 
-        // The scale factor is the first element of the matrix
-        return matrix[0];
+    public void setTempAddressPoint(Double x, Double y) {
+        if (x == null || y == null) {
+            tempAddressPoint = null;
+        } else {
+            tempAddressPoint = new Point2D(x, y);
+        }
     }
-
 
 }
