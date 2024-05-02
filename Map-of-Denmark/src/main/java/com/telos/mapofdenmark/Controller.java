@@ -296,14 +296,16 @@ public class Controller {
     }
 
     private void panToAddress(String selectedAddress){
-        if(model.getAddressIdMap().get(selectedAddress) != null && lastPannedToAddress != model.getAddressIdMap().get(selectedAddress)){
-            Node addressNode = model.getAddressIdMap().get(selectedAddress);
+        String addressToLowerCase = selectedAddress.toLowerCase();
+        if(model.getAddressIdMap().get(addressToLowerCase) != null && lastPannedToAddress != model.getAddressIdMap().get(addressToLowerCase)){
+            Node addressNode = model.getAddressIdMap().get(addressToLowerCase);
             lastPannedToAddress = addressNode;
             double addressX = addressNode.getLon() * 0.56;
             double addressY = -addressNode.getLat();
 
             view.pan(addressX, addressY);
 
+            view.drawCircle(addressX,addressY);
 
         }
         else if (model.getAddressIdMap().get(selectedAddress) == null){
