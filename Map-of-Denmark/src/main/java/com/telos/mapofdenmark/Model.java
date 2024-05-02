@@ -14,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.ZipInputStream;
 import javax.xml.stream.*;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 import com.telos.mapofdenmark.KDTreeClasses.KDTree;
 import com.telos.mapofdenmark.Shortest_Route.DirectedEdge;
@@ -41,8 +43,9 @@ public class Model implements Serializable {
     KDTree kdTree;
     Address address;
     EdgeWeightedDigraph EWD;
-    HashMap<Node, Integer> DigraphNodeToIndex;
-    HashMap<Integer, Node> DigraphIndexToNode;
+   // HashMap<Node, Integer> DigraphNodeToIndex;
+  //  HashMap<Integer, Node> DigraphIndexToNode;
+    BiMap<Node,Integer> IndexBINode;
     HashMap<Long, Node> id2node;
     HashMap<String, Double> tagToScaleValue;
     List<Member> relationsMembers;
@@ -106,8 +109,9 @@ public class Model implements Serializable {
                 "private",
                 "pedestrian",
                 "footway"));
-        this.DigraphNodeToIndex = new HashMap<>();
-        this.DigraphIndexToNode = new HashMap<>();
+     //   this.DigraphNodeToIndex = new HashMap<>();
+      //  this.DigraphIndexToNode = new HashMap<>();
+        this.IndexBINode = HashBiMap.create();
         this.tagToScaleValue = new HashMap<>();
         /*
         tagToScaleValue.put("building", 70.0);
@@ -177,8 +181,9 @@ public class Model implements Serializable {
                         id2node.put(id, node);
                         nodeList.add(node);
                         addressId = id;
-                        DigraphNodeToIndex.put(node, roadCountX);
-                        DigraphIndexToNode.put(roadCountX, node);
+                        IndexBINode.put(node, roadCountX);
+                        //DigraphNodeToIndex.put(node, roadCountX);
+                        //DigraphIndexToNode.put(roadCountX, node);
                         roadCountX++;
 
                     }
@@ -358,8 +363,10 @@ public class Model implements Serializable {
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
                         if (shouldAdd && vertexIndex > -1) {
-                            Node fromNode = DigraphIndexToNode.get(vertexIndex);
-                            int toIndex = DigraphNodeToIndex.get(node);
+                            //Node fromNode = DigraphIndexToNode.get(vertexIndex);
+                           // int toIndex = DigraphNodeToIndex.get(node);
+                            Node fromNode = IndexBINode.inverse().get(vertexIndex);
+                            int toIndex = IndexBINode.get(node);
                             double dist = distance(fromNode.lat, node.lat, fromNode.lon, node.lon);
                             double weight_distance_modifier = dist;
                             double weight_car = 1.0;
@@ -390,7 +397,8 @@ public class Model implements Serializable {
                             }
 
                         }
-                        vertexIndex = DigraphNodeToIndex.get(node);
+                      //  vertexIndex = DigraphNodeToIndex.get(node);
+                        vertexIndex = IndexBINode.get(node);
                     }
                     way.clear();
                     roadtype = "";
@@ -421,7 +429,8 @@ public class Model implements Serializable {
         double y = startaddress.getLat();
         Node tmpNode = kdTree.getNearestNeighbor(x,y,true).getWay().getArbitraryNode();
         list.clear();
-        this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(tmpNode),vehicle); // this starts the dijkstra search from the index that refferes to a node
+      //  this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(tmpNode),vehicle); // this starts the dijkstra search from the index that refferes to a node
+        this.Dijkstra = new SP(EWD,IndexBINode.get(tmpNode),vehicle);
     }
 
 
@@ -445,13 +454,13 @@ public class Model implements Serializable {
 
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
-        for(DirectedEdge i: Dijkstra.pathTo(DigraphNodeToIndex.get(tmpNode))) {
-             if(!NodeAdded.contains(DigraphIndexToNode.get(i.to()))){
-                 NodeAdded.add(DigraphIndexToNode.get(i.to()));
-                 path.add(DigraphIndexToNode.get(i.to()));
-             } else if (!NodeAdded.contains(DigraphIndexToNode.get(i.from()))){
-                 NodeAdded.add(DigraphIndexToNode.get(i.from()));
-                 path.add(DigraphIndexToNode.get(i.from()));
+            for(DirectedEdge i: Dijkstra.pathTo(IndexBINode.get(tmpNode))) {
+             if(!NodeAdded.contains(IndexBINode.inverse().get(i.to()))){
+                 NodeAdded.add(IndexBINode.inverse().get(i.to()));
+                 path.add(IndexBINode.inverse().get(i.to()));
+             } else if (!NodeAdded.contains(IndexBINode.inverse().get(i.from()))){
+                 NodeAdded.add(IndexBINode.inverse().get(i.from()));
+                 path.add(IndexBINode.inverse().get(i.from()));
              }
 
          }
