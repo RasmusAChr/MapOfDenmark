@@ -176,7 +176,6 @@ public class Model implements Serializable {
                         DigraphNodeToIndex.put(node, roadCountX);
                         DigraphIndexToNode.put(roadCountX, node);
                         roadCountX++;
-
                     }
                     case "tag" -> {
                         var v = input.getAttributeValue(null, "v");
@@ -308,7 +307,7 @@ public class Model implements Serializable {
                             }
                             break;
                         case "maxspeed":
-                            max_speed = Double.parseDouble(v);
+                            //max_speed = Double.parseDouble(v);
                     }
 
                 } else if (name.equals("nd")) {
