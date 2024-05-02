@@ -2,8 +2,11 @@ package com.telos.mapofdenmark;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +30,8 @@ public class Controller_Boot {
 
     @FXML
     private Button btn_no;
+    @FXML
+    private Text Loading;
 
 
     public void init(View_Boot view, Stage primaryStage){
@@ -52,6 +57,7 @@ public class Controller_Boot {
         FileChooser.ExtensionFilter zippedFilter = new FileChooser.ExtensionFilter("Zipped OSM files (*.osm.zip)", "*.osm.zip");
         fileChooser.getExtensionFilters().addAll(osmFilter, objFilter,zippedFilter);
 
+        Loading.setVisible(true);
         // This retrieves the Stage from this component's scene
         Stage stage = (Stage) btn_YES.getScene().getWindow();
         File file = fileChooser.showOpenDialog(stage);

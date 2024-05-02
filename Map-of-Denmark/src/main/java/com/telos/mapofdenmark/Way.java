@@ -22,7 +22,7 @@ public class Way implements Serializable {
         this.zoom_scale = zoom_scale;
     }
 
-    public void draw(GraphicsContext gc, double zoom, boolean darkMode) {
+    public void draw(GraphicsContext gc, double zoom, boolean darkMode, ColorScheme cs) {
         gc.beginPath();
         gc.moveTo(coords[0], coords[1]);
         for (int i = 2 ; i < coords.length ; i += 2) {

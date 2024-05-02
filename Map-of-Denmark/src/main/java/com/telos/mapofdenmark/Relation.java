@@ -13,7 +13,6 @@ public class Relation implements Serializable{
 
 
     public Relation(String type,List<Member> memberRefs){
-        ColorScheme cs = new ColorScheme();
         this.type=type;
         this.memberRefs = memberRefs;
         for(Member m : memberRefs){
@@ -32,11 +31,11 @@ public class Relation implements Serializable{
         this.memberRefs=memberRefs;
     }
 
-    public void Draw(GraphicsContext gc,double zoom,boolean darkMode){
+    public void Draw(GraphicsContext gc,double zoom,boolean darkMode, ColorScheme cs){
         gc.setStroke(Color.RED);
         for(Member m : memberRefs){
             if(m.getType().equals("outer")){
-                m.way.draw(gc,zoom,darkMode);
+                m.way.draw(gc,zoom,darkMode,cs);
             }
         }
     }
