@@ -164,4 +164,22 @@ public class View {
     public void Current_Slider_value(double value){
         slider_value = value;
     }
+
+    public Point2D getCanvasCenterPoint(){
+        double centerX = canvas.getWidth() / 2;
+        double centerY = canvas.getHeight() / 2;
+
+        Point2D canvasCoordsTransformed = mousetoModel(centerX, centerY);
+
+        return canvasCoordsTransformed;
+    }
+    public double getScale() {
+        // Get the transformation matrix
+        double[] matrix = trans.toArray(null);
+
+        // The scale factor is the first element of the matrix
+        return matrix[0];
+    }
+
+
 }
