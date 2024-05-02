@@ -40,6 +40,8 @@ public class View {
     @FXML
     private Pane backgroundPane;
 
+    Point2D tempAddressPoint;
+
     public View(Model model, Stage primaryStage) throws IOException {
         this.model = model;
 
@@ -89,8 +91,8 @@ public class View {
         gc.setTransform(trans);
         gc.setLineWidth(0.000005);
         // Logic for drawing ways from KDTree instead of all ways
-        Point2D canvasTopLeft =  mousetoModel(0,0);
-        Point2D canvasBottomRight = mousetoModel(canvas.getWidth(),canvas.getHeight());
+        Point2D canvasTopLeft =  mousetoModel(-200,-200);
+        Point2D canvasBottomRight = mousetoModel(canvas.getWidth() + 200,canvas.getHeight() + 200);
         Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         for (Node nodeSpatial : nodesFromKD) {
             Way way = nodeSpatial.getWay();
@@ -104,6 +106,10 @@ public class View {
             line.draw(gc, dark);
         }
         drawPOI();
+
+        if(tempAddressPoint != null){
+            drawCircle(tempAddressPoint.getX(), tempAddressPoint.getY());
+        }
     }
     private void drawPOI() {
         if (!model.getPointsOfInterest().isEmpty()) {
@@ -111,17 +117,21 @@ public class View {
                 System.out.println("Attempted to draw POI at: " + pointOfInterest.getX() + ", " + pointOfInterest.getY());
 
                 // Calculate the visible size of the POI on the canvas
-                double radius = 0.0001;  // Radius of the circle in pixels
                 double x = pointOfInterest.getX();
                 double y = pointOfInterest.getY();
 
                 // Draw a filled circle centered on the point
-                gc.setFill(Color.BLACK);  // Set the fill color for the circle
-                gc.fillOval(x - radius, y - radius, 2 * radius, 2 * radius);
-                gc.setFill(Color.RED);  // Set the fill color for the circle
-                gc.fillOval(x - radius+0.000025, y - radius+0.000025, 1.5 * radius, 1.5 * radius);
+                drawCircle(x,y);
             }
         }
+    }
+
+    void drawCircle(double x, double y){
+        double radius = 0.0001; // Radius of the circle in pixels
+        gc.setFill(Color.BLACK);  // Set the fill color for the circle
+        gc.fillOval(x - radius, y - radius, 2 * radius, 2 * radius);
+        gc.setFill(Color.RED);  // Set the fill color for the circle
+        gc.fillOval(x - radius+0.000025, y - radius+0.000025, 1.5 * radius, 1.5 * radius);
     }
 
     void pan(double dx, double dy) {
@@ -153,9 +163,32 @@ public class View {
             // TODO Auto-generated catch block
             throw new RuntimeException(e);
         }
-
     }
+
+    public Point2D convertGeoCoordsToPixels(double lon, double lat){
+        Point2D transformedGeoPoint = trans.transform(lon, lat);
+
+        return transformedGeoPoint;
+    }
+
     public void Current_Slider_value(double value){
         slider_value = value;
+    }
+
+    public Point2D getCanvasCenterPoint(){
+        double centerX = canvas.getWidth() / 2;
+        double centerY = canvas.getHeight() / 2;
+
+        Point2D canvasCoordsTransformed = mousetoModel(centerX, centerY);
+
+        return new Point2D(centerX,centerY);
+    }
+
+    public void setTempAddressPoint(Double x, Double y) {
+        if (x == null || y == null) {
+            tempAddressPoint = null;
+        } else {
+            tempAddressPoint = new Point2D(x, y);
+        }
     }
 }
