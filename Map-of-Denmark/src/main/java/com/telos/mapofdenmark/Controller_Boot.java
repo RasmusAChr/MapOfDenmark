@@ -72,8 +72,8 @@ public class Controller_Boot {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Error: File not selected or found."); // or something else
-            // Using default file
+            // If no file has been selected, pick the default map
+            default_path();
         }
 
     }
