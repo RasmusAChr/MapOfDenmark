@@ -132,6 +132,12 @@ public class Controller {
                 addressParsing(trie, searchBar.getText());
                 searchBarCounter = 0;
             }
+            if(event.getCode() == KeyCode.BACK_SPACE && searchBar.getText().isEmpty()) {
+                // Backspace key was pressed and search bar is empty
+                view.setTempAddressPoint(null, null);
+                view.redraw();
+            }
+
         });
         searchBar1.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar1.getText().isEmpty())) {
@@ -311,11 +317,12 @@ public class Controller {
             double dx = canvasCenterAsPixels.getX() - addressAsPixels.getX();
             double dy = canvasCenterAsPixels.getY() - addressAsPixels.getY();
 
-            view.pan(dx, dy);
+
 
             view.drawCircle(addressX,addressY);
 
             view.setTempAddressPoint(addressX,addressY);
+            view.pan(dx, dy);
         }
         else if (model.getAddressIdMap().get(selectedAddress) == null){
             System.out.println("Not a valid Address");
