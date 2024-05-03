@@ -94,6 +94,10 @@ public class ColorScheme implements Serializable{
         darkColors.put("industrial", "#b7a9b5");
         colors.put("plant_nursery", "#8cbf80");
         darkColors.put("plant_nursery", "#5e8e5b");
+        colors.put("cemetery", "#aacbaf");
+        darkColors.put("cemetery", "#7e9d86");
+        colors.put("recreation_ground", "#dffce2");
+        darkColors.put("recreation_ground", "#aedbbf");
 
 
         // Building

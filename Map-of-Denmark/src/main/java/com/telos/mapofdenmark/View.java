@@ -97,6 +97,7 @@ public class View {
         Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         Queue<Node> buildingNodesFromKD = model.kdTreeBuildings.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         Queue<Node> naturalsNodesFromKD = model.kdTreeNaturals.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> landuseNodesFromKD = model.kdTreeLanduses.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
 
         // Draws land border
         for (var relation : model.RelationsPlace) {
@@ -112,17 +113,26 @@ public class View {
             }
         }
 
+        // Drawing natural relations
+        for(Node naturalsNode : naturalsNodesFromKD){
+            RelationTwo relation = naturalsNode.getRefRelation();
+            relation.Draw(gc,slider_value,dark);
+        }
+
+        // Drawing landuse relations
+        for(Node landuseNode : landuseNodesFromKD){
+            RelationTwo relation = landuseNode.getRefRelation();
+            relation.Draw(gc,slider_value,dark);
+        }
+
         // Drawing building relations
         for(Node buildingNode : buildingNodesFromKD){
             RelationTwo relation = buildingNode.getRefRelation();
             relation.Draw(gc,slider_value,dark);
         }
 
-        // Drawing naturals relations
-        for(Node naturalsNode : naturalsNodesFromKD){
-            RelationTwo relation = naturalsNode.getRefRelation();
-            relation.Draw(gc,slider_value,dark);
-        }
+
+
 //        // Drawing relations
 //        for (var relation : model.RelationsPlace) {
 //            relation.Draw(gc,slider_value,dark);

@@ -35,8 +35,10 @@ public class Model implements Serializable {
     List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
     List<RelationTwo> RelationsPlace = new ArrayList<>();
-    List<RelationTwo> RelationsBuilding = new ArrayList<>();
     List<RelationTwo> RelationsNatural = new ArrayList<>();
+    List<RelationTwo> RelationsLanduse = new ArrayList<>();
+    List<RelationTwo> RelationsBuilding = new ArrayList<>();
+
     // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
     List<Node> centerPointNodes = new ArrayList<>();
     // Collection used for storing points of interest
@@ -44,7 +46,8 @@ public class Model implements Serializable {
     // Collection used for storing center points for building relations
     List<Node> centerPointNodesBuilding = new ArrayList<>();
     // Collection used for storing cennter points for natural relations
-    List<Node> centerPointNodesNaturals = new ArrayList<>();
+    List<Node> centerPointNodesNatural = new ArrayList<>();
+    List<Node> centerPointNodesLanduse = new ArrayList<>();
     SP Dijkstra = null;
     private Trie trie;
     double minlat, maxlat, minlon, maxlon;
@@ -56,6 +59,7 @@ public class Model implements Serializable {
     KDTree kdTreeBuildings;
     // This KDTree holds all building relations
     KDTree kdTreeNaturals;
+    KDTree kdTreeLanduses;
     Address address;
     EdgeWeightedDigraph EWD;
    // HashMap<Node, Integer> DigraphNodeToIndex;
@@ -167,7 +171,7 @@ public class Model implements Serializable {
         this.addressList = new ArrayList<>();
         this.address = new Address();
         this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
-        this.allowedRelationTypes = new HashSet<>(Arrays.asList("place", "building", "natural", "leisure", "amenity"));
+        this.allowedRelationTypes = new HashSet<>(Arrays.asList("place", "natural", "landuse", "building"));
         if (filename.endsWith(".osm.zip")) {
             parseZIP(inputStream);
         } else if (filename.endsWith(".osm")) {
@@ -180,6 +184,7 @@ public class Model implements Serializable {
         this.kdTree = new KDTree();
         this.kdTreeBuildings = new KDTree();
         this.kdTreeNaturals = new KDTree();
+        this.kdTreeLanduses = new KDTree();
         for (String s : uniqueWayTypes) System.out.println(s);
 
         // Populates the KDTree using all nodes from .osm
@@ -190,8 +195,10 @@ public class Model implements Serializable {
         System.out.println("size of building collection: "+centerPointNodesBuilding.size());
         kdTreeBuildings.populate(centerPointNodesBuilding);
        System.out.println("Size of building KDTree: " + kdTreeBuildings.size());
-       kdTreeNaturals.populate(centerPointNodesNaturals);
+       kdTreeNaturals.populate(centerPointNodesNatural);
        System.out.println("Size of building Naturals: " + kdTreeNaturals.size());
+       kdTreeLanduses.populate(centerPointNodesLanduse);
+       System.out.println("Size of building Landuse: " + kdTreeLanduses.size());
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -507,6 +514,17 @@ public class Model implements Serializable {
                                     }
                                 }
                                 addToCenterPointNodesRelation(nListe, tmpRelation, "natural");
+                            } else if (relationKey.equals("landuse")) {
+                                RelationTwo tmpRelation = new RelationTwo(RelationsType, new ArrayList<>(relationsMembers), relationLandform);
+                                RelationsLanduse.add(tmpRelation);
+                                // for loop to find center point from member
+                                List<Node> nListe = new ArrayList<>();
+                                for(Member member : relationsMembers){
+                                    if(member.getWay() != null){
+                                        nListe.addAll(member.getWay().getNodes());
+                                    }
+                                }
+                                addToCenterPointNodesRelation(nListe, tmpRelation, "landuse");
                             }
                         }
                     }
@@ -665,7 +683,9 @@ public class Model implements Serializable {
                 centerPointNodesBuilding.add(centeredNode);
                 break;
             case "natural":
-                centerPointNodesNaturals.add(centeredNode);
+                centerPointNodesNatural.add(centeredNode);
+            case "landuse":
+                centerPointNodesLanduse.add(centeredNode);
             default:
                 break;
         }
