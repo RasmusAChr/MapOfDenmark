@@ -3,7 +3,6 @@ package com.telos.mapofdenmark;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -115,19 +114,19 @@ public class View {
 
         // Drawing natural relations
         for(Node naturalsNode : naturalsNodesFromKD){
-            RelationTwo relation = naturalsNode.getRefRelation();
+            Relation relation = naturalsNode.getRefRelation();
             relation.Draw(gc,slider_value,dark);
         }
 
         // Drawing landuse relations
         for(Node landuseNode : landuseNodesFromKD){
-            RelationTwo relation = landuseNode.getRefRelation();
+            Relation relation = landuseNode.getRefRelation();
             relation.Draw(gc,slider_value,dark);
         }
 
         // Drawing building relations
         for(Node buildingNode : buildingNodesFromKD){
-            RelationTwo relation = buildingNode.getRefRelation();
+            Relation relation = buildingNode.getRefRelation();
             relation.Draw(gc,slider_value,dark);
         }
 
