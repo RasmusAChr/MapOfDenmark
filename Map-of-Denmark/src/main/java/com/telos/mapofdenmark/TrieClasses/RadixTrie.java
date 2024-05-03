@@ -39,14 +39,14 @@ public class RadixTrie {
             return node;
         }
 
-        String substring = word.substring(index);
-        RadixNode child = node.children.get(substring.charAt(0));
+        char firstChar = word.charAt(index);
+        RadixNode child = node.children.get(firstChar);
 
         if (child == null) {
-            child = new RadixNode(substring); // If no child with the leading character, create a new node with the substring
-            node.children.put(substring.charAt(0), child);
+            child = new RadixNode(word.substring(index));
             child.parent = node;
-            child.endOfWord = true;  // Directly mark this as end of word
+            node.children.put(firstChar, child);
+            child.endOfWord = true;
             return child;
         } else {
             // Find common prefix length

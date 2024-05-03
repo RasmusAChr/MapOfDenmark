@@ -65,7 +65,7 @@ public class Controller {
 
     private Node lastPannedToAddress;
 
-    private Boolean allowedToPan = false;
+    private boolean allowedToPan = false;
 
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
@@ -172,8 +172,8 @@ public class Controller {
     }
 
     private void checkForIfTextIsStreet(TextField searchBar, int searchBarCounter, Trie trie){
-        if(trie.equals(searchBar.getText())){
-
+        if(trie.contains(searchBar.getText())){
+            
         }
     }
 

@@ -39,6 +39,28 @@ public class Trie implements Serializable {
         currentNode.endOfWord = true; // Mark the end of a word
     }
 
+    // Inspiration for contains method for a Trie found here: https://www.baeldung.com/trie-java
+    public boolean contains(String inputWord) {
+        // Start traversal at root node
+        TrieNode currentNode = rootNode;
+        // Iterate through each character of the input word
+        for(int i = 0; i < inputWord.length(); i++){
+            // Gets current character of the input word
+            char character = inputWord.charAt(i);
+            // Gets child node corresponding to the current character
+            TrieNode node = currentNode.children.get(character);
+            // Checks whether the child node does exist
+            if(node == null){
+                // If it isn't in the Trie, return false
+                return false;
+            }
+            currentNode = node;
+        }
+        // Returns true if the node was reached during traversal
+        return currentNode.endOfWord;
+    }
+
+
     /**
      * Retrieves a list of all words in the trie that start with the given prefix.
      * @param prefix The prefix to search for.

@@ -9,15 +9,16 @@ public class RadixNode implements Serializable {
     Map<String, RadixNode> children; // Map to store child nodes, where the key is a sequence of characters
     boolean endOfWord; // boolean to indicate whether this node is at the end of a word or not
     String value; // The sequence of characters stored in this node
-    RadixNode parent = null; // Parent node
+    RadixNode parent; // Parent node
 
     /**
      * Default constructor for non-root nodes.
      */
     public RadixNode(String value) {
         this.children = new HashMap<>();
-        endOfWord = false;
-        value = value;
+        this.endOfWord = false;
+        this.value = value;
+        this.parent = null;
     }
 
     /**
@@ -28,5 +29,6 @@ public class RadixNode implements Serializable {
         this.children = new HashMap<>(initialCapacity);
         this.endOfWord = false;
         this.value = "";
+        this.parent = null;
     }
 }
