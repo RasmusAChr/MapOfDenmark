@@ -186,6 +186,7 @@ public class Controller {
         Node node = model.getAddressIdMap().get(input);
         model.list.add(new Line(model.getDijkstraPath(node)));
         view.redraw();
+        System.gc();
 
     }
     @FXML

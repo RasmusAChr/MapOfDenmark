@@ -259,6 +259,7 @@ public class Model implements Serializable {
             }
         }
         input.close();
+        System.gc();
     }
 
     private void parseRouteNet(InputStream inputStream) throws IOException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
