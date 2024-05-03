@@ -105,7 +105,7 @@
                         </Slider>
                         <ImageView fx:id="sliderEmoji" fitHeight="44.0" fitWidth="84.0" preserveRatio="true">
                            <image>
-                              <Image url="@GUI%20Icons/icons8-search-500.png" />
+                              <Image url="@GUI%20Icons/Earth%20Emoji.png" />
                            </image>
                            <VBox.margin>
                               <Insets left="35.0" />

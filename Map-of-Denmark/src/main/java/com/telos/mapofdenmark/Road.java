@@ -21,10 +21,10 @@ public class Road extends Way implements Serializable {
         double zoomValue = 0.0;
         if(lt.findKey(roadType)) {
             gc.setStroke(cs.getColor(roadType, darkMode));
-            if (zoom < 0.1) {
-                zoomValue = lt.getWidth(roadType) / 1.666;
+            if (zoom < 5.0) {
+                zoomValue = lt.getWidth(roadType) / 0.666;
             } else {
-                zoomValue = lt.getWidth(roadType) / (zoom/30);
+                zoomValue = lt.getWidth(roadType) / (zoom/10);
             }
             gc.setLineWidth(zoomValue);
         }

@@ -62,6 +62,7 @@ public class Controller {
     @FXML
     private ImageView searchImage;
     private int  searchBarCounter = 0;
+    private double distance;
 
     private Node lastPannedToAddress;
 
@@ -95,7 +96,6 @@ public class Controller {
     @FXML
     private void initialize(){
         vehicle = false;
-        zoomSlider.setValue(50.0);
         // Sets the visuals of the theme toggle
         themeToggleBtn.getStyleClass().add("root-light");
 
@@ -242,14 +242,16 @@ public class Controller {
         // This portion changes image the image itself
         // Note this loads the image everytime so it may be faster to store all images in seperate image variables but may cost more memory
         String imagePath;
-        if (sliderValue > 85.0){
-            imagePath = "Sunflower Emoji.png";
-        } else if (sliderValue > 60.0) {
-            imagePath = "Bicycle Emoji.png";
-        } else if (sliderValue > 25.0) {
-            imagePath = "Airplane Emoji.png";
+        if ( distance < 0.1) {
+                imagePath = "Earth Emoji.png";
+        }else if (distance < 50.0) {
+                imagePath = "Sunflower Emoji.png";
+        } else if (distance < 400.0) {
+                imagePath = "Bicycle Emoji.png";
+        } else if (distance < 3500.0) {
+                imagePath = "Airplane Emoji.png";
         } else {
-            imagePath = "Earth Emoji.png";
+                imagePath = "Earth Emoji.png";
         }
 
         // Load and set the new image
@@ -348,6 +350,7 @@ public class Controller {
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distance = R * c * 1000; // convert to meters
+        this.distance = distance;
 
         distanceLabel.setText(String.format("Scale of line : %.0f m", distance));  // Setting the distance text directly formatted
     }
