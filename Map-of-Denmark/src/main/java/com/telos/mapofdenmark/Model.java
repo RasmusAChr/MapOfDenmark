@@ -180,7 +180,8 @@ public class Model implements Serializable {
         this.trie = new Trie();
         for(Address address : addressList){
             if(address != null){
-                trie.insert(address.getFullAddress());
+                trie.insert(address.getStreet());
+                // RadixTrie insert put here
             } else System.out.println("Address is null");
         }
         this.kdTree = new KDTree();

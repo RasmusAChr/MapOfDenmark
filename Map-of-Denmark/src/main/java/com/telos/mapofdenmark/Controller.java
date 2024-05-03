@@ -65,6 +65,8 @@ public class Controller {
 
     private Node lastPannedToAddress;
 
+    private Boolean allowedToPan = false;
+
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
@@ -111,6 +113,8 @@ public class Controller {
                 if(searchBarCounter == 0){
                     searchBar.setText(chosenSelection);
                     panToAddress(chosenSelection);
+
+
                 }
                 // Puts it into the second searchbar
                 else{
@@ -166,6 +170,13 @@ public class Controller {
             CalculateDistance(lineStart, lineEnd);
           });
     }
+
+    private void checkForIfTextIsStreet(TextField searchBar, int searchBarCounter, Trie trie){
+        if(trie.equals(searchBar.getText())){
+
+        }
+    }
+
     @FXML
     private void handleSearch() {
         StartSearch();
@@ -260,22 +271,11 @@ public class Controller {
     @FXML
     private void addressParsing(Trie trie, String newValue) {
         suggestionsBox.getItems().clear(); // Clear previous suggestions
-
-        // Used keep track of previous suggestions so no duplication happens
-        List<String> previousSuggestions = new ArrayList<>();
-        previousSuggestions.clear();
-
             // Only proceed if the new value is not empty
             if (!newValue.isEmpty()) {
                 // Get new suggestions based on the current text in the search bar
                 List<String> suggestionsList = model.getSuggestionList(newValue);
-                // Print and store new suggestions
-                for (String suggestion : suggestionsList) {
-                    if (!previousSuggestions.contains(suggestion)) {
-                        System.out.println(suggestion);
-                        previousSuggestions.add(suggestion);
-                    }
-                }
+
                 // Logic for the suggestionsBox in UI
                 if (!suggestionsList.isEmpty()) {
                     suggestionsBox.setVisible(true);
@@ -302,7 +302,8 @@ public class Controller {
 
     private void panToAddress(String selectedAddress){
         String addressToLowerCase = selectedAddress.toLowerCase();
-        if(model.getAddressIdMap().get(addressToLowerCase) != null && lastPannedToAddress != model.getAddressIdMap().get(addressToLowerCase)){
+        if(model.getAddressIdMap().get(addressToLowerCase) != null && lastPannedToAddress != model.getAddressIdMap().get(addressToLowerCase)
+        && allowedToPan){
             Node addressNode = model.getAddressIdMap().get(addressToLowerCase);
             lastPannedToAddress = addressNode;
             double addressX = addressNode.getLon() * 0.56;
@@ -349,5 +350,9 @@ public class Controller {
         double distance = R * c * 1000; // convert to meters
 
         distanceLabel.setText(String.format("Scale of line : %.0f m", distance));  // Setting the distance text directly formatted
+    }
+
+    public void setAllowedToPan(Boolean allowedToPan){
+        this.allowedToPan = allowedToPan;
     }
 }
