@@ -595,9 +595,8 @@ public class Model implements Serializable {
             } else if (k.contains("city")) {
                 address.setCity(v);
             } else if (k.contains("municipality")) {
+                // To save performance it may be easier to not store the municipality in the trie but instead map city to municipality
                 address.setMunicipality(v);
-            } else if (k.contains("country")) {
-                address.setCountry(v);
             }
         }
     }
