@@ -99,7 +99,7 @@ public class Controller_Boot {
     }
 
     private InputStream loadDefaultFile() {
-        InputStream inputStream = Controller_Boot.class.getResourceAsStream("/kbh.osm");
+        InputStream inputStream = getClass().getResourceAsStream("/kbh.osm");
         System.out.println("Loaded default file: " + inputStream); // Print loaded file for debugging
         return inputStream;
     }
