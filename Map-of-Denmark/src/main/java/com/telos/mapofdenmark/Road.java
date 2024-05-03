@@ -18,8 +18,8 @@ public class Road extends Way implements Serializable {
 
     @Override
     public void draw(GraphicsContext gc, double zoom, boolean darkMode,ColorScheme cs) {
-        double zoomValue = 0.0;
         if(lt.findKey(roadType)) {
+            double zoomValue;
             gc.setStroke(cs.getColor(roadType, darkMode));
             if (zoom < 0.1) {
                 zoomValue = lt.getWidth(roadType) / 1.666;

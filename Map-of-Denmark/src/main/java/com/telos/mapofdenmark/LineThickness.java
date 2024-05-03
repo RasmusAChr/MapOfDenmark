@@ -36,7 +36,7 @@ public class LineThickness implements Serializable {
         linewidth.put("living_street", 0.0001);
         linewidth.put("track", 0.00013);
         linewidth.put("cycleway", 0.00008);
-        linewidth.put("yes", 0.0001);
+        //linewidth.put("yes", 0.0001);
         linewidth.put("designated", 0.0001);
         linewidth.put("use_sidepath", 0.0001);
         linewidth.put("optional_sidepath", 0.0001);

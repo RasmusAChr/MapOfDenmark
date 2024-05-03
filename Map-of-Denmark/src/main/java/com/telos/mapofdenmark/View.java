@@ -69,7 +69,7 @@ public class View {
         primaryStage.show();
         redraw();
         pan(-0.56*model.minlon, model.maxlat);
-        zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
+        zoom(0, 0, 2000); // dynamic zoom factor: canvas.getHeight() / (model.maxlat - model.minlat));
         //Listens for changes done to the width then changes the canvas acordingly
         primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> resizePanes(primaryStage.getWidth(), primaryStage.getHeight()));
         //Listens for changes done to the Height then changes the canvas acordingly
@@ -108,12 +108,9 @@ public class View {
         for (Node nodeSpatial : nodesFromKD) {
             Way way = nodeSpatial.getWay();
             if (way != null && way.getZoom_scale() < slider_value) {
-                gc.setStroke(Color.BLACK);
-
                 if (way.wayType.equals("place") || way.wayType.equals("natural") || way.wayType.equals("landuse") || way.wayType.equals("building") || way.wayType.equals("road")) {
                     way.draw(gc, slider_value, dark, model.getColorScheme());
                 }
-
             }
         }
 
