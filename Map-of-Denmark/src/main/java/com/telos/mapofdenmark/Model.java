@@ -140,8 +140,7 @@ public class Model implements Serializable {
      //   this.DigraphNodeToIndex = new HashMap<>();
       //  this.DigraphIndexToNode = new HashMap<>();
         this.IndexBINode = HashBiMap.create();
-        this.tagToScaleValue = new HashMap<>();
-        /*
+        this.tagToScaleValue = new HashMap<>();/*
         tagToScaleValue.put("building", 70.0);
         tagToScaleValue.put("shop", 70.0);
         tagToScaleValue.put("barrier", 70.0);
@@ -158,12 +157,13 @@ public class Model implements Serializable {
         tagToScaleValue.put("railway", 40.0);
         tagToScaleValue.put("living_street", 60.0);
         tagToScaleValue.put("residential", 60.0);
-                        case "building":
+                        /*case "building":
                             zoom_scale = 80.0;
                         case "building", "barrier", "tourism", "tunnel", "water", "waterway", "area", "route", "shop",
                              "bridge", "power", "railway", "public_transport", "office", "natural", "leisure",
                              "landuse", "cycleway", "footway":
-                            //zoom_scale = 0.1;break;*/
+                            //zoom_scale = 0.1;break;
+                            */
         this.id2way = new HashMap<>();
         this.id2node = new HashMap<>();
         this.relationsMembers = new ArrayList<>();
@@ -281,6 +281,7 @@ public class Model implements Serializable {
 
     private void parseWaysAndRelations(XMLStreamReader input1, int tagKind) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         var way = new ArrayList<Node>();
+        var wayType = "";
         var building = false;
         var coast = false;
         var relationLandform = "";
@@ -298,7 +299,6 @@ public class Model implements Serializable {
         long wayid = 0;
         int vertexIndex = -2;
         double zoom_scale = -1.0;
-        double max_speed = -1.0;
         String relationKey = "";
 
         //if (!parsedFirstWay){
@@ -324,6 +324,7 @@ public class Model implements Serializable {
                 if (name.equals("way")) {
                     wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
                     way.clear();
+                    wayType = "";
                     building = false;
                     coast = false;
                 } else if (!insideRelation && name.equals("tag")) {
@@ -331,6 +332,8 @@ public class Model implements Serializable {
                     var k = input1.getAttributeValue(null, "k");
                     if (tagToScaleValue.containsKey(k)) zoom_scale = tagToScaleValue.get(k);
                     switch (k) {
+                        case "place", "natural", "landuse", "building":
+                            wayType = k;
                         case "highway":
                             if (tagToScaleValue.containsKey(v)) zoom_scale = tagToScaleValue.get(v);
                             roadtype = v;
@@ -376,9 +379,6 @@ public class Model implements Serializable {
                                 cycleable = true;
                                 drivable = true;
                             }
-                            break;
-                        case "maxspeed":
-                            //max_speed = Double.parseDouble(v); Dum Bornholm way
                     }
 
                 } else if (name.equals("nd")) {
@@ -420,16 +420,17 @@ public class Model implements Serializable {
                 var name = input1.getLocalName();
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name.equals("way")) {
-                    if (!roadtype.isEmpty()) {
+                    if (!roadtype.isEmpty()) { // Creates a road
                         Road tmpRoad = new Road(way, roadtype, zoom_scale, lt);
                         ways.add(tmpRoad);
                         addToCenterPointNodes(way, tmpRoad, true);
                         id2way.put(wayid,tmpRoad);
-                    } else {
-                        Way tmpWay = new Way(way, zoom_scale);
+                    } else { // Creates a way which is not a road
+                        Way tmpWay = new Way(way, zoom_scale, wayType);
                         ways.add(tmpWay);
                         addToCenterPointNodes(way, tmpWay, false);
                         id2way.put(wayid,tmpWay);
+
                     }
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
@@ -449,11 +450,7 @@ public class Model implements Serializable {
                             if (!drivable) {
                                 weight_car = 500000.0;
                             } else if(roadIdSet.containsKey(roadtype)){
-                                if (max_speed > 0) {
-                                    weight_car = weight_distance_modifier * (max_speed/50.0);
-                                } else {
-                                    weight_car = weight_distance_modifier * roadIdSet.get(roadtype);
-                                }
+                                weight_car = weight_distance_modifier * roadIdSet.get(roadtype);
                             }
                             if (oneway) {
                                 if (onewayBicycle) {
@@ -484,7 +481,6 @@ public class Model implements Serializable {
                     insideRelation = false;
                     RelationsType = "";
                     zoom_scale = -1.0;
-                    max_speed = -1.0;
                 } else if (name.equals("relation") && insideRelation) {
                     vertexIndex = -1;
                     insideRelation = false;

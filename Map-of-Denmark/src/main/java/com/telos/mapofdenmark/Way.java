@@ -12,8 +12,9 @@ public class Way implements Serializable {
     Node refNode;
     double zoom_scale;
     ArrayList<Node> nodesInWay;
+    String wayType;
 
-    public Way(ArrayList<Node> way, double zoom_scale) {
+    public Way(ArrayList<Node> way, double zoom_scale, String type) {
         this.nodesInWay = new ArrayList<>();
         nodesInWay.addAll(way);
         coords = new double[way.size() * 2];
@@ -25,6 +26,7 @@ public class Way implements Serializable {
         }
         this.refNode = way.get(0);
         this.zoom_scale = zoom_scale;
+        this.wayType = type;
     }
     public double[] getCoords() {
         return coords;

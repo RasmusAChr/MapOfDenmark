@@ -109,7 +109,11 @@ public class View {
             Way way = nodeSpatial.getWay();
             if (way != null && way.getZoom_scale() < slider_value) {
                 gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark, model.getColorScheme());
+
+                if (way.wayType.equals("place") || way.wayType.equals("natural") || way.wayType.equals("landuse") || way.wayType.equals("building") || way.wayType.equals("road")) {
+                    way.draw(gc, slider_value, dark, model.getColorScheme());
+                }
+
             }
         }
 
