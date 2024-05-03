@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.ZipInputStream;
+import java.util.Comparator;
 import javax.xml.stream.*;
 
 import com.telos.mapofdenmark.KDTreeClasses.KDTree;
@@ -22,23 +23,37 @@ import com.telos.mapofdenmark.Shortest_Route.SP;
 import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.geometry.Point2D;
+import javafx.scene.transform.Affine;
+import javafx.scene.transform.NonInvertibleTransformException;
 
 public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
+
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
-    List<Relation> Relations = new ArrayList<>();
+    List<RelationTwo> RelationsPlace = new ArrayList<>();
+    List<RelationTwo> RelationsBuilding = new ArrayList<>();
+    List<RelationTwo> RelationsNatural = new ArrayList<>();
     // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
     List<Node> centerPointNodes = new ArrayList<>();
     // Collection used for storing points of interest
     List<Point2D> pointsOfInterest = new ArrayList<>();
+    // Collection used for storing center points for building relations
+    List<Node> centerPointNodesBuilding = new ArrayList<>();
+    // Collection used for storing cennter points for natural relations
+    List<Node> centerPointNodesNaturals = new ArrayList<>();
     SP Dijkstra = null;
     private Trie trie;
     double minlat, maxlat, minlon, maxlon;
     List<Address> addressList;
     Map<String, Node> addressIdMap;
+    // This KDTree holds all ways
     KDTree kdTree;
+    // This KDTree holds all building relations
+    KDTree kdTreeBuildings;
+    // This KDTree holds all building relations
+    KDTree kdTreeNaturals;
     Address address;
     EdgeWeightedDigraph EWD;
     HashMap<Node, Integer> DigraphNodeToIndex;
@@ -49,10 +64,14 @@ public class Model implements Serializable {
     HashMap<Long, Way> id2way;
     int roadCount;
     int indexForCenterPoints = 0;
+    long wayid = 0;
+    Set<String> uniqueWayTypes = new HashSet<>();
     Map<String, Double> roadIdSet;
     HashSet<String> cycleTags;
     ColorScheme cs;
     LineThickness lt;
+    Set<String> allowedRelationTypes;
+
     static Model load(InputStream inputStream, String fileName) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if(fileName.endsWith(".obj")){
             try (var in = new ObjectInputStream(new BufferedInputStream(inputStream))) {
@@ -144,7 +163,7 @@ public class Model implements Serializable {
         this.addressList = new ArrayList<>();
         this.address = new Address();
         this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
-
+        this.allowedRelationTypes = new HashSet<>(Arrays.asList("place", "building", "natural", "leisure", "amenity"));
         if (filename.endsWith(".osm.zip")) {
             parseZIP(inputStream);
         } else if (filename.endsWith(".osm")) {
@@ -155,8 +174,20 @@ public class Model implements Serializable {
             trie.insert(address.getFullAddress());
         }
         this.kdTree = new KDTree();
+        this.kdTreeBuildings = new KDTree();
+        this.kdTreeNaturals = new KDTree();
+        for (String s : uniqueWayTypes) System.out.println(s);
+
+        // Populates the KDTree using all nodes from .osm
+//        kdTree.populate(nodeList);
+        // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
         kdTree.populate(centerPointNodes);
         save(filename+".obj");
+        System.out.println("size of building collection: "+centerPointNodesBuilding.size());
+        kdTreeBuildings.populate(centerPointNodesBuilding);
+       System.out.println("Size of building KDTree: " + kdTreeBuildings.size());
+       kdTreeNaturals.populate(centerPointNodesNaturals);
+       System.out.println("Size of building Naturals: " + kdTreeNaturals.size());
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -198,13 +229,10 @@ public class Model implements Serializable {
                             parseAddressFromOSM(v, k);
                         }
                     }
-                    case "way" -> {
+                    case "way","relation" -> {
                         EWD = new EdgeWeightedDigraph(roadCountX);
-                        parseWaysAndRelations(input, tagKind);
-                        return;
-                    }
-                    case "relation" -> {
-                        parseWaysAndRelations(input,tagKind);
+                        wayid = Long.parseLong(input.getAttributeValue(null,"id"));
+                        parseWaysAndRelations(input, tagKind); // First way element ???? input.getname = way
                         return;
                     }
                 }
@@ -242,7 +270,10 @@ public class Model implements Serializable {
 
     private void parseWaysAndRelations(XMLStreamReader input1, int tagKind) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         var way = new ArrayList<Node>();
+        var building = false;
         var coast = false;
+        var relationLandform = "";
+        var validRelation = false;
         String roadtype = "";
         String RelationsType = "";
         boolean shouldAdd = false;
@@ -257,6 +288,23 @@ public class Model implements Serializable {
         int vertexIndex = -2;
         double zoom_scale = -1.0;
         double max_speed = -1.0;
+        String relationKey = "";
+
+        //if (!parsedFirstWay){
+
+        if (input1.getLocalName().equals("way")){
+            wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
+        }
+        //}
+        //if (!parsedFirstRelation){
+        if (input1.getLocalName().equals("relation")){
+            relationsMembers = new ArrayList<>();
+            insideRelation = true;
+            RelationsType = "";
+            relationLandform = "";
+            relationKey = "";
+        }
+        //}
 
         while (input1.hasNext()) {
             tagKind = input1.next();
@@ -265,6 +313,8 @@ public class Model implements Serializable {
                 if (name.equals("way")) {
                     wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
                     way.clear();
+                    building = false;
+                    coast = false;
                 } else if (!insideRelation && name.equals("tag")) {
                     var v = input1.getAttributeValue(null, "v");
                     var k = input1.getAttributeValue(null, "k");
@@ -325,10 +375,12 @@ public class Model implements Serializable {
                     var node = id2node.get(ref);
                     way.add(node);
                 } else if (name.equals("relation")) {
-                    
+                    relationsMembers = new ArrayList<>();
                     insideRelation = true;
-                    relationsMembers.clear();
                     RelationsType = "";
+                    relationLandform = "";
+                    relationKey = "";
+                    validRelation = false;
                 } else if (insideRelation && name.equals("member")) {
                     // parse Ref
                     var ref = Long.parseLong(input1.getAttributeValue(null,"ref"));
@@ -342,7 +394,15 @@ public class Model implements Serializable {
 
                     if(k.equals("type")){
                         RelationsType = v;
+                    } else if (allowedRelationTypes.contains(k)) {
+                        validRelation = true;
+                        relationKey = k;
+                        relationLandform = v;
                     }
+                    /*else if (k.equals("place") || k.equals("building") || k.equals("natural") || k.equals("leisure") ||
+                               k.equals("amenity") || k.equals("surface")){
+                        relationLandform = v;
+                    }*/
                 }
 
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
@@ -412,12 +472,46 @@ public class Model implements Serializable {
                     zoom_scale = -1.0;
                     max_speed = -1.0;
                 } else if (name.equals("relation") && insideRelation) {
+                    vertexIndex = -1;
                     insideRelation = false;
-                    Relations.add(new Relation(RelationsType,relationsMembers));
-
+                    if (RelationsType.equals("multipolygon")) {
+                        if (validRelation) {
+                            if (relationKey.equals("place")) {
+                                RelationsPlace.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
+                            } else if (relationKey.equals("building")) {
+                                RelationTwo tmpRelation = new RelationTwo(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform);
+                                RelationsBuilding.add(tmpRelation);
+                                // for loop to find center point from member
+                                List<Node> nListe = new ArrayList<>();
+                                for(Member member : relationsMembers){
+                                    if(member.getWay() != null){
+                                        nListe.addAll(member.getWay().getNodes());
+                                    }
+                                }
+                                addToCenterPointNodesRelation(nListe, tmpRelation, "building");
+                            } else if (relationKey.equals("natural")) {
+                                RelationTwo tmpRelation = new RelationTwo(RelationsType, new ArrayList<>(relationsMembers), relationLandform);
+                                RelationsNatural.add(tmpRelation);
+                                // for loop to find center point from member
+                                List<Node> nListe = new ArrayList<>();
+                                for(Member member : relationsMembers){
+                                    if(member.getWay() != null){
+                                        nListe.addAll(member.getWay().getNodes());
+                                    }
+                                }
+                                addToCenterPointNodesRelation(nListe, tmpRelation, "natural");
+                            }
+                        }
+                    }
                 }
             }
         }
+    }
+
+    private int weightCalculate() {
+        //calculate the weight of the edge, based on different factors.
+
+        return 20;
     }
 
     //Dijkstra implementation
@@ -544,6 +638,30 @@ public class Model implements Serializable {
     }
     public ColorScheme getColorScheme() {
         return cs;
+    }
+
+    // finds the center lat and lon among a collection of nodes
+    public void addToCenterPointNodesRelation(List<Node> nodes, RelationTwo refRelation, String type){
+        double sumLat = 0;
+        double sumLon = 0;
+        for(Node node : nodes){
+            sumLat += node.getLat();
+            sumLon += node.getLon();
+        }
+        double centerLat = sumLat / nodes.size();
+        double centerLon = sumLon / nodes.size();
+        Node centeredNode = new Node(indexForCenterPoints, centerLat, centerLon);
+        centeredNode.setRefRelation(refRelation);
+        switch (type) {
+            case "building":
+                centerPointNodesBuilding.add(centeredNode);
+                break;
+            case "natural":
+                centerPointNodesNaturals.add(centeredNode);
+            default:
+                break;
+        }
+        indexForCenterPoints++;
     }
 }
 

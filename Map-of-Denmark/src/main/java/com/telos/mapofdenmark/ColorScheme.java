@@ -16,13 +16,19 @@ public class ColorScheme implements Serializable{
 
     public Color getColor(String type, boolean dark){
         String hex = null;
-       if(!dark){
-           hex = colors.get(type);
-       }
-       else {
-           hex = darkColors.get(type);
-       }
-        return Color.web(hex);
+        try{
+            if(!dark){
+                hex = colors.get(type);
+            }
+            else {
+                hex = darkColors.get(type);
+            }
+            return Color.web(hex);
+        } catch (NullPointerException e) {
+            if (!type.isEmpty()) System.out.println(type);
+            return getDefaultColor(dark);
+        }
+
     }
 
     public boolean findKeyC(String b) {
@@ -30,12 +36,60 @@ public class ColorScheme implements Serializable{
     }
 
     public Color getDefaultColor(boolean dark){
-        if(dark) return Color.web("#d3d3d3");
-        return Color.web("#FFFFFF");
+        if(dark) return Color.web("#ff0000");
+        return Color.web("#ff0000");
     }
     // Scheme for all the colors
     public void defaultScheme(){
         colors.clear();
+
+        // Relations
+        // Natural
+        colors.put("islet", "#f2efe9");
+
+        colors.put("island", "#f2efe9");
+
+        colors.put("peninsula","#f2efe9");
+
+        colors.put("hamlet", "#f5dcba");
+
+
+        // Leisure
+        colors.put("park", "#c8facc");
+
+        colors.put("marina","#90c5ee");
+
+        colors.put("golf_course", "#d9d0c9");
+
+        // Amenity
+        colors.put("parking", "#eeeeee");
+
+        colors.put("university", "#ffffe5");
+
+        // Building
+        colors.put("apartments", "#d8d0c9");
+
+        colors.put("house", "#d8d0c9");
+
+        colors.put("residential", "#d8d0c9");
+
+        colors.put("dormitory", "#d8d0c9");
+
+        colors.put("office", "#d8d0c9");
+
+        colors.put("school", "#d8d0c9");
+
+        colors.put("college", "#d8d0c9");
+
+        colors.put("hospital", "#d8d0c9");
+
+        colors.put("retail", "#d8d0c9");
+
+        colors.put("square", "#d8d0c9");
+
+        colors.put("hotel", "#d8d0c9");
+
+        colors.put("yes", "#d8d0c9");
 
         //Roads
         colors.put("default", "#000000");
@@ -52,8 +106,6 @@ public class ColorScheme implements Serializable{
         darkColors.put("tertiary", "#C0392B");
         colors.put("unclassified", "#566573");
         darkColors.put("unclassified", "#FFFFFF");
-        colors.put("residential", "#808B96");
-        darkColors.put("residential", "#FFFFFF");
         colors.put("motorway_link", "#808B96");
         darkColors.put("motorway_link", "#FFFFFF");
         colors.put("trunk_link", "#808B96");
@@ -70,8 +122,6 @@ public class ColorScheme implements Serializable{
         darkColors.put("track", "#FFFFFF");
         colors.put("cycleway", "#808B96");
         darkColors.put("cycleway", "#FFFFFF");
-        colors.put("yes", "#808B96");
-        darkColors.put("yes", "#FFFFFF");
         colors.put("designated", "#808B96");
         darkColors.put("designated", "#FFFFFF");
         colors.put("use_sidepath", "#808B96");
@@ -93,8 +143,8 @@ public class ColorScheme implements Serializable{
 
         // NATURALS
         colors.put("fell","#48a160");
-        colors.put("grassland","#68bf60");
-        colors.put("heath","#45ed7d");
+        colors.put("grassland","#f2efe9");
+        colors.put("heath","#eaf0d6");
         colors.put("moor","#45ed7d");
         colors.put("scrub","#93ad6a");
         colors.put("scrubbery","#93ad6a");
@@ -103,7 +153,7 @@ public class ColorScheme implements Serializable{
         colors.put("tree_stump","#5c2606");
         colors.put("tundra","#48a160");
         colors.put("wood","#188f40");
-        colors.put("bay","#a8d5ed");
+        colors.put("bay","#90c5ee");
         colors.put("beach","#f2db68");
         colors.put("blowhole","#f2db68");
         colors.put("cape","#f2db68");
@@ -114,7 +164,6 @@ public class ColorScheme implements Serializable{
         colors.put("hot_spring","#a8d5ed");
         colors.put("isthmus","#45ed7d");
         colors.put("mud","#332702");
-        colors.put("peninsula","#45ed7d");
         colors.put("shoal","#f2db68");
         colors.put("spring","#7daaff");
         colors.put("strait","#7daaff");
