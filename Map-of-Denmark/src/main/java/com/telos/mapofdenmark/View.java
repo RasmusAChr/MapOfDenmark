@@ -87,7 +87,7 @@ public class View {
 //            gc.setFill(Color.WHITE);
 //            gc.setStroke(Color.BLACK);
 //        }
-        gc.setFill(cs.getColor("water", dark));
+        gc.setFill(model.cs.getColor("water", dark));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
         gc.setLineWidth(0.000005);
@@ -95,12 +95,32 @@ public class View {
         Point2D canvasTopLeft =  mousetoModel(-200,-200);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth() + 200,canvas.getHeight() + 200);
         Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-        // rangeSearch(x1,x2,y1,y2)
         Queue<Node> buildingNodesFromKD = model.kdTreeBuildings.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         Queue<Node> naturalsNodesFromKD = model.kdTreeNaturals.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
 
+        // Draws land border
+        for (var relation : model.RelationsPlace) {
+            relation.Draw(gc,slider_value,dark);
+        }
+
+        // Drawing ways
+        for (Node nodeSpatial : nodesFromKD) {
+            Way way = nodeSpatial.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+            }
+        }
+
+        // Drawing building relations
         for(Node buildingNode : buildingNodesFromKD){
             RelationTwo relation = buildingNode.getRefRelation();
+            relation.Draw(gc,slider_value,dark);
+        }
+
+        // Drawing naturals relations
+        for(Node naturalsNode : naturalsNodesFromKD){
+            RelationTwo relation = naturalsNode.getRefRelation();
             relation.Draw(gc,slider_value,dark);
         }
 //        // Drawing relations
@@ -114,14 +134,6 @@ public class View {
 //            relation.Draw(gc,slider_value,dark);
 //        }
 
-        // Drawing ways
-        for (Node nodeSpatial : nodesFromKD) {
-            Way way = nodeSpatial.getWay();
-            if (way != null && way.getZoom_scale() < slider_value) {
-                gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark, model.getColorScheme());
-            }
-        }
 
         for (var line : model.list) {
             line.draw(gc, dark);
