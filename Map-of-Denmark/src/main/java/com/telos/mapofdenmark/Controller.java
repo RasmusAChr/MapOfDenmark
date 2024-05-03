@@ -271,9 +271,18 @@ public class Controller {
                 List<String> suggestionsList = model.getSuggestionList(newValue);
                 // Print and store new suggestions
                 for (String suggestion : suggestionsList) {
+                    // Checks whether the suggestion already has been there
                     if (!previousSuggestions.contains(suggestion)) {
                         System.out.println(suggestion);
-                        previousSuggestions.add(suggestion);
+                        // Does the check for street names in the first searchbar
+                        if(searchBarCounter == 0){
+                            filterStreetNames(searchBar,suggestionsList, suggestion, previousSuggestions);
+                        }
+                        // Does the check in the second searchbar
+                        else{
+                            filterStreetNames(searchBar1,suggestionsList, suggestion, previousSuggestions);
+                        }
+
                     }
                 }
                 // Logic for the suggestionsBox in UI
@@ -286,6 +295,28 @@ public class Controller {
             } else {
                 suggestionsBox.setVisible(false);
             }
+    }
+
+    private void filterStreetNames(TextField searchTextField, List<String> suggestionsList,
+                                   String suggestion, List<String> prevSuggestions){
+        // Checks whether there is text in the searchBar
+        if(searchTextField.getText() != null){
+            String searchText = searchTextField.getText();
+            // If the prefix contains spaces, it must mean that we are past the street name stage
+            if(searchText.contains(" ")){
+                suggestionsList.add(suggestion);
+                prevSuggestions.add(suggestion);
+            }
+            else{
+                // Else check
+                for(String suggestionFromList : suggestionsList){
+                    if(!suggestionFromList.contains(searchText)){
+                        suggestionsList.add(suggestionFromList);
+                        prevSuggestions.add(suggestion);
+                    }
+                }
+            }
+        }
     }
 
 
