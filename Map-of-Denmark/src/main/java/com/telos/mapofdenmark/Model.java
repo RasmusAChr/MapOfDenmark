@@ -23,6 +23,7 @@ import com.telos.mapofdenmark.Shortest_Route.DirectedEdge;
 import com.telos.mapofdenmark.Shortest_Route.EdgeWeightedDigraph;
 import com.telos.mapofdenmark.Shortest_Route.SP;
 import com.telos.mapofdenmark.TrieClasses.Address;
+import com.telos.mapofdenmark.TrieClasses.RadixTrie;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.geometry.Point2D;
 import javafx.scene.transform.Affine;
@@ -50,6 +51,7 @@ public class Model implements Serializable {
     List<Node> centerPointNodesLanduse = new ArrayList<>();
     SP Dijkstra = null;
     private Trie trie;
+    private RadixTrie radixTrie;
     double minlat, maxlat, minlon, maxlon;
     List<Address> addressList;
     Map<String, Node> addressIdMap;
@@ -178,10 +180,12 @@ public class Model implements Serializable {
             parseRouteNet(inputStream);
         }
         this.trie = new Trie();
+        this.radixTrie = new RadixTrie();
         for(Address address : addressList){
             if(address != null){
                 trie.insert(address.getStreet());
                 // RadixTrie insert put here
+                radixTrie.insert(address.getFullAddress());
             } else System.out.println("Address is null");
         }
         this.kdTree = new KDTree();
@@ -629,8 +633,8 @@ public class Model implements Serializable {
         return addressIdMap;
     }
     public List<String> getSuggestionList(String input){
-        return trie.getAddressSuggestions(input.toLowerCase(), 4);
-
+//        return trie.getAddressSuggestions(input.toLowerCase(), 4);
+        return radixTrie.getAddressSuggestions(input.toLowerCase(), 4);
     }
 
     // finds the center lat and lon among a collection of nodes

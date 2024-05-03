@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// Heavily inspired from https://leetcode.com/problems/implement-trie-prefix-tree/solutions/1996974/radix-tree-with-comments/
+
 public class RadixTrie {
     RadixNode rootNode;
 
@@ -12,7 +14,6 @@ public class RadixTrie {
      * Constructor for the Trie class.
      */
     public RadixTrie(){
-//        rootNode = new TrieNode(); // At initialization the trie will start with an empty root node
         rootNode = new RadixNode(29); // Create a root node with a specified initial capacity
     }
 
@@ -23,65 +24,53 @@ public class RadixTrie {
     public void insert(String inputWord) {
         if (inputWord == null || inputWord.isEmpty()) return; // Do not process null or empty strings
         String input = inputWord.toLowerCase(); // Convert the word to lowercase to ensure the trie is case-insensitive
-        insert(rootNode, input, 0);
+        insert(rootNode, input);
     }
 
     /**
      * Helper method to insert a word into the Patricia Trie recursively.
      * @param node The current node in the trie.
      * @param word The word to be inserted.
-     * @param index The index at which the substring starts.
      * @return The updated node after insertion.
      */
-    private RadixNode insert(RadixNode node, String word, int index) {
-        if (index == word.length()) {
-            node.endOfWord = true; // Mark the end of the word
+    private RadixNode insert(RadixNode node, String word) {
+        if (node == null) return new RadixNode(word, true);
+
+        if(node.value.equals(word)) {
+            node.endOfWord = true;
             return node;
         }
 
-        char firstChar = word.charAt(index);
-        RadixNode child = node.children.get(firstChar);
+        // Find the point of divergence between the node's string and the input string.
+        int i = 0;
+        while (i < node.value.length() && i < word.length() && node.value.charAt(i) == word.charAt(i)) {
+            i++;
+        }
 
-        if (child == null) {
-            child = new RadixNode(word.substring(index));
-            child.parent = node;
-            node.children.put(firstChar, child);
-            child.endOfWord = true;
-            return child;
+        // If the entire node string is a prefix of the input, continue insertion in the corresponding child.
+        if (i == node.value.length()) {
+            char nextChar = word.charAt(i);
+            node.children.putIfAbsent(nextChar, new RadixNode("", false));
+            node.children.put(nextChar, insert(node.children.get(nextChar), word.substring(i)));
+            return node;
+        }
+        
+        // Split the node if only part of it is a prefix.
+        RadixNode subtree = new RadixNode(node.value.substring(i), node.endOfWord);
+        subtree.children.putAll(node.children);
+        node.children.clear();
+        node.children.put(node.value.charAt(i), subtree);
+
+        // Handle the remaining substring of the input.
+        if (i == word.length()) {
+            node.endOfWord = true;
         } else {
-            // Find common prefix length
-            String commonPrefix = findCommonPrefix(child.value, substring);
-            if (commonPrefix.length() < child.value.length()) {
-                // Split the current node
-                RadixNode newChild = new RadixNode(child.value.substring(commonPrefix.length()));
-                newChild.children.putAll(child.children);
-                newChild.endOfWord = child.endOfWord;
-
-                // Reset current child node
-                child.value = commonPrefix;
-                child.children.clear();
-                child.children.put(newChild.value.charAt(0), newChild);
-                child.endOfWord = false;
-            }
-
-            if (commonPrefix.length() < substring.length()) {
-                // Insert remaining part
-                return insert(child, substring.substring(commonPrefix.length()), 0);
-            } else {
-                child.endOfWord = true;
-                return child;
-            }
+            node.endOfWord = false;
+            node.children.put(word.charAt(i), new RadixNode(word.substring(i), true));
         }
-    }
 
-    private String findCommonPrefix(String str1, String str2) {
-        int minLength = Math.min(str1.length(), str2.length());
-        for (int i = 0; i < minLength; i++) {
-            if (str1.charAt(i) != str2.charAt(i)) {
-                return str1.substring(0, i);
-            }
-        }
-        return str1.substring(0, minLength);
+        node.value = node.value.substring(0, i);
+        return node;
     }
 
     /**
@@ -116,7 +105,7 @@ public class RadixTrie {
      * @param limit Maximum number of suggestions.
      */
     // A recursive method that collects suggestions from the given node
-    private void collectAddressSuggestions(TrieNode node, String prefix, List<String> addressSuggestions, int limit){
+    private void collectAddressSuggestions(RadixNode node, String prefix, List<String> addressSuggestions, int limit){
         // If the currentnode is the end of the word, that means the prefix formed so far represents a word found in the trie
         // If that is the case, we will add the word to the suggestion list
         if(node.endOfWord){
@@ -128,11 +117,11 @@ public class RadixTrie {
         }
 
         // We recursively travel through each child node to collect suggestions
-        for (char character: node.children.keySet()){
+        for (char charValue : node.children.keySet()){
             if (addressSuggestions.size() >= limit) {
                 return; // Stop collecting if the limit has been reached
             }
-            collectAddressSuggestions(node.children.get(character), prefix + character, addressSuggestions, limit);
+            collectAddressSuggestions(node.children.get(charValue), prefix + charValue, addressSuggestions, limit);
         }
     }
 

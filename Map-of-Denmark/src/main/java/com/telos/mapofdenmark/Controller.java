@@ -132,7 +132,7 @@ public class Controller {
         searchBar.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar.getText().isEmpty())) {
                 System.out.println(searchBar.getText());
-                addressParsing(trie, searchBar.getText());
+                addressParsing(searchBar.getText());
                 searchBarCounter = 0;
             }
             if(event.getCode() == KeyCode.BACK_SPACE && searchBar.getText().isEmpty()) {
@@ -144,7 +144,7 @@ public class Controller {
         searchBar1.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar1.getText().isEmpty())) {
                 System.out.println(searchBar1.getText());
-                addressParsing(trie, searchBar1.getText());
+                addressParsing(searchBar1.getText());
                 searchBarCounter = 1;
             }
         });
@@ -269,7 +269,7 @@ public class Controller {
     }
 
     @FXML
-    private void addressParsing(Trie trie, String newValue) {
+    private void addressParsing(String newValue) {
         suggestionsBox.getItems().clear(); // Clear previous suggestions
             // Only proceed if the new value is not empty
             if (!newValue.isEmpty()) {
