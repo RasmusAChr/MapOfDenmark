@@ -179,7 +179,9 @@ public class Model implements Serializable {
         }
         this.trie = new Trie();
         for(Address address : addressList){
-            trie.insert(address.getFullAddress());
+            if(address != null){
+                trie.insert(address.getFullAddress());
+            } else System.out.println("Address is null");
         }
         this.kdTree = new KDTree();
         this.kdTreeBuildings = new KDTree();
@@ -585,7 +587,6 @@ public class Model implements Serializable {
     }
 
     public void parseAddressFromOSM(String v, String k){
-        // Assuming you have a Trie instance called 'trie'
         if(address.getStreet().equals(null) || address.getStreet().isEmpty()) {
             if (k.contains("street")) {
                 address.setStreet(v);
