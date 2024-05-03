@@ -40,8 +40,10 @@ javafx {
 }
 
 dependencies {
+  implementation 'com.google.guava:guava:31.1-jre'
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+
   implementation group: 'org.openjfx', name: 'javafx-base', version: javaFxVersion, classifier: 'win'
   implementation group: 'org.openjfx', name: 'javafx-base', version: javaFxVersion, classifier: 'mac'
   implementation group: 'org.openjfx', name: 'javafx-base', version: javaFxVersion, classifier: 'linux'
