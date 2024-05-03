@@ -131,6 +131,11 @@ public class Controller {
                 addressParsing(trie, searchBar.getText());
                 searchBarCounter = 0;
             }
+            if(event.getCode() == KeyCode.BACK_SPACE && searchBar.getText().isEmpty()) {
+                // Backspace key was pressed and search bar is empty
+                view.setTempAddressPoint(null, null);
+                view.redraw();
+            }
         });
         searchBar1.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar1.getText().isEmpty())) {
@@ -296,15 +301,26 @@ public class Controller {
     }
 
     private void panToAddress(String selectedAddress){
-        if(model.getAddressIdMap().get(selectedAddress) != null && lastPannedToAddress != model.getAddressIdMap().get(selectedAddress)){
-            Node addressNode = model.getAddressIdMap().get(selectedAddress);
+        String addressToLowerCase = selectedAddress.toLowerCase();
+        if(model.getAddressIdMap().get(addressToLowerCase) != null && lastPannedToAddress != model.getAddressIdMap().get(addressToLowerCase)){
+            Node addressNode = model.getAddressIdMap().get(addressToLowerCase);
             lastPannedToAddress = addressNode;
             double addressX = addressNode.getLon() * 0.56;
             double addressY = -addressNode.getLat();
 
-            view.pan(addressX, addressY);
+            Point2D canvasCenterAsPixels = view.getCanvasCenterPoint();
+
+            Point2D addressAsPixels = view.convertGeoCoordsToPixels(addressX, addressY);
+
+            double dx = canvasCenterAsPixels.getX() - addressAsPixels.getX();
+            double dy = canvasCenterAsPixels.getY() - addressAsPixels.getY();
 
 
+
+            view.drawCircle(addressX,addressY);
+
+            view.setTempAddressPoint(addressX,addressY);
+            view.pan(dx, dy);
         }
         else if (model.getAddressIdMap().get(selectedAddress) == null){
             System.out.println("Not a valid Address");

@@ -51,18 +51,27 @@ public class Model implements Serializable {
     int indexForCenterPoints = 0;
     Map<String, Double> roadIdSet;
     HashSet<String> cycleTags;
-    static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
-        if (filename.endsWith(".obj")) {
-            try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) { // good code
+    ColorScheme cs;
+    LineThickness lt;
+    static Model load(InputStream inputStream, String fileName) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
+        if(fileName.endsWith(".obj")){
+            try (var in = new ObjectInputStream(new BufferedInputStream(inputStream))) {
                 return (Model) in.readObject();
+            } catch (Exception e) {
+                // Close the input stream if an exception occurs
+                inputStream.close();
+                throw e;
             }
-
         }
-        return new Model(filename);
+        else{
+            return new Model(inputStream, fileName);
+        }
     }
 
 
-    public Model(String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
+    public Model(InputStream inputStream, String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
+        cs = new ColorScheme();
+        lt = new LineThickness();
         this.roadIdSet = new HashMap<String, Double>(Map.of(
                 "motorway",0.4545,
                 "trunk", 0.625,
@@ -137,9 +146,9 @@ public class Model implements Serializable {
         this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
 
         if (filename.endsWith(".osm.zip")) {
-            parseZIP(filename);
+            parseZIP(inputStream);
         } else if (filename.endsWith(".osm")) {
-            parseRouteNet(filename);
+            parseRouteNet(inputStream);
         }
         this.trie = new Trie();
         for(Address address : addressList){
@@ -214,8 +223,8 @@ public class Model implements Serializable {
         }
     }
 
-    private void parseRouteNet(String filename) throws IOException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
-        parseNodeNet(new FileInputStream(filename));
+    private void parseRouteNet(InputStream inputStream) throws IOException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
+        parseNodeNet(inputStream);
     }
 
     void save(String filename) throws FileNotFoundException, IOException {
@@ -224,8 +233,8 @@ public class Model implements Serializable {
         }
     }
 
-    private void parseZIP(String filename) throws IOException, XMLStreamException, FactoryConfigurationError {
-        var input = new ZipInputStream(new FileInputStream(filename));
+    private void parseZIP(InputStream inputStream) throws IOException, XMLStreamException, FactoryConfigurationError {
+        var input = new ZipInputStream(inputStream);
         input.getNextEntry();
         parseNodeNet(input);
     }
@@ -307,7 +316,7 @@ public class Model implements Serializable {
                             }
                             break;
                         case "maxspeed":
-                            //max_speed = Double.parseDouble(v);
+                            //max_speed = Double.parseDouble(v); Dum Bornholm way
                     }
 
                 } else if (name.equals("nd")) {
@@ -340,7 +349,7 @@ public class Model implements Serializable {
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name.equals("way")) {
                     if (!roadtype.isEmpty()) {
-                        Road tmpRoad = new Road(way,roadtype, zoom_scale);
+                        Road tmpRoad = new Road(way, roadtype, zoom_scale, lt);
                         ways.add(tmpRoad);
                         addToCenterPointNodes(way, tmpRoad, true);
                         id2way.put(wayid,tmpRoad);
@@ -531,6 +540,9 @@ public class Model implements Serializable {
 
     public List<Point2D> getPointsOfInterest() {
         return pointsOfInterest;
+    }
+    public ColorScheme getColorScheme() {
+        return cs;
     }
 }
 
