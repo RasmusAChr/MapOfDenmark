@@ -1,7 +1,6 @@
 package com.telos.mapofdenmark;
 
 import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,7 +12,6 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.ZipInputStream;
-import java.util.Comparator;
 import javax.xml.stream.*;
 import java.util.TreeMap;
 import com.google.common.collect.BiMap;
@@ -26,8 +24,6 @@ import com.telos.mapofdenmark.Shortest_Route.SP;
 import com.telos.mapofdenmark.TrieClasses.Address;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.geometry.Point2D;
-import javafx.scene.transform.Affine;
-import javafx.scene.transform.NonInvertibleTransformException;
 
 public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
@@ -35,10 +31,10 @@ public class Model implements Serializable {
     List<Line> list = new ArrayList<Line>();
     List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
-    List<RelationTwo> RelationsPlace = new ArrayList<>();
-    List<RelationTwo> RelationsNatural = new ArrayList<>();
-    List<RelationTwo> RelationsLanduse = new ArrayList<>();
-    List<RelationTwo> RelationsBuilding = new ArrayList<>();
+    List<Relation> RelationsPlace = new ArrayList<>();
+    List<Relation> RelationsNatural = new ArrayList<>();
+    List<Relation> RelationsLanduse = new ArrayList<>();
+    List<Relation> RelationsBuilding = new ArrayList<>();
 
     // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
     List<Node> centerPointNodes = new ArrayList<>();
@@ -137,7 +133,8 @@ public class Model implements Serializable {
                 "destination",
                 "private",
                 "pedestrian",
-                "footway"));
+                "footway",
+                "driveway"));
      //   this.DigraphNodeToIndex = new HashMap<>();
       //  this.DigraphIndexToNode = new HashMap<>();
         this.IndexBINode = HashBiMap.create();
@@ -188,11 +185,8 @@ public class Model implements Serializable {
         this.kdTreeLanduses = new KDTree();
         for (String s : uniqueWayTypes) System.out.println(s);
 
-        // Populates the KDTree using all nodes from .osm
-//        kdTree.populate(nodeList);
         // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
-        kdTree.populate(centerPointNodes);
-        save(filename+".obj");
+        kdTree.populate(centerPointNodes); // tilføjer ikke
         System.out.println("size of building collection: "+centerPointNodesBuilding.size());
         kdTreeBuildings.populate(centerPointNodesBuilding);
        System.out.println("Size of building KDTree: " + kdTreeBuildings.size());
@@ -200,6 +194,7 @@ public class Model implements Serializable {
        System.out.println("Size of building Naturals: " + kdTreeNaturals.size());
        kdTreeLanduses.populate(centerPointNodesLanduse);
        System.out.println("Size of building Landuse: " + kdTreeLanduses.size());
+       save(filename+".obj");
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -380,6 +375,13 @@ public class Model implements Serializable {
                                 drivable = true;
                             }
                             break;
+                        case "service":
+                            if (cycleTags.contains(v)) {
+                            shouldAdd = true;
+                            cycleable = true;
+                            drivable = true;
+                            }
+                            break;
                         case "maxspeed":
                             //max_speed = Double.parseDouble(v); Dum Bornholm way
                     }
@@ -494,9 +496,9 @@ public class Model implements Serializable {
                     if (RelationsType.equals("multipolygon")) {
                         if (validRelation) {
                             if (relationKey.equals("place")) {
-                                RelationsPlace.add(new RelationTwo(RelationsType,relationsMembers,relationLandform));
+                                RelationsPlace.add(new Relation(RelationsType,relationsMembers,relationLandform, cs));
                             } else if (relationKey.equals("building")) {
-                                RelationTwo tmpRelation = new RelationTwo(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform);
+                                Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
                                 RelationsBuilding.add(tmpRelation);
                                 // for loop to find center point from member
                                 List<Node> nListe = new ArrayList<>();
@@ -507,7 +509,7 @@ public class Model implements Serializable {
                                 }
                                 addToCenterPointNodesRelation(nListe, tmpRelation, "building");
                             } else if (relationKey.equals("natural")) {
-                                RelationTwo tmpRelation = new RelationTwo(RelationsType, new ArrayList<>(relationsMembers), relationLandform);
+                                Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers), relationLandform,cs);
                                 RelationsNatural.add(tmpRelation);
                                 // for loop to find center point from member
                                 List<Node> nListe = new ArrayList<>();
@@ -518,7 +520,7 @@ public class Model implements Serializable {
                                 }
                                 addToCenterPointNodesRelation(nListe, tmpRelation, "natural");
                             } else if (relationKey.equals("landuse")) {
-                                RelationTwo tmpRelation = new RelationTwo(RelationsType, new ArrayList<>(relationsMembers), relationLandform);
+                                Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers), relationLandform,cs);
                                 RelationsLanduse.add(tmpRelation);
                                 // for loop to find center point from member
                                 List<Node> nListe = new ArrayList<>();
@@ -670,7 +672,7 @@ public class Model implements Serializable {
     }
 
     // finds the center lat and lon among a collection of nodes
-    public void addToCenterPointNodesRelation(List<Node> nodes, RelationTwo refRelation, String type){
+    public void addToCenterPointNodesRelation(List<Node> nodes, Relation refRelation, String type){
         double sumLat = 0;
         double sumLon = 0;
         for(Node node : nodes){

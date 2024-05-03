@@ -1,11 +1,8 @@
 package com.telos.mapofdenmark;
 
-import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.FillRule;
 
-import javax.security.auth.login.AccountNotFoundException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -15,15 +12,16 @@ public class Relation implements Serializable {
 
     private List<Member> members;
     private List<Node> orderedNodes;
+    private List<List<Node>> listOfOrderedNodes;
     private List<Way> innerWays;
     private List<Member> nonRelatedMembers;
+    private List<Way> singleWays;
     boolean drawable;
     Node lastNode = null;
-    ColorScheme cs = new ColorScheme();
+    ColorScheme cs;
 
 
-    public Relation(String type, List<Member> memberRefs, String landform) {
-        ColorScheme cs = new ColorScheme();
+    public Relation(String type, List<Member> memberRefs, String landform, ColorScheme cs) {
         this.type = type;
         this.landform = landform;
         this.members = memberRefs;
@@ -31,52 +29,27 @@ public class Relation implements Serializable {
         this.innerWays = new ArrayList<>();
         this.nonRelatedMembers = new ArrayList<>();
         this.orderedNodes = new ArrayList<>();
+        this.singleWays = new ArrayList<>();
+        this.listOfOrderedNodes = new ArrayList<>();
+        this.cs = cs;
         orderNodes();
     }
 
     public void orderNodes(){
+        var hasBeenSorted = false;
 
 
-
-        // Check if a node appears 2 times. If not place the way with that node in another list.
-        //System.out.println("non related members:");
+        // If a way doesn't exist, then don't manipulate/draw it.
         for (Member m : members) {
             if (m.getWay() == null) {
                 drawable = false;
                 return;
             }
-            if (hasDuplicateCoordinates(m)) {
-                nonRelatedMembers.add(m);
-                //System.out.println(m.getRef());
-                //System.out.println("lastNode: " + lastNode.id + "    node: " + m.getWay().getNodes().get(m.getWay().getNodes().size()-1).id);
-            }
         }
-
-        // Remove the collected members after the iteration
-        members.removeAll(nonRelatedMembers);
-
-        if (addToOrderedNodes() == null) {
-            //System.out.println("EMPTY");
-            drawable = false;
-            return;
-        }
-
-
 
         while (!addToOrderedNodes().isEmpty()) addToOrderedNodes();
         //System.out.println("------------------------------");
 
-    }
-
-    public boolean hasDuplicateCoordinates(Member member) {
-        //Set<Double> encounteredCoordinates = new HashSet<>();
-        Set<Point2D> encounteredCoordinates = new HashSet<>();
-        for (int i = 0; i < member.getWay().getCoords().length; i += 2) {
-            if (!encounteredCoordinates.add(new Point2D(member.getWay().getCoords()[i], member.getWay().getCoords()[i+1]))) {
-                return true; // Coordinate encountered more than once
-            }
-        }
-        return false; // No coordinate encountered more than once
     }
 
     public List<Member> addToOrderedNodes (){
@@ -87,16 +60,18 @@ public class Relation implements Serializable {
         ListIterator<Member> iterator = members.listIterator();
         while (iterator.hasNext()) {
             Member m = iterator.next();
-            if (m.getWay() == null) {
-                drawable = false;
-                return null;
-            }
 
             Node currentFirstNode = m.getWay().getNodes().get(0);
             if(m.getType().equals("inner")){
                 innerWays.add(m.getWay());
                 iterator.remove();
             }
+            // If the first and last node is the same, it's a single way
+            else if (currentFirstNode == m.getWay().getNodes().get(m.getWay().getNodes().size()-1)){
+                singleWays.add(m.getWay());
+                iterator.remove();
+            }
+            // If the next way is not inner or a single way, then add the first node to the ordered list.
             else if (lastNode == null){
                 //System.out.println("First node " + m.getRef());
                 orderedNodes.addAll(m.getWay().getNodes());
@@ -108,14 +83,25 @@ public class Relation implements Serializable {
                 orderedNodes.addAll(m.getWay().getNodes());
                 lastNode = orderedNodes.get(orderedNodes.size()-1);
                 iterator.remove(); // Remove the current member using the iterator
+                if (lastNode == orderedNodes.get(0)){
+                    listOfOrderedNodes.add(new ArrayList<>(orderedNodes));
+                    lastNode = null;
+                    orderedNodes.clear();
+                }
             }
             // Else if the last node in list is the same as the last node in current member
             else if (lastNode.equals(reverseNodes(m).get(0))) {
                 orderedNodes.addAll(reverseNodes(m));
                 lastNode = orderedNodes.get(orderedNodes.size()-1);
                 iterator.remove(); // Remove the current member using the iterator
+                if (lastNode == orderedNodes.get(0)){
+                    listOfOrderedNodes.add(new ArrayList<>(orderedNodes));
+                    lastNode = null;
+                    orderedNodes.clear();
+                }
             }
             else {
+                System.out.println("If you see this text loop for over 5 minutes, there are problems in relations");
                 //System.out.println("https://www.openstreetmap.org/way/" + m.getRef() + "#map=11/55.1424/14.9641");
                 leftOverMembers.add(m);
             }
@@ -130,34 +116,47 @@ public class Relation implements Serializable {
 
         if (drawable){
             // FOR OUTER
-            if (!orderedNodes.isEmpty()){
-                double[] xPoints = new double[orderedNodes.size()];
-                double[] yPoints = new double[orderedNodes.size()];
-                for (int i = 0; i < orderedNodes.size(); i++) {
-                    var node = orderedNodes.get(i);
-                    xPoints[i] = 0.56 * node.getLon();
-                    yPoints[i] = -node.getLat();
-                }
-                // Moves to start coordinates
-                gc.moveTo(xPoints[0], yPoints[0]);
-                // Creates a not visible line to next coordinate (to create selection).
-                for (int i = 0; i < xPoints.length; i++) {
-                    gc.lineTo(xPoints[i], yPoints[i]);
+            for (List<Node> nodeList : listOfOrderedNodes){
+                if (!nodeList.isEmpty()) {
+                    double[] xPoints = new double[nodeList.size()];
+                    double[] yPoints = new double[nodeList.size()];
+                    for (int i = 0; i < nodeList.size(); i++) {
+                        var node = nodeList.get(i);
+                        xPoints[i] = 0.56 * node.getLon();
+                        yPoints[i] = -node.getLat();
+                    }
+                    // Moves to start coordinates
+                    gc.moveTo(xPoints[0], yPoints[0]);
+                    // Creates a not visible line to next coordinate (to create selection).
+                    for (int i = 0; i < xPoints.length; i++) {
+                        gc.lineTo(xPoints[i], yPoints[i]);
+                    }
                 }
             }
 
             // FOR INNER
-            if(!innerWays.isEmpty())
-                for(Way w : innerWays){
+            if(!innerWays.isEmpty()) {
+                for (Way w : innerWays) {
                     double[] coords = w.getCoords();
                     gc.moveTo(coords[0], coords[1]);
-                    for (int i = 2 ; i < coords.length ; i += 2) {
-                        gc.lineTo(coords[i], coords[i+1]);
+                    for (int i = 2; i < coords.length; i += 2) {
+                        gc.lineTo(coords[i], coords[i + 1]);
                     }
                 }
+            }
+
+            if (!singleWays.isEmpty()){
+                for (Way w : singleWays) {
+                    double[] coords = w.getCoords();
+                    gc.moveTo(coords[0], coords[1]);
+                    for (int i = 2; i < coords.length; i += 2) {
+                        gc.lineTo(coords[i], coords[i + 1]);
+                    }
+                }
+            }
 
             // FOR NON RELATED MEMBERS
-            if (!nonRelatedMembers.isEmpty()){
+            /*if (!nonRelatedMembers.isEmpty()){
                 for (Member m : nonRelatedMembers){
                     Way w = m.getWay();
                     double[] coords = w.getCoords();
@@ -166,7 +165,7 @@ public class Relation implements Serializable {
                         gc.lineTo(coords[i], coords[i+1]);
                     }
                 }
-            }
+            }*/
 
             gc.fill();
             gc.stroke();
