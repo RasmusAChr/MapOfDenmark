@@ -136,7 +136,8 @@ public class Model implements Serializable {
                 "destination",
                 "private",
                 "pedestrian",
-                "footway"));
+                "footway",
+                "driveway"));
      //   this.DigraphNodeToIndex = new HashMap<>();
       //  this.DigraphIndexToNode = new HashMap<>();
         this.IndexBINode = HashBiMap.create();
@@ -376,6 +377,13 @@ public class Model implements Serializable {
                                 shouldAdd = true;
                                 cycleable = true;
                                 drivable = true;
+                            }
+                            break;
+                        case "service":
+                            if (cycleTags.contains(v)) {
+                            shouldAdd = true;
+                            cycleable = true;
+                            drivable = true;
                             }
                             break;
                         case "maxspeed":
