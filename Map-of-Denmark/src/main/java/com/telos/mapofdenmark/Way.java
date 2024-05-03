@@ -2,15 +2,20 @@ package com.telos.mapofdenmark;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 public class Way implements Serializable {
     double[] coords;
     Node refNode;
     double zoom_scale;
+    ArrayList<Node> nodesInWay;
 
     public Way(ArrayList<Node> way, double zoom_scale) {
+        this.nodesInWay = new ArrayList<>();
+        nodesInWay.addAll(way);
         coords = new double[way.size() * 2];
         for (int i = 0 ; i < way.size() ; ++i) {
             var node = way.get(i);
@@ -21,6 +26,9 @@ public class Way implements Serializable {
         this.refNode = way.get(0);
         this.zoom_scale = zoom_scale;
     }
+    public double[] getCoords() {
+        return coords;
+    }
 
     public void draw(GraphicsContext gc, double zoom, boolean darkMode, ColorScheme cs) {
         gc.beginPath();
@@ -30,6 +38,10 @@ public class Way implements Serializable {
         }
         gc.stroke();
     }
+    public ArrayList<Node> getNodes(){
+        return nodesInWay;
+    }
+
 
     public Node getArbitraryNode(){
         return refNode;

@@ -10,7 +10,6 @@ public class Member implements Serializable{
     public Member(String Type,long ref){
         this.Type=Type;
         this.ref=ref;
-
     }
     public String getType(){
         return Type;
@@ -20,6 +19,9 @@ public class Member implements Serializable{
     }
     public void setWay(Way way){
         this.way=way;
+    }
+    public Way getWay(){
+        return way;
     }
 
 }

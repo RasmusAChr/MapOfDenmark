@@ -80,13 +80,14 @@ public class View {
 
     void redraw() {
         gc.setTransform(new Affine());
-        if(dark) {
-            gc.setStroke(Color.WHITE);
-            gc.setFill(Color.web("#212F3D"));
-        } else{
-            gc.setFill(Color.WHITE);
-            gc.setStroke(Color.BLACK);
-        }
+//        if(dark) {
+//            gc.setStroke(Color.WHITE);
+//            gc.setFill(Color.web("#212F3D"));
+//        } else{
+//            gc.setFill(Color.WHITE);
+//            gc.setStroke(Color.BLACK);
+//        }
+        gc.setFill(model.cs.getColor("water", dark));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
         gc.setLineWidth(0.000005);
@@ -94,6 +95,15 @@ public class View {
         Point2D canvasTopLeft =  mousetoModel(-200,-200);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth() + 200,canvas.getHeight() + 200);
         Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> buildingNodesFromKD = model.kdTreeBuildings.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> naturalsNodesFromKD = model.kdTreeNaturals.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+
+        // Draws land border
+        for (var relation : model.RelationsPlace) {
+            relation.Draw(gc,slider_value,dark);
+        }
+
+        // Drawing ways
         for (Node nodeSpatial : nodesFromKD) {
             Way way = nodeSpatial.getWay();
             if (way != null && way.getZoom_scale() < slider_value) {
@@ -101,6 +111,29 @@ public class View {
                 way.draw(gc, slider_value, dark, model.getColorScheme());
             }
         }
+
+        // Drawing building relations
+        for(Node buildingNode : buildingNodesFromKD){
+            RelationTwo relation = buildingNode.getRefRelation();
+            relation.Draw(gc,slider_value,dark);
+        }
+
+        // Drawing naturals relations
+        for(Node naturalsNode : naturalsNodesFromKD){
+            RelationTwo relation = naturalsNode.getRefRelation();
+            relation.Draw(gc,slider_value,dark);
+        }
+//        // Drawing relations
+//        for (var relation : model.RelationsPlace) {
+//            relation.Draw(gc,slider_value,dark);
+//        }
+//        for (var relation : model.RelationsBuilding) {
+//            relation.Draw(gc,slider_value,dark);
+//        }
+//        for (var relation : model.RelationsNatural) {
+//            relation.Draw(gc,slider_value,dark);
+//        }
+
 
         for (var line : model.list) {
             line.draw(gc, dark);
@@ -110,6 +143,7 @@ public class View {
         if(tempAddressPoint != null){
             drawCircle(tempAddressPoint.getX(), tempAddressPoint.getY());
         }
+
     }
     private void drawPOI() {
         if (!model.getPointsOfInterest().isEmpty()) {
