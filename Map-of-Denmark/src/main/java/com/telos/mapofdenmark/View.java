@@ -136,7 +136,7 @@ public class View {
 
 
         for (var line : model.list) {
-            line.draw(gc, dark);
+            line.draw(gc, dark, slider_value);
         }
         drawPOI();
 
