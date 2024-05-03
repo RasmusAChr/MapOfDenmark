@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.zip.ZipInputStream;
 import java.util.Comparator;
 import javax.xml.stream.*;
+import java.util.TreeMap;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
@@ -65,7 +66,7 @@ public class Model implements Serializable {
    // HashMap<Node, Integer> DigraphNodeToIndex;
   //  HashMap<Integer, Node> DigraphIndexToNode;
     BiMap<Node,Integer> IndexBINode;
-    HashMap<Long, Node> id2node;
+    TreeMap<Long, Node> id2node;
     HashMap<String, Double> tagToScaleValue;
     List<Member> relationsMembers;
     HashMap<Long, Way> id2way;
@@ -73,7 +74,7 @@ public class Model implements Serializable {
     int indexForCenterPoints = 0;
     long wayid = 0;
     Set<String> uniqueWayTypes = new HashSet<>();
-    Map<String, Double> roadIdSet;
+    HashMap<String, Double> roadIdSet;
     HashSet<String> cycleTags;
     ColorScheme cs;
     LineThickness lt;
@@ -165,12 +166,12 @@ public class Model implements Serializable {
                              "landuse", "cycleway", "footway":
                             //zoom_scale = 0.1;break;*/
         this.id2way = new HashMap<>();
-        this.id2node = new HashMap<>();
+        this.id2node = new TreeMap<>();
         this.relationsMembers = new ArrayList<>();
         this.roadCount = 0;
         this.addressList = new ArrayList<>();
         this.address = new Address();
-        this.addressIdMap = new HashMap<>(); // Used for ref a node id to an adress
+        this.addressIdMap = new TreeMap<>(); // Used for ref a node id to an adress
         this.allowedRelationTypes = new HashSet<>(Arrays.asList("place", "natural", "landuse", "building"));
         if (filename.endsWith(".osm.zip")) {
             parseZIP(inputStream);
