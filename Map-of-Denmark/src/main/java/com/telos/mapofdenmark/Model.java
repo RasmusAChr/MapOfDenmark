@@ -39,6 +39,12 @@ public class Model implements Serializable {
     List<RelationTwo> RelationsLanduse = new ArrayList<>();
     List<RelationTwo> RelationsBuilding = new ArrayList<>();
 
+    /*List<RelationTwo> WaysPlace = new ArrayList<>();
+    List<RelationTwo> WaysNatural = new ArrayList<>();
+    List<RelationTwo> WaysLanduse = new ArrayList<>();
+    List<RelationTwo> WaysBuilding = new ArrayList<>();
+    List<RelationTwo> WaysRoads = new ArrayList<>();*/
+
     // Collection used for storing center points such that multiple nodes with same way ref is not used to populate KDTree
     List<Node> centerPointNodes = new ArrayList<>();
     // Collection used for storing points of interest
@@ -48,6 +54,13 @@ public class Model implements Serializable {
     // Collection used for storing cennter points for natural relations
     List<Node> centerPointNodesNatural = new ArrayList<>();
     List<Node> centerPointNodesLanduse = new ArrayList<>();
+
+    List<Node> centerPointNodesWaysPlace = new ArrayList<>();
+    List<Node> centerPointNodesWaysNatural = new ArrayList<>();
+    List<Node> centerPointNodesWaysLanduse = new ArrayList<>();
+    List<Node> centerPointNodesWaysBuilding = new ArrayList<>();
+    List<Node> centerPointNodesWaysRoads = new ArrayList<>();
+
     SP Dijkstra = null;
     private Trie trie;
     double minlat, maxlat, minlon, maxlon;
@@ -60,6 +73,12 @@ public class Model implements Serializable {
     // This KDTree holds all building relations
     KDTree kdTreeNaturals;
     KDTree kdTreeLanduses;
+
+    KDTree kdTreeWaysPlace;
+    KDTree kdTreeWaysNatural;
+    KDTree kdTreeWaysLanduse;
+    KDTree kdTreeWaysBuilding;
+    KDTree kdTreeWaysRoads;
     Address address;
     EdgeWeightedDigraph EWD;
    // HashMap<Node, Integer> DigraphNodeToIndex;
@@ -185,20 +204,38 @@ public class Model implements Serializable {
         this.kdTreeBuildings = new KDTree();
         this.kdTreeNaturals = new KDTree();
         this.kdTreeLanduses = new KDTree();
+
+        this.kdTreeWaysPlace = new KDTree();
+        this.kdTreeWaysNatural = new KDTree();
+        this.kdTreeWaysLanduse = new KDTree();
+        this.kdTreeWaysBuilding = new KDTree();
+        this.kdTreeWaysRoads = new KDTree();
+
         for (String s : uniqueWayTypes) System.out.println(s);
 
         // Populates the KDTree using all nodes from .osm
 //        kdTree.populate(nodeList);
         // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
         kdTree.populate(centerPointNodes);
-        save(filename+".obj");
         System.out.println("size of building collection: "+centerPointNodesBuilding.size());
         kdTreeBuildings.populate(centerPointNodesBuilding);
-       System.out.println("Size of building KDTree: " + kdTreeBuildings.size());
-       kdTreeNaturals.populate(centerPointNodesNatural);
-       System.out.println("Size of building Naturals: " + kdTreeNaturals.size());
-       kdTreeLanduses.populate(centerPointNodesLanduse);
-       System.out.println("Size of building Landuse: " + kdTreeLanduses.size());
+        System.out.println("Size of building KDTree: " + kdTreeBuildings.size());
+        kdTreeNaturals.populate(centerPointNodesNatural);
+        System.out.println("Size of building Naturals: " + kdTreeNaturals.size());
+        kdTreeLanduses.populate(centerPointNodesLanduse);
+        System.out.println("Size of building Landuse: " + kdTreeLanduses.size());
+
+        kdTreeLanduses.populate(centerPointNodesWaysPlace);
+        System.out.println("Size of building Ways Place: " + centerPointNodesWaysPlace.size());
+        kdTreeLanduses.populate(centerPointNodesWaysNatural);
+        System.out.println("Size of building Ways Natural: " + centerPointNodesWaysNatural.size());
+        kdTreeLanduses.populate(centerPointNodesWaysLanduse);
+        System.out.println("Size of building Ways Landuse: " + centerPointNodesWaysLanduse.size());
+        kdTreeLanduses.populate(centerPointNodesWaysBuilding);
+        System.out.println("Size of building Ways Building: " + centerPointNodesWaysBuilding.size());
+        kdTreeLanduses.populate(centerPointNodesWaysRoads);
+        System.out.println("Size of building Ways Roads: " + centerPointNodesWaysRoads.size());
+        save(filename+".obj");
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -281,7 +318,6 @@ public class Model implements Serializable {
 
     private void parseWaysAndRelations(XMLStreamReader input1, int tagKind) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         var way = new ArrayList<Node>();
-        var wayType = "";
         var building = false;
         var coast = false;
         var relationLandform = "";
@@ -300,11 +336,13 @@ public class Model implements Serializable {
         int vertexIndex = -2;
         double zoom_scale = -1.0;
         String relationKey = "";
+        String wayType = "";
 
         //if (!parsedFirstWay){
 
         if (input1.getLocalName().equals("way")){
             wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
+            wayType  = "";
         }
         //}
         //if (!parsedFirstRelation){
@@ -423,12 +461,12 @@ public class Model implements Serializable {
                     if (!roadtype.isEmpty()) { // Creates a road
                         Road tmpRoad = new Road(way, roadtype, zoom_scale, lt);
                         ways.add(tmpRoad);
-                        addToCenterPointNodes(way, tmpRoad, true);
+                        addToCenterPointNodes(way, tmpRoad, true, "road");
                         id2way.put(wayid,tmpRoad);
                     } else { // Creates a way which is not a road
                         Way tmpWay = new Way(way, zoom_scale, wayType);
                         ways.add(tmpWay);
-                        addToCenterPointNodes(way, tmpWay, false);
+                        addToCenterPointNodes(way, tmpWay, false, wayType);
                         id2way.put(wayid,tmpWay);
 
                     }
@@ -628,7 +666,7 @@ public class Model implements Serializable {
     }
 
     // finds the center lat and lon among a collection of nodes
-    public void addToCenterPointNodes(List<Node> nodes, Way refWay, Boolean isPartOfRoad){
+    public void addToCenterPointNodes(List<Node> nodes, Way refWay, Boolean isPartOfRoad, String type){
         double sumLat = 0;
         double sumLon = 0;
         for(Node node : nodes){
@@ -643,6 +681,27 @@ public class Model implements Serializable {
         centeredNode.setPartOfRoad(isPartOfRoad);
         centerPointNodes.add(centeredNode);
         indexForCenterPoints++;
+        System.out.println("Centerpoint node was called with the following type: " + type);
+        switch (type) {
+            case "place":
+                centerPointNodesWaysPlace.add(centeredNode);
+                break;
+            case "natural":
+                centerPointNodesWaysNatural.add(centeredNode);
+                break;
+            case "landuse":
+                centerPointNodesWaysLanduse.add(centeredNode);
+                break;
+            case "building":
+                centerPointNodesWaysBuilding.add(centeredNode);
+                break;
+            case "road":
+                centerPointNodesWaysRoads.add(centeredNode);
+                break;
+            default:
+                break;
+        }
+
     }
     public void addPOI(Point2D POI) {
         pointsOfInterest.add(POI);
@@ -680,8 +739,10 @@ public class Model implements Serializable {
                 break;
             case "natural":
                 centerPointNodesNatural.add(centeredNode);
+                break;
             case "landuse":
                 centerPointNodesLanduse.add(centeredNode);
+                break;
             default:
                 break;
         }

@@ -99,19 +99,30 @@ public class View {
         Queue<Node> naturalsNodesFromKD = model.kdTreeNaturals.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         Queue<Node> landuseNodesFromKD = model.kdTreeLanduses.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
 
+        Queue<Node> waysPlaceNodesFromKD = model.kdTreeWaysPlace.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> waysNaturalNodesFromKD = model.kdTreeWaysNatural.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> waysLanduseNodesFromKD = model.kdTreeWaysLanduse.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> waysBuildingNodesFromKD = model.kdTreeBuildings.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> waysRoadsNodesFromKD = model.kdTreeWaysRoads.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+
         // Draws land border
         for (var relation : model.RelationsPlace) {
             relation.Draw(gc,slider_value,dark);
         }
 
         // Drawing ways
-        for (Node nodeSpatial : nodesFromKD) {
+        /*for (Node nodeSpatial : nodesFromKD) {
             Way way = nodeSpatial.getWay();
             if (way != null && way.getZoom_scale() < slider_value) {
                 if (way.wayType.equals("place") || way.wayType.equals("natural") || way.wayType.equals("landuse") || way.wayType.equals("building") || way.wayType.equals("road")) {
                     way.draw(gc, slider_value, dark, model.getColorScheme());
                 }
             }
+        }*/
+
+        for (Node nodeSpatial : waysPlaceNodesFromKD) {
+            Way way = nodeSpatial.getWay();
+            way.draw(gc, slider_value, dark, model.getColorScheme());
         }
 
         // Drawing natural relations
