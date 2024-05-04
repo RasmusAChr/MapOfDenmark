@@ -8,6 +8,7 @@ public class Address implements Serializable {
     String houseNumber;
     String city;
     String municipality;
+    String country;
 
     //Lupin 32 27xx Smørum Egedal Danmark
     public Address() {
@@ -15,13 +16,15 @@ public class Address implements Serializable {
         this.houseNumber = "";
         this.city = "";
         this.municipality = "";
+        this.country = "";
     }
 
-    public Address(String street, String houseNumber, String city, String municipality){
+    public Address(String street, String houseNumber, String city, String municipality, String country){
         this.street = street;
-        this.houseNumber = street;
+        this.houseNumber = houseNumber;
         this.city = city;
         this.municipality = municipality;
+        this.country = country;
     }
 
     public void setStreet(String street) {
@@ -40,8 +43,10 @@ public class Address implements Serializable {
         this.municipality = municipality;
     }
 
+    public void setCountry(String country) { this.country = country; }
+
     public String getFullAddress(){
-        return street+" "+houseNumber+" "+city+" "+municipality;
+        return street+" "+houseNumber+" "+city+" "+municipality+" "+country;
     }
 
 //    public String getFullAddress() {

@@ -179,6 +179,7 @@ public class Model implements Serializable {
         } else if (filename.endsWith(".osm")) {
             parseRouteNet(inputStream);
         }
+
         this.trie = new Trie();
         this.radixTrie = new RadixTrie();
         for(Address address : addressList){
@@ -602,6 +603,8 @@ public class Model implements Serializable {
             } else if (k.contains("municipality")) {
                 // To save performance it may be easier to not store the municipality in the trie but instead map city to municipality
                 address.setMunicipality(v);
+            } else if (k.contains("country")) {
+                address.setCountry(v);
             }
         }
     }
@@ -632,6 +635,7 @@ public class Model implements Serializable {
     public Map<String, Node> getAddressIdMap() {
         return addressIdMap;
     }
+
     public List<String> getSuggestionList(String input){
 //        return trie.getAddressSuggestions(input.toLowerCase(), 4);
         return radixTrie.getAddressSuggestions(input.toLowerCase(), 4);
