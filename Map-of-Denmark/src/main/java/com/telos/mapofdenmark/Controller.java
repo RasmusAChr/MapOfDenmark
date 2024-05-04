@@ -66,7 +66,7 @@ public class Controller {
 
     private Node lastPannedToAddress;
 
-    private boolean allowedToPan = false;
+    private boolean allowedToPan = true;
 
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;

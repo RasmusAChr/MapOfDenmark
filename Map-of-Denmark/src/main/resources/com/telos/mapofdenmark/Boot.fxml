@@ -7,7 +7,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.telos.mapofdenmark.Controller_Boot">
+<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx"  xmlns:fx="http://javafx.com/fxml" fx:controller="com.telos.mapofdenmark.Controller_Boot">
    <children>
       <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
          <children>
@@ -25,10 +25,17 @@
                      </children>
                   </HBox>
                </bottom>
-               <center>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="WELCOME TO THE MAP OF DENMARK DO YOU WISH TO RUN A CUSTOM MAP?" BorderPane.alignment="CENTER">
+               <top>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="WELCOME TO THE MAP OF DENMARK" BorderPane.alignment="CENTER">
                      <font>
-                        <Font name="Cambria" size="15.0" />
+                        <Font name="Cambria" size="24.0" />
+                     </font>
+                  </Text>
+               </top>
+               <center>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="DO YOU WISH TO RUN A CUSTOM MAP?" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font size="15.0" />
                      </font>
                   </Text>
                </center>
