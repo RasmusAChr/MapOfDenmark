@@ -29,7 +29,7 @@ public class RadixTrie implements Serializable {
     public void insert(String inputWord) {
         if (inputWord == null || inputWord.isEmpty()) return; // Do not process null or empty strings
         String input = inputWord.toLowerCase(); // Convert the word to lowercase to ensure the trie is case-insensitive
-        System.out.println("Inserting word: " + input);
+//        System.out.println("Inserting word: " + input);
         insert(rootNode, input, 0);
     }
 
@@ -59,10 +59,10 @@ public class RadixTrie implements Serializable {
             RadixNode childNode = node.children.get(nextChar);
             if (childNode == null) {
                 childNode = new RadixNode(word.substring(index + i), true);
-                System.out.println("Creating new node with value: " + childNode.value);
+//                System.out.println("Creating new node with value: " + childNode.value);
                 node.children.put(nextChar, childNode);
             } else {
-                System.out.println("Inserting at existing node for char: " + nextChar);
+//                System.out.println("Inserting at existing node for char: " + nextChar);
                 node.children.put(nextChar, insert(childNode, word, index + i));
             }
             return node;
@@ -75,7 +75,7 @@ public class RadixTrie implements Serializable {
                 RadixNode newChild = new RadixNode(node.value.substring(i), node.endOfWord);
                 newChild.children.putAll(node.children);
 
-                System.out.println("Splitting node. New leaf: " + newLeaf.value + ", new child: " + newChild.value);
+//                System.out.println("Splitting node. New leaf: " + newLeaf.value + ", new child: " + newChild.value);
                 node.children.clear();
                 node.children.put(newLeaf.value.charAt(0), newLeaf);
                 node.children.put(newChild.value.charAt(0), newChild);
@@ -103,14 +103,14 @@ public class RadixTrie implements Serializable {
         RadixNode currentNode = rootNode;
         String currentPrefix = "";
 
-        System.out.println("Starting traversal for prefix: " + prefix);
+//        System.out.println("Starting traversal for prefix: " + prefix);
         int prefixPosition = 0;
 
         while (prefixPosition < prefix.length() && currentNode != null) {
             boolean matched = false;
             for (RadixNode child : currentNode.children.values()) {
                 if (prefix.startsWith(currentPrefix + child.value)) {
-                    System.out.println("Traversed to node: " + child.value + ", currentPrefix: " + (currentPrefix + child.value));
+//                    System.out.println("Traversed to node: " + child.value + ", currentPrefix: " + (currentPrefix + child.value));
                     currentNode = child;
                     currentPrefix += child.value;
                     prefixPosition += child.value.length();
@@ -119,7 +119,7 @@ public class RadixTrie implements Serializable {
                 } else if (child.value.startsWith(prefix.substring(prefixPosition))) {
                     // Handle partial prefix in node
                     String matchPart = prefix.substring(prefixPosition);
-                    System.out.println("Partially matched node: " + child.value + " with prefix part: " + matchPart);
+//                    System.out.println("Partially matched node: " + child.value + " with prefix part: " + matchPart);
                     currentNode = child;
                     currentPrefix += child.value; // Ensure the entire node value is added to currentPrefix
                     prefixPosition += matchPart.length();
@@ -129,16 +129,16 @@ public class RadixTrie implements Serializable {
             }
 
             if (!matched) {
-                System.out.println("No child node extends the prefix beyond: " + currentPrefix);
+//                System.out.println("No child node extends the prefix beyond: " + currentPrefix);
                 return addressSuggestions;
             }
         }
 
         if (prefixPosition >= prefix.length()) {
-            System.out.println("Collecting suggestions for built prefix: " + currentPrefix);
+//            System.out.println("Collecting suggestions for built prefix: " + currentPrefix);
             collectAddressSuggestions(currentNode, currentPrefix, addressSuggestions, limit);
         } else {
-            System.out.println("Prefix traversal ended prematurely.");
+//            System.out.println("Prefix traversal ended prematurely.");
         }
 
 //        return addressSuggestions;
