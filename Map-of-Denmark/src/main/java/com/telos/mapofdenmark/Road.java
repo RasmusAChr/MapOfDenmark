@@ -20,7 +20,7 @@ public class Road extends Way implements Serializable {
     public void draw(GraphicsContext gc, double zoom, boolean darkMode,ColorScheme cs) {
         double zoomValue;
         if(lt.findKey(roadType)) {
-            gc.setStroke(cs.getRoadColor(roadType, darkMode));
+            gc.setStroke(cs.getColor(roadType, darkMode, "road"));
             if (zoom < 5.0) {
                 zoomValue = lt.getWidth(roadType) / 2;//0.666;
             } else {

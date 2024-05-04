@@ -11,9 +11,6 @@ public class ColorScheme implements Serializable{
     Map<String, String> naturalDarkColors;
     Map<String, String> landuseColors;
     Map<String, String> landuseDarkColors;
-    Map<String, String> buildingColors;
-    Map<String, String> buildingDarkColors;
-
     Map<String, String> roadColors;
     Map<String, String> roadDarkColors;
 
@@ -25,14 +22,11 @@ public class ColorScheme implements Serializable{
         naturalDarkColors = new HashMap<>();
         landuseColors = new HashMap<>();
         landuseDarkColors = new HashMap<>();
-        buildingColors = new HashMap<>();
-        buildingDarkColors = new HashMap<>();
         roadColors = new HashMap<>();
         roadDarkColors = new HashMap<>();
         placeScheme();
         naturalScheme();
         landuseScheme();
-        buildingScheme();
         roadScheme();
     }
 
@@ -51,7 +45,7 @@ public class ColorScheme implements Serializable{
                         hex = landuseColors.get(landform);
                         break;
                     case "building":
-                        hex = "#d8d0c9";//buildingColors.get(landform);
+                        hex = "#a39d98";
                         break;
                     case "road":
                         hex = roadColors.get(landform);
@@ -70,7 +64,7 @@ public class ColorScheme implements Serializable{
                         hex = landuseDarkColors.get(landform);
                         break;
                     case "building":
-                        hex = "#9b9087";//buildingDarkColors.get(landform);
+                        hex = "#706b67";
                         break;
                     case "road":
                         hex = roadDarkColors.get(landform);
@@ -80,23 +74,6 @@ public class ColorScheme implements Serializable{
             return Color.web(hex);
         } catch (NullPointerException e) {
             if (!landform.isEmpty()) System.out.println("missing color on: " + type + " " + landform);
-            return getDefaultColor(dark);
-        }
-
-    }
-
-    public Color getRoadColor(String type, boolean dark){
-        String hex = null;
-        try{
-            if(!dark){
-                hex = roadColors.get(type);
-            }
-            else {
-                hex = roadDarkColors.get(type);
-            }
-            return Color.web(hex);
-        } catch (NullPointerException e) {
-            if (!type.isEmpty()) System.out.println("missing color on: " + type);
             return getDefaultColor(dark);
         }
 
@@ -238,92 +215,6 @@ public class ColorScheme implements Serializable{
         landuseDarkColors.put("bare_rock", "#a6a6a6");
         landuseColors.put("scree", "#e4dcd4");
         landuseDarkColors.put("scree", "#c5bdb5");
-    }
-
-    public void buildingScheme(){
-        // Building
-        buildingColors.put("apartments", "#d8d0c9");
-        buildingDarkColors.put("apartments", "#9b9087");
-        buildingColors.put("house", "#d8d0c9");
-        buildingDarkColors.put("house", "#9b9087");
-        buildingColors.put("residential", "#d8d0c9");
-        buildingDarkColors.put("residential", "#9b9087");
-        buildingColors.put("dormitory", "#d8d0c9");
-        buildingDarkColors.put("dormitory", "#9b9087");
-        buildingColors.put("office", "#d8d0c9");
-        buildingDarkColors.put("office", "#9b9087");
-        buildingColors.put("school", "#d8d0c9");
-        buildingDarkColors.put("school", "#9b9087");
-        buildingColors.put("college", "#d8d0c9");
-        buildingDarkColors.put("college", "#9b9087");
-        buildingColors.put("hospital", "#d8d0c9");
-        buildingDarkColors.put("hospital", "#9b9087");
-        buildingColors.put("retail", "#d8d0c9");
-        buildingDarkColors.put("retail", "#9b9087");
-        buildingColors.put("square", "#d8d0c9");
-        buildingDarkColors.put("square", "#9b9087");
-        buildingColors.put("hotel", "#d8d0c9");
-        buildingDarkColors.put("hotel", "#9b9087");
-        buildingColors.put("yes", "#d8d0c9");
-        buildingDarkColors.put("yes", "#9b9087");
-        buildingColors.put("farm", "#d8d0c9");
-        buildingDarkColors.put("farm", "#9b9087");
-        buildingColors.put("terrace", "#d8d0c9");
-        buildingDarkColors.put("terrace", "#9b9087");
-        buildingColors.put("semidetached_house", "#d8d0c9");
-        buildingDarkColors.put("semidetached_house", "#9b9087");
-        buildingColors.put("detached", "#d8d0c9");
-        buildingDarkColors.put("detached", "#d8d0c9");
-        buildingColors.put("warehouse", "#d8d0c9");
-        buildingDarkColors.put("warehouse", "#d8d0c9");
-        buildingColors.put("garage", "#d8d0c9");
-        buildingDarkColors.put("garage", "#d8d0c9");
-        buildingColors.put("cabin", "#d8d0c9");
-        buildingDarkColors.put("cabin", "#d8d0c9");
-        buildingColors.put("shed", "#d8d0c9");
-        buildingDarkColors.put("shed", "#d8d0c9");
-        buildingColors.put("bungalow", "#d8d0c9");
-        buildingDarkColors.put("bungalow", "#d8d0c9");
-        buildingColors.put("roof", "#d8d0c9");
-        buildingDarkColors.put("roof", "#d8d0c9");
-        buildingColors.put("hut", "#d8d0c9");
-        buildingDarkColors.put("hut", "#d8d0c9");
-        buildingColors.put("kiosk", "#d8d0c9");
-        buildingDarkColors.put("kiosk", "#d8d0c9");
-        buildingColors.put("slurry_tank", "#d8d0c9");
-        buildingDarkColors.put("slurry_tank", "#d8d0c9");
-        buildingColors.put("farm_auxiliary", "#d8d0c9");
-        buildingDarkColors.put("farm_auxiliary", "#d8d0c9");
-        buildingColors.put("church", "#d8d0c9");
-        buildingDarkColors.put("church", "#d8d0c9");
-        buildingColors.put("silo", "#d8d0c9");
-        buildingDarkColors.put("silo", "#d8d0c9");
-        buildingColors.put("supermarket", "#d8d0c9");
-        buildingDarkColors.put("supermarket", "#d8d0c9");
-        buildingColors.put("storage_tank", "#d8d0c9");
-        buildingDarkColors.put("storage_tank", "#d8d0c9");
-        buildingColors.put("windmill", "#d8d0c9");
-        buildingDarkColors.put("windmill", "#d8d0c9");
-        buildingColors.put("carport", "#d8d0c9");
-        buildingDarkColors.put("carport", "#d8d0c9");
-        buildingColors.put("lighthouse", "#d8d0c9");
-        buildingDarkColors.put("lighthouse", "#d8d0c9");
-        buildingColors.put("ruins", "#d8d0c9");
-        buildingDarkColors.put("ruins", "#d8d0c9");
-        buildingColors.put("transformer_tower", "#d8d0c9");
-        buildingDarkColors.put("transformer_tower", "#d8d0c9");
-        buildingColors.put("toilets", "#d8d0c9");
-        buildingDarkColors.put("toilets", "#d8d0c9");
-        buildingColors.put("kindergarten", "#d8d0c9");
-        buildingDarkColors.put("kindergarten", "#d8d0c9");
-        buildingColors.put("sports_centre", "#d8d0c9");
-        buildingDarkColors.put("sports_centre", "#d8d0c9");
-        buildingColors.put("greenhouse", "#d8d0c9");
-        buildingDarkColors.put("greenhouse", "#d8d0c9");
-        buildingColors.put("barn", "#d8d0c9");
-        buildingDarkColors.put("barn", "#d8d0c9");
-        buildingColors.put("barn", "#d8d0c9");
-        buildingDarkColors.put("barn", "#d8d0c9");
     }
 
     public void roadScheme(){
