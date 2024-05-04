@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 
 public class Node implements Serializable {
-    long id;
+    int id;
     public double lat, lon;
     Way way;
     boolean isPartOfRoad;
     Relation refRelation;
 
-    public Node(long id, double lat, double lon) {
+    public Node(int id, double lat, double lon) {
         this.id = id;
         this.lat = lat;
         this.lon = lon;

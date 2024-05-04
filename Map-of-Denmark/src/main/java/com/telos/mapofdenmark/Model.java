@@ -61,7 +61,6 @@ public class Model implements Serializable {
     EdgeWeightedDigraph EWD;
    // HashMap<Node, Integer> DigraphNodeToIndex;
   //  HashMap<Integer, Node> DigraphIndexToNode;
-    BiMap<Node,Integer> IndexBINode;
     TreeMap<Long, Node> id2node;
     HashMap<String, Double> tagToScaleValue;
     List<Member> relationsMembers;
@@ -137,7 +136,6 @@ public class Model implements Serializable {
                 "driveway"));
      //   this.DigraphNodeToIndex = new HashMap<>();
       //  this.DigraphIndexToNode = new HashMap<>();
-        this.IndexBINode = HashBiMap.create();
         this.tagToScaleValue = new HashMap<>();
         /*
         tagToScaleValue.put("building", 70.0);
@@ -199,7 +197,7 @@ public class Model implements Serializable {
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         long addressId = 0;
-        int roadCountX = 0;
+        int NodeCount = 0;
         while (input.hasNext()) {
 
             var tagKind = input.next();
@@ -216,14 +214,11 @@ public class Model implements Serializable {
                         var id = Long.parseLong(input.getAttributeValue(null, "id"));
                         var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
                         var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
-                        Node node = new Node(id, lat, lon);
+                        Node node = new Node(NodeCount, lat, lon);
                         id2node.put(id, node);
                         nodeList.add(node);
                         addressId = id;
-                        IndexBINode.put(node, roadCountX);
-                        //DigraphNodeToIndex.put(node, roadCountX);
-                        //DigraphIndexToNode.put(roadCountX, node);
-                        roadCountX++;
+                        NodeCount++;
 
                     }
                     case "tag" -> {
@@ -238,7 +233,7 @@ public class Model implements Serializable {
                         }
                     }
                     case "way","relation" -> {
-                        EWD = new EdgeWeightedDigraph(roadCountX);
+                        EWD = new EdgeWeightedDigraph(NodeCount);
                         wayid = Long.parseLong(input.getAttributeValue(null,"id"));
                         parseWaysAndRelations(input, tagKind); // First way element ???? input.getname = way
                         return;
@@ -295,10 +290,10 @@ public class Model implements Serializable {
         boolean access = false;
         boolean acccesPostBollean = false;
         long wayid = 0;
-        int vertexIndex = -2;
         double zoom_scale = -1.0;
         double max_speed = -1.0;
         String relationKey = "";
+        Node startNode = null;
 
         //if (!parsedFirstWay){
 
@@ -439,12 +434,8 @@ public class Model implements Serializable {
                     }
                     // Ensuring that every node has a ref to the way it is apart of
                     for (Node node : way) {
-                        if (shouldAdd && vertexIndex > -1) {
-                            //Node fromNode = DigraphIndexToNode.get(vertexIndex);
-                           // int toIndex = DigraphNodeToIndex.get(node);
-                            Node fromNode = IndexBINode.inverse().get(vertexIndex);
-                            int toIndex = IndexBINode.get(node);
-                            double dist = distance(fromNode.lat, node.lat, fromNode.lon, node.lon);
+                        if (shouldAdd && startNode != null) {
+                            double dist = distance(startNode.lat, node.lat, startNode.lon, node.lon);
                             double weight_distance_modifier = dist;
                             double weight_car = 1.0;
                             double weight_cycle = dist;
@@ -455,27 +446,22 @@ public class Model implements Serializable {
                             if (!drivable) {
                                 weight_car = 500000.0;
                             } else if(roadIdSet.containsKey(roadtype)){
-                                if (max_speed > 0) {
-                                    weight_car = weight_distance_modifier * (max_speed/50.0);
-                                } else {
-                                    weight_car = weight_distance_modifier * roadIdSet.get(roadtype);
-                                }
+                                weight_car = weight_distance_modifier * roadIdSet.get(roadtype);
                             }
                             if (oneway) {
                                 if (onewayBicycle) {
-                                    EWD.addEdge(new DirectedEdge(vertexIndex, toIndex, weight_cycle, weight_car ));
+                                    EWD.addEdge(new DirectedEdge(startNode.id, node.id, weight_cycle, weight_car ));
                                 } else {
-                                    EWD.addEdge(new DirectedEdge(vertexIndex, toIndex, weight_cycle, weight_car ));
-                                    EWD.addEdge(new DirectedEdge(toIndex, vertexIndex, weight_cycle, 500000.0 ));
+                                    EWD.addEdge(new DirectedEdge(startNode.id, node.id, weight_cycle, weight_car ));
+                                    EWD.addEdge(new DirectedEdge(node.id, startNode.id, weight_cycle, 500000.0 ));
                                 }
                             } else {
-                                EWD.addEdge(new DirectedEdge(vertexIndex, toIndex, weight_cycle, weight_car ));
-                                EWD.addEdge(new DirectedEdge(toIndex, vertexIndex, weight_cycle, weight_car ));
+                                EWD.addEdge(new DirectedEdge(startNode.id, node.id, weight_cycle, weight_car ));
+                                EWD.addEdge(new DirectedEdge(node.id, startNode.id, weight_cycle, weight_car ));
                             }
 
                         }
-                      //  vertexIndex = DigraphNodeToIndex.get(node);
-                        vertexIndex = IndexBINode.get(node);
+                        startNode = node;
                     }
                     way.clear();
                     roadtype = "";
@@ -484,7 +470,6 @@ public class Model implements Serializable {
                     cycleable = false;
                     oneway = false;
                     onewayBicycle = false;
-                    vertexIndex = -2;
                     access = false;
                     acccesPostBollean = false;
                     insideRelation = false;
@@ -492,7 +477,6 @@ public class Model implements Serializable {
                     zoom_scale = -1.0;
                     max_speed = -1.0;
                 } else if (name.equals("relation") && insideRelation) {
-                    vertexIndex = -1;
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
                         if (validRelation) {
@@ -539,12 +523,6 @@ public class Model implements Serializable {
         }
     }
 
-    private int weightCalculate() {
-        //calculate the weight of the edge, based on different factors.
-
-        return 20;
-    }
-
     //Dijkstra implementation
     public void StartDijkstra(Node startaddress,boolean vehicle){
         double x = startaddress.getLon();
@@ -552,7 +530,7 @@ public class Model implements Serializable {
         Node tmpNode = kdTree.getNearestNeighbor(x,y,true).getWay().getArbitraryNode();
         list.clear();
       //  this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(tmpNode),vehicle); // this starts the dijkstra search from the index that refferes to a node
-        this.Dijkstra = new SP(EWD,IndexBINode.get(tmpNode),vehicle);
+        this.Dijkstra = new SP(EWD,tmpNode.id,vehicle);
     }
 
 
@@ -576,13 +554,13 @@ public class Model implements Serializable {
 
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
-            for(DirectedEdge i: Dijkstra.pathTo(IndexBINode.get(tmpNode))) {
-             if(!NodeAdded.contains(IndexBINode.inverse().get(i.to()))){
-                 NodeAdded.add(IndexBINode.inverse().get(i.to()));
-                 path.add(IndexBINode.inverse().get(i.to()));
-             } else if (!NodeAdded.contains(IndexBINode.inverse().get(i.from()))){
-                 NodeAdded.add(IndexBINode.inverse().get(i.from()));
-                 path.add(IndexBINode.inverse().get(i.from()));
+            for(DirectedEdge i: Dijkstra.pathTo(tmpNode.id)) {
+             if(!NodeAdded.contains(id2node.get(i.to()))){
+                 NodeAdded.add(id2node.get(i.to()));
+                 path.add(id2node.get(i.to()));
+             } else if (!NodeAdded.contains(id2node.get(i.from()))){
+                 NodeAdded.add(id2node.get(i.from()));
+                 path.add(id2node.get(i.from()));
              }
 
          }
