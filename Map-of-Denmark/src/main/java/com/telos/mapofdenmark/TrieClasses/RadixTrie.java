@@ -3,6 +3,7 @@ package com.telos.mapofdenmark.TrieClasses;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,6 +27,7 @@ public class RadixTrie implements Serializable {
     public void insert(String inputWord) {
         if (inputWord == null || inputWord.isEmpty()) return; // Do not process null or empty strings
         String input = inputWord.toLowerCase(); // Convert the word to lowercase to ensure the trie is case-insensitive
+        System.out.println("Inserting word: " + input);
         insert(rootNode, input, 0);
     }
 
@@ -55,8 +57,10 @@ public class RadixTrie implements Serializable {
             RadixNode childNode = node.children.get(nextChar);
             if (childNode == null) {
                 childNode = new RadixNode(word.substring(index + i), true);
+                System.out.println("Creating new node with value: " + childNode.value);
                 node.children.put(nextChar, childNode);
             } else {
+                System.out.println("Inserting at existing node for char: " + nextChar);
                 node.children.put(nextChar, insert(childNode, word, index + i));
             }
             return node;
@@ -68,6 +72,8 @@ public class RadixTrie implements Serializable {
                 RadixNode newLeaf = new RadixNode(word.substring(index + i), true);
                 RadixNode newChild = new RadixNode(node.value.substring(i), node.endOfWord);
                 newChild.children.putAll(node.children);
+
+                System.out.println("Splitting node. New leaf: " + newLeaf.value + ", new child: " + newChild.value);
                 node.children.clear();
                 node.children.put(newLeaf.value.charAt(0), newLeaf);
                 node.children.put(newChild.value.charAt(0), newChild);
@@ -91,24 +97,22 @@ public class RadixTrie implements Serializable {
      * @return A list of suggestions that start with the prefix.
      */
     public List<String> getAddressSuggestions(String prefix, int limit){
-        List<String> addressSuggestions = new ArrayList<>(); // A list that stores the suggestions
-        RadixNode currentNode = rootNode; // Start the traversal from the root node
+        List<String> addressSuggestions = new ArrayList<>();
+        RadixNode currentNode = rootNode;
+        String currentPrefix = ""; // Initialize current prefix as empty
 
-        // Traverse through each character from the prefix
-        for (char character: prefix.toCharArray()){
-            currentNode = currentNode.children.get(character); // We move to the next node
-            // Checks whether the prefix exists in the trie or not. If they don't then return an empty list
-            if(currentNode == null){
-                return addressSuggestions;
+        // Traverse to the node that matches the end of the prefix
+        for (char character : prefix.toCharArray()) {
+            currentNode = currentNode.children.get(character);
+            if (currentNode == null) {
+                return addressSuggestions; // If the prefix is not found
             }
+            currentPrefix += currentNode.value; // Build the correct prefix path
         }
 
-        // Collect suggestions recursively through the collectAddressSuggestions method, which starts from this current node
-        collectAddressSuggestions(currentNode, prefix, addressSuggestions, limit);
-
-//        return addressSuggestions;
-        // instead of just returning the collected strings we format them before returning
-        return formatAddressSuggestions(addressSuggestions);
+        System.out.println("Collecting suggestions for prefix: " + prefix);
+        collectAddressSuggestions(currentNode, currentPrefix, addressSuggestions, limit);
+        return formatAddressSuggestions(addressSuggestions); // Assuming this method
     }
 
     /**
@@ -119,23 +123,18 @@ public class RadixTrie implements Serializable {
      * @param limit Maximum number of suggestions.
      */
     // A recursive method that collects suggestions from the given node
-    private void collectAddressSuggestions(RadixNode node, String prefix, List<String> addressSuggestions, int limit){
-        // If the current node is the end of a word, add the complete address to the suggestion list
-        if(node.endOfWord){
-            addressSuggestions.add(prefix + node.value);
-            if(addressSuggestions.size() >= limit){
-//                System.out.println("Limit has been reached");
-                return; // If the limit has been reached, we stop collecting anymore suggestions.
+    private void collectAddressSuggestions(RadixNode node, String prefix, List<String> addressSuggestions, int limit) {
+        if (node.endOfWord) {
+            addressSuggestions.add(prefix);
+            System.out.println("Adding to suggestions: " + prefix);
+            if (addressSuggestions.size() >= limit) {
+                return;
             }
         }
 
-        // Recursively traverse each child node to collect suggestions
-        for (char charValue : node.children.keySet()) {
-            if (addressSuggestions.size() >= limit) {
-                return; // Stop collecting if the limit has been reached
-            }
-            // Append the remaining characters of node.value to prefix
-            collectAddressSuggestions(node.children.get(charValue), prefix + node.value, addressSuggestions, limit);
+        for (Map.Entry<Character, RadixNode> entry : node.children.entrySet()) {
+            String extendedPrefix = prefix + entry.getValue().value; // Only extend prefix with the value of the current child
+            collectAddressSuggestions(entry.getValue(), extendedPrefix, addressSuggestions, limit);
         }
     }
 
