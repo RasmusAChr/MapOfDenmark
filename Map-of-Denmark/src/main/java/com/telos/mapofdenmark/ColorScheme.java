@@ -111,13 +111,13 @@ public class ColorScheme implements Serializable{
     public void placeScheme(){
         // Place
         placeColors.put("islet", "#f2efe9");
-        placeDarkColors.put("islet", "#464646");
+        placeDarkColors.put("islet", "#b5b3ae");
         placeColors.put("island", "#f2efe9");
-        placeDarkColors.put("island", "#3d3d3d");
+        placeDarkColors.put("island", "#b5b3ae");
         placeColors.put("hamlet", "#f2efe9");
-        placeDarkColors.put("hamlet", "#323232");
+        placeDarkColors.put("hamlet", "#b5b3ae");
         placeColors.put("archipelago", "#f2efe9");
-        placeDarkColors.put("archipelago", "#292929");
+        placeDarkColors.put("archipelago", "#b5b3ae");
         placeColors.put("square", "#dadada");
         placeDarkColors.put("square", "#a0a0a0");
         placeColors.put("neighbourhood", "#dadada");
