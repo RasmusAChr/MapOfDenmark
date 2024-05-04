@@ -10,7 +10,7 @@ public class Road extends Way implements Serializable {
     String roadType;
     LineThickness lt;
     public Road(ArrayList<Node> way, String roadType, double zoom_scale, LineThickness lt) {
-        super(way, zoom_scale);
+        super(way, zoom_scale, "", "road");
         this.roadType = roadType;
         this.lt = lt;
 
@@ -18,13 +18,14 @@ public class Road extends Way implements Serializable {
 
     @Override
     public void draw(GraphicsContext gc, double zoom, boolean darkMode,ColorScheme cs) {
-        double zoomValue = 0.0;
+        double zoomValue;
         if(lt.findKey(roadType)) {
-            gc.setStroke(cs.getColor(roadType, darkMode));
+            gc.setStroke(cs.getColor(roadType, darkMode, "road"));
             if (zoom < 5.0) {
-                zoomValue = lt.getWidth(roadType) / 0.666;
+                zoomValue = lt.getWidth(roadType) / 2;//0.666;
             } else {
-                zoomValue = lt.getWidth(roadType) / (zoom/10);
+                zoomValue = lt.getWidth(roadType) / 2;
+                //zoomValue = lt.getWidth(roadType) / (zoom/10);
             }
             gc.setLineWidth(zoomValue);
         }
@@ -32,4 +33,9 @@ public class Road extends Way implements Serializable {
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(0.00001);
     }
+
+    /*@Override
+    public void fill(GraphicsContext gc, boolean darkMode, ColorScheme cs, String type){
+        return;
+    }*/
 }

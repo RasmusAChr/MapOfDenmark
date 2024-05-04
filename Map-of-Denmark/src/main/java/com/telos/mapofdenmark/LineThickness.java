@@ -45,7 +45,7 @@ public class LineThickness implements Serializable {
         linewidth.put("service", 0.00008);
         linewidth.put("pedestrian", 0.00007);
         linewidth.put("footway", 0.00007);
-        linewidth.put("path", 0.00007);
+        linewidth.put("path", 0.00003);
     }
 
     public boolean findKey(String a) {
