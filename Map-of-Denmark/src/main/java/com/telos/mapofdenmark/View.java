@@ -119,21 +119,7 @@ public class View {
             }
         }
 
-        // Drawing natural relations
-        for(Node naturalsNode : naturalsNodesFromKD){
-            Relation relation = naturalsNode.getRefRelation();
-            relation.Draw(gc,slider_value,dark,"natural");
-        }
 
-        // Drawing natural ways
-        for (Node naturalsNode : waysNaturalNodesFromKD) {
-            Way way = naturalsNode.getWay();
-            if (way != null && way.getZoom_scale() < slider_value) {
-                gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark, model.getColorScheme());
-                way.fill(gc, dark, model.getColorScheme(), "natural");
-            }
-        }
 
         // Drawing landuse relations
         for(Node landuseNode : landuseNodesFromKD){
@@ -148,6 +134,22 @@ public class View {
                 gc.setStroke(Color.BLACK);
                 way.draw(gc, slider_value, dark, model.getColorScheme());
                 way.fill(gc, dark, model.getColorScheme(), "landuse");
+            }
+        }
+
+        // Drawing natural relations
+        for(Node naturalsNode : naturalsNodesFromKD){
+            Relation relation = naturalsNode.getRefRelation();
+            relation.Draw(gc,slider_value,dark,"natural");
+        }
+
+        // Drawing natural ways
+        for (Node naturalsNode : waysNaturalNodesFromKD) {
+            Way way = naturalsNode.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+                way.fill(gc, dark, model.getColorScheme(), "natural");
             }
         }
 
