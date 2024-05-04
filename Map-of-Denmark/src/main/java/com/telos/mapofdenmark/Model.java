@@ -184,7 +184,7 @@ public class Model implements Serializable {
         this.radixTrie = new RadixTrie();
         for(Address address : addressList){
             if(address != null){
-                trie.insert(address.getStreet());
+//                trie.insert(address.getStreet());
                 // RadixTrie insert put here
                 radixTrie.insert(address.getFullAddress());
             } else System.out.println("Address is null");
