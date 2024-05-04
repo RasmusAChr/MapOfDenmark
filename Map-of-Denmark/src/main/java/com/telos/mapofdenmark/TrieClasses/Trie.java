@@ -12,12 +12,14 @@ import java.util.regex.Pattern;
  * The "Trie" data structure is a prefix tree data structure, that is able to find suggestions based on a prefix.
  * It contains methods such as "Insert" which inserts words into the trie, "getAddressSuggestions" which finds the node corresponding to the prefix
  * and lastly "collectAddressSuggestions" which is a recursive method to collect suggestions starting from a given node.
+ *
+ * Credit for the original idea for the data structure: Squash.io  Link: https://www.squash.io/tutorial-trie-data-structure-availability-in-java/
  */
 public class Trie implements Serializable {
     TrieNode rootNode;
 
     /**
-     * Constructor for the Trie class.
+     * Constructor which constructs a new Trie with an empty root node
      */
     public Trie(){
 //        rootNode = new TrieNode(); // At initialization the trie will start with an empty root node
@@ -39,7 +41,13 @@ public class Trie implements Serializable {
         currentNode.endOfWord = true; // Mark the end of a word
     }
 
-    // Inspiration for contains method for a Trie found here: https://www.baeldung.com/trie-java
+    /**
+     * Method to check whether the trie contains a certain input word
+     * @param inputWord - the word that needs to be checked in the trie
+     * @return - true = trie does contain word, false = trie does not contain word
+     *
+     * Credit for original implementation of method: https://www.baeldung.com/trie-java
+     */
     public boolean contains(String inputWord) {
         // Start traversal at root node
         TrieNode currentNode = rootNode;

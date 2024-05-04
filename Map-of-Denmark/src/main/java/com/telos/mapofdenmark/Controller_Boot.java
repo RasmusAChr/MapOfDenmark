@@ -12,9 +12,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
+/**
+ * The Controller_Boot class controls the boot screen of the application, but only the boot screen.
+ * It handles user interactions which includes: loading a custom file or choosing the default file.
+ */
 public class Controller_Boot {
-
+    /**
+     * The default constructor for the Controller_Boot class.
+     * Only initializes an empty constructor for the FXML file.
+     */
     public Controller_Boot(){}
 
     public String userFilename;
@@ -35,7 +41,11 @@ public class Controller_Boot {
     @FXML
     private Text Loading;
 
-
+    /**
+     * Initializes the controller with the specified view and stage.
+     * @param view - the View_Boot associated with this controller
+     * @param primaryStage - the primary stage of the JavaFX application
+     */
     public void init(View_Boot view, Stage primaryStage){
         this.view = view;
         this.primaryStage = primaryStage;
@@ -44,7 +54,13 @@ public class Controller_Boot {
     }
 
 
-    // Loads the custim file when pressing Yes
+    /**
+     * Method used when the user chooses to load a custom file. It creates a file chooser with the appropriate settings for the allowed file types.
+     * If the user back out of choosing a file, it will use the default file to load.
+     * @throws XMLStreamException - if an error occurs during XML parsing
+     * @throws IOException - if an Input/Output error occurs
+     * @throws ClassNotFoundException - If the specified class could not be found
+     */
     @FXML
     private void readFile() throws XMLStreamException, IOException, ClassNotFoundException {
 
@@ -82,7 +98,13 @@ public class Controller_Boot {
         }
 
     }
-    // Loads the dault file when pressing no
+    /**
+     * Method triggered if the user don't want to pick a custom file.
+     * If so the method will load the default file for the user
+     * @throws XMLStreamException - if an error occurs during XML parsing
+     * @throws IOException - if an Input/Output error occurs
+     * @throws ClassNotFoundException - If the specified class could not be found
+     */
     @FXML
     private void default_path() throws XMLStreamException, IOException, ClassNotFoundException {
         // Using default file
@@ -98,16 +120,35 @@ public class Controller_Boot {
         }
     }
 
+    /**
+     * Method used to load the default file from resources using InputStreams.
+     * @return - an InputStream for the default file
+     */
     private InputStream loadDefaultFile() {
         InputStream inputStream = getClass().getResourceAsStream("/kbh.osm");
         System.out.println("Loaded default file: " + inputStream); // Print loaded file for debugging
         return inputStream;
     }
+
+    /**
+     * Method used to run the map with the given InputStream and file name.
+     * @param primaryStage - The primary stage of the JavaFX application
+     * @param inputStream - the InputStream for the map data
+     * @param userFilename - the name of the file chosen
+     * @throws XMLStreamException - if an error occurs during XML parsing
+     * @throws IOException - if an Input/Output error occurs
+     * @throws ClassNotFoundException - If the specified class could not be found
+     */
     private void runMap(Stage primaryStage,InputStream inputStream, String userFilename) throws XMLStreamException, IOException, ClassNotFoundException {
         var model = Model.load(inputStream, userFilename);
         var view = new View(model, primaryStage);
 
     }
+
+    /**
+     * Getter method to return the file name of the chosen file
+     * @return - String containing the file name
+     */
     public String FileName(){
         if (userFilename == null) return "KBH";
         else return userFilename;

@@ -8,16 +8,33 @@ import java.util.*;
 
 // Inspiration to KDTree from https://www.geeksforgeeks.org/search-and-insertion-in-k-dimensional-tree/
 // We also utilized code from chapter 3 in Algorithms 4 by Wayne and Sedgewick ch 3.2
+/**
+ * The KDTree class is a spatial data structure that supports organizing nodes in a 2D dimensional space.
+ * The data structure supports the following methods: Insertion method to insert nodes into the KDTree, deleteMin which deletes the smallest key in the KDTree,
+ * rangeSearch to find nodes within a given range, and also nearestNeighbor search which finds the nearest neighbor to a given node, with the option to find the nearest node
+ * that is on a road or just the nearest node in general.
+ */
 public class KDTree implements Serializable
 {
     final static long serialVersionUID = 12851802756812749L;
     private KDNode root; // root of BST
+    /**
+     * The KDNode class is an inner class inside the KDTree class. This class represents a node that
+     * is stored inside the KDTree.
+     */
     private class KDNode implements Serializable{
         final static long serialVersionUID = 3254120512025412L;
         double x, y; // Coordinates of the point which will be used for the line that will be drawn to create half planes
         private Node val;
         private KDNode left, right; // links to the left and right subtrees
         private int size; // number of nodes in the subtree rooted here
+        /**
+         * The constructor of the KDNode stores 4 different pieces of information
+         * @param x - the X coordinate of the node after transformation
+         * @param y - the Y coordinate of the node after transformation
+         * @param val - the node's original x & y coordinates before transformation
+         * @param size - the size of the subtree rooted at this current node
+         */
         public KDNode(double x, double y, Node val, int size)
         {
             // Constructor has been changed from a normal BST to accomodate coordinates
@@ -28,24 +45,53 @@ public class KDTree implements Serializable
             this.size = size;
         }
     }
+    /**
+     * getter method to return the number of nodes inside a KDTree
+     * @return number of nodes stored inside the KDTree
+     */
     public int size() {
         // Returns the number of nodes in the BST
         return size(root);
     }
+    /**
+     * Helper method that returns the size of the subtree rooted at the given node
+     * @param x - Root of the subtree
+     * @return - size of subtree rooted at the node
+     */
     private int size(KDNode x) {
         // Helper method to calculate size of a subtree rooted at a given node
         if (x == null) return 0;
         else return x.size;
     }
+    /**
+     * Method to check whether the KDTree is empty or not
+     * @return - true if the KDTree is empty, and false if not
+     */
     public boolean isEmpty() {
         // Checks if the BST is empty
         return size() == 0;
     }
+    /**
+     * Inserts a node with transformed coordinates, and original coordinates stored inside value
+     * @param x - the transformed x coordinate of the node
+     * @param y - the transformed y coordinate of the node
+     * @param val - the original x & y coordinate of the node
+     */
     public void put(double x, double y, Node val) {
         // Public method to insert a key-value pair; updates if key exists
         // Put method arguments change to acommodate nodes new attributes
         root = put(root, x, y, val, 0);
     }
+    /**
+     * A helper method that recursively inserts a node with the given transformed coordinates and the
+     * original coordinates given in value
+     * @param x - root of the subtree
+     * @param xCoord - the transformed x-coordinate of the node
+     * @param yCoord - the transformed y-coordinate of the node
+     * @param val - the original x & y coordinate of the node
+     * @param depth - the current depth of the subtree
+     * @return - the root of the modified subtree
+     */
     private KDNode put(KDNode x, double xCoord, double yCoord, Node val, int depth) {
         if (x == null) return new KDNode(xCoord, yCoord, val, 1);
         // Perform comparison based on the determined axis
@@ -68,9 +114,23 @@ public class KDTree implements Serializable
         x.size = size(x.left) + size(x.right) + 1;
         return x;
     }
+    /**
+     * Uses the given coordinates to return the node with it's original coordinates
+     * @param x - the x-coordinate of the node
+     * @param y - the y-coordinate of the node
+     * @return - the node at the given coordinates, or null if no node was found
+     */
     public Node get(double x, double y){
         return get(x, y, 0);
     }
+    /**
+     * Helper method to recursively return the node with it's original coordinates at the given
+     * coordinates
+     * @param xCoord - the transformed x-coordinate of the node
+     * @param yCoord - the transformed y-coordinate of the node
+     * @param depth - the current depth of the subtree
+     * @return - a node with it's original coordinates, or null if no node was found
+     */
     private Node get(double xCoord, double yCoord, int depth) {
         // Retrieves the value associated with a given key
         KDNode x = root;
@@ -103,16 +163,30 @@ public class KDTree implements Serializable
         // Increment depth at each step to alternate comparison axis
         return null;
     }
-
+    /**
+     * Method to remove the node with smallest key in a subtree
+     * @param x - the root node of the subtree
+     * @return - the root of the updated subtree
+     */
     private KDNode deleteMin(KDNode x) {
         // Removes the node with the smallest key in a subtree
         if (x.left == null) return x.right;
         x.left = deleteMin(x.left);
         return x;
     }
+    /**
+     * Method to traverse the KDTree in-order, printing out the coordinates of each node along
+     * the way. Used to test whether the  {@link #populate(List)} method worked as intended
+     */
     public void inOrderTraverse(){
         inOrderTraverse(root);
     }
+
+    /**
+     * Helper method for in-order traversal of the KDTree, which goes throught the tree
+     * recursively
+     * @param x - the current node that is traversing
+     */
     private void inOrderTraverse(KDNode x) {
         // Traverses the BST in order
         if (x == null) return;
@@ -121,6 +195,10 @@ public class KDTree implements Serializable
         inOrderTraverse(x.right);
     }
 
+    /**
+     * Tester method that traverses the KDTree in level order, printing out the coordinates
+     * of each node along the way
+     */
     public void levelOrderTraverse() {
         Queue<KDNode> queue = new LinkedList<>();
         queue.add(root);
@@ -133,16 +211,29 @@ public class KDTree implements Serializable
         }
     }
 
-
+    /**
+     * Retrieves the X coordinate of the root node
+     * @return - X coordinate of the root node
+     */
     public Double getRootX() {
         return root.x;
     }
 
-    // Method to populate a kdtree and making it balanced with data from an array
+    /**
+     * Method to populate the KDTree with nodes from the given list, whilst also
+     * ensuring the tree remains balanced
+     * @param nodelist - the list of nodes that will be inserted into the KDTree
+     */
     public void populate(List<Node> nodelist){
         populateKDTree(nodelist, 0);
     }
 
+    /**
+     * Helper method that recursively populates the KDTree. It populates it by keep finding
+     * the median of the nodes. Ensuring the tree keeps being balanced.
+     * @param nodelist - the list of the nodes that will be inserted into the KDTree
+     * @param depth - the current depth of the tree
+     */
     // Helper method which makes recursive calls to itself.
     private void populateKDTree(List<Node> nodelist, int depth) {
         if (nodelist.isEmpty()) return;  // Ensure no operations on an empty list
@@ -176,6 +267,14 @@ public class KDTree implements Serializable
         if (medianIndex + 1 < nodelist.size()) populateKDTree(nodelist.subList(medianIndex+1, nodelist.size()), depth);
     }
 
+    /**
+     * Method to perform a range search on the KDTree, so that it only returns nodes within this range
+     * @param xMin - the minimum X coordinate of the range
+     * @param xMax - the maximum X coordinate of the range
+     * @param yMin - the minimum Y coordinate of the range
+     * @param yMax - the maximum Y coordinate of the range
+     * @return - a queue of the nodes within the specified range
+     */
     public Queue<Node> rangeSearch(double xMin, double xMax, double yMin, double yMax)
     {
 //        System.out.println("Range Searching for these param: xMin:"+xMin+" xMax:"+xMax+" yMin:"+yMin+" yMax:"+yMax);
@@ -184,6 +283,16 @@ public class KDTree implements Serializable
         return queue;
     }
 
+    /**
+     * Helper method that recursively finds node within the given bounds, and adds the nodes found to a queue
+     * @param x - the current node which is being examined
+     * @param queue - the queue that the nodes found will be added to
+     * @param xMin - the minimum X coordinate of the range
+     * @param xMax - the maximum X coordinate of the range
+     * @param yMin - the minimum Y coordinate of the range
+     * @param yMax - the maximum Y coordinate of the range
+     * @param depth - the current depth of the recursion step in the KDTree
+     */
     private void rangeSearch(KDNode x, Queue<Node> queue, double xMin, double xMax, double yMin, double yMax, int depth)
     {
         if (x == null) return;
@@ -207,6 +316,15 @@ public class KDTree implements Serializable
         if (cmphi > 0) rangeSearch(x.right, queue, xMin, xMax, yMin, yMax, depth+1);
     }
 
+    /**
+     * Method to find the nearest neighbor for a given node given in x and y coordinates. It uses the {@link #ceiling(Double, Double, boolean)}
+     * and the {@link #floor(double, double, boolean)} methods to find their respective best candidates and then compares the two to find the best overall nearest node.
+     * Also comes with the option to find the nearest neighbor in general, or the nearest one that is on a road specifically.
+     * @param xCoord - the X coordinate of the given node
+     * @param yCoord - the Y coordinate of the given node
+     * @param shouldFindNearestRoad - true = find nearest node on a road, false = nearest node in general
+     * @return - the nearest node either on a road or in general
+     */
     public Node getNearestNeighbor(Double xCoord, Double yCoord, boolean shouldFindNearestRoad){
         Node tmpNode1 = floor(xCoord*0.56, -yCoord, shouldFindNearestRoad);
         Node tmpNode2 = ceiling(xCoord*0.56, -yCoord, shouldFindNearestRoad);
@@ -226,12 +344,11 @@ public class KDTree implements Serializable
     }
 
     /**
-     * Returns the smallest key in the symbol table greater than or equal to {@code key}.
-     *
-     * @param  key the key
-     * @return the smallest key in the symbol table greater than or equal to {@code key}
-     * @throws NoSuchElementException if there is no such key
-     * @throws IllegalArgumentException if {@code key} is {@code null}
+     * Returns the smallest key stored in the KDTree that is greater than or equal to the given coordinates
+     * @param xCoord - the X coordinate of the given node
+     * @param yCoord - the Y coordinate of the given node
+     * @param findNearestRoad -  true = find nearest node greater than or equal to the given coordinates that is on a road, false = nearest node in general
+     * @return - the smallest node greater than or equal to the given coordinates, either one that is on a road or just in general
      */
     public Node ceiling(Double xCoord, Double yCoord, boolean findNearestRoad) {
         if (xCoord == null || yCoord == null) throw new IllegalArgumentException("argument to ceiling() is null");
@@ -241,6 +358,18 @@ public class KDTree implements Serializable
         else return x.val;
     }
 
+    /**
+     * Helper method that recursively searches for the smallest node in the KDTree greater than or equal to the given coordinates.
+     * It also considers the depth of the recursion to determine which axis it should do the comparsion (0 for x-axis and 1 for y-axis).
+     * The boolean shouldFindNearestRoad, determines whether the method should account for nodes only on roads, or just find nodes in general
+     * @param x - current node that is examined
+     * @param xCoord - the X coordinate of the given node
+     * @param yCoord - the Y coordinate of the given node
+     * @param depth - the current depth of the recursion step in the KDTree
+     * @param shouldFindNearestRoad - boolean indication whether to find nodes on roads or not
+     * @param best - best candidate found so far
+     * @return - the smallest node greater than or equal to the given coordinates, either on a road or not depending on boolean
+     */
     private KDNode ceiling(KDNode x, Double xCoord, Double yCoord, int depth, boolean shouldFindNearestRoad, KDNode best) {
         if (x == null) return null;
         int cmp;
@@ -273,6 +402,13 @@ public class KDTree implements Serializable
         }
     }
 
+    /**
+     * Returns the largest key stored in the KDTree that is less than or equal to the given coordinates
+     * @param xCoord - the X coordinate of the given node
+     * @param yCoord - the Y coordinate of the given node
+     * @param shouldFindNearestRoad -  true = find nearest node less than or equal to the given coordinates that is on a road, false = nearest node in general
+     * @return - the largest node less than or equal to the given coordinates, either one that is on a road or just in general
+     */
     public Node floor(double xCoord, double yCoord, boolean shouldFindNearestRoad) {
         KDNode x = floor(root, xCoord, yCoord, 0, shouldFindNearestRoad, null);
         if (x == null) return null; //"argument to floor() is too small"
@@ -280,6 +416,19 @@ public class KDTree implements Serializable
 
     }
 
+    /**
+     *
+     * Helper method that recursively searches for the largest node in the KDTree less than or equal to the given coordinates.
+     * It also considers the depth of the recursion to determine which axis it should do the comparison (0 for x-axis and 1 for y-axis).
+     * The boolean shouldFindNearestRoad, determines whether the method should account for nodes only on roads, or just find nearest nodes in general
+     * @param x - current node that is examined
+     * @param xCoord - the X coordinate of the given node
+     * @param yCoord - the Y coordinate of the given node
+     * @param depth - the current depth of the recursion step in the KDTree
+     * @param shouldFindNearestRoad - boolean indication whether to find nodes on roads or not
+     * @param best - best candidate found so far
+     * @return - the largest node less than or equal to the given coordinates, either on a road or not depending on boolean
+     */
     private KDNode floor(KDNode x, double xCoord, double yCoord, int depth, boolean shouldFindNearestRoad, KDNode best) {
         if (x == null) return best;
         int cmp;
@@ -312,7 +461,14 @@ public class KDTree implements Serializable
         }
     }
 
-    // range serach methods that returns a set instead of a queue to ensure that the same way is not drawn multiple times
+    /**
+     * Performs a range search within the given range, and returns a set of ways found
+     * @param xMin - the minimum X coordinate of the range
+     * @param xMax - the maximum X coordinate of the range
+     * @param yMin - the minimum Y coordinate of the range
+     * @param yMax - the maximum Y coordinate of the range
+     * @return - Set of ways that were found in the range search
+     */
     public Set<Way> rangeSearchSet(double xMin, double xMax, double yMin, double yMax)
     {
 //        System.out.println("Range Searching for these param: xMin:"+xMin+" xMax:"+xMax+" yMin:"+yMin+" yMax:"+yMax);
@@ -321,6 +477,17 @@ public class KDTree implements Serializable
         return waySet;
     }
 
+    /**
+     * Recursive helper method that recursively searches for ways within the given range. The ways found in the range are added to the waySet.
+     * It also considers the depth of the recursion to determine which axis it should do the comparison (0 for x-axis and 1 for y-axis)
+     * @param x - the current node that is being examined
+     * @param waySet - the set that the ways found will be added to
+     * @param xMin - the minimum X coordinate of the range
+     * @param xMax - the maximum X coordinate of the range
+     * @param yMin - the minimum Y coordinate of the range
+     * @param yMax - the maximum Y coordinate of the range
+     * @param depth - current depth of the recursion step
+     */
     private void rangeSearchSet(KDNode x, Set<Way> waySet, double xMin, double xMax, double yMin, double yMax, int depth)
     {
         if (x == null) return;
