@@ -74,7 +74,7 @@ public class Model implements Serializable {
     HashSet<String> cycleTags;
     ColorScheme cs;
     LineThickness lt;
-    Set<String> allowedRelationTypes;
+    Set<String> allowedKeyTypes;
 
     static Model load(InputStream inputStream, String fileName) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if(fileName.endsWith(".obj")){
@@ -169,7 +169,7 @@ public class Model implements Serializable {
         this.addressList = new ArrayList<>();
         this.address = new Address();
         this.addressIdMap = new TreeMap<>(); // Used for ref a node id to an adress
-        this.allowedRelationTypes = new HashSet<>(Arrays.asList("place", "natural", "landuse", "building"));
+        this.allowedKeyTypes = new HashSet<>(Arrays.asList("place", "natural", "landuse", "building")); // Allowed types for relations and ways
         if (filename.endsWith(".osm.zip")) {
             parseZIP(inputStream);
         } else if (filename.endsWith(".osm")) {
@@ -179,22 +179,30 @@ public class Model implements Serializable {
         for(Address address : addressList){
             trie.insert(address.getFullAddress());
         }
+        // KD-Tree for all ways
         this.kdTree = new KDTree();
+
+        // KD-Tree for relations
         this.kdTreeBuildings = new KDTree();
         this.kdTreeNaturals = new KDTree();
         this.kdTreeLanduses = new KDTree();
         for (String s : uniqueWayTypes) System.out.println(s);
 
         // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
-        kdTree.populate(centerPointNodes); // tilføjer ikke
-        System.out.println("size of building collection: "+centerPointNodesBuilding.size());
+        // KD-Tree for ways
+        kdTree.populate(centerPointNodes);
+        System.out.println("size of KD-Tree all ways: " + centerPointNodesBuilding.size());
+
+        // KD-Trees for Relations
         kdTreeBuildings.populate(centerPointNodesBuilding);
-       System.out.println("Size of building KDTree: " + kdTreeBuildings.size());
-       kdTreeNaturals.populate(centerPointNodesNatural);
-       System.out.println("Size of building Naturals: " + kdTreeNaturals.size());
-       kdTreeLanduses.populate(centerPointNodesLanduse);
-       System.out.println("Size of building Landuse: " + kdTreeLanduses.size());
-       save(filename+".obj");
+        System.out.println("Size of KD-Tree Relations Building: " + kdTreeBuildings.size());
+        kdTreeNaturals.populate(centerPointNodesNatural);
+        System.out.println("Size of KD-Tree Relations Naturals: " + kdTreeNaturals.size());
+        kdTreeLanduses.populate(centerPointNodesLanduse);
+        System.out.println("Size of KD-Tree Relations Landuse: " + kdTreeLanduses.size());
+
+        // Saves objects to binary file
+        save(filename+".obj");
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -299,11 +307,15 @@ public class Model implements Serializable {
         double zoom_scale = -1.0;
         double max_speed = -1.0;
         String relationKey = "";
+        String wayKey = "";
+        String wayLandform = "";
 
         //if (!parsedFirstWay){
 
         if (input1.getLocalName().equals("way")){
             wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
+            wayKey = "";
+            wayLandform = "";
         }
         //}
         //if (!parsedFirstRelation){
@@ -330,6 +342,10 @@ public class Model implements Serializable {
                     var k = input1.getAttributeValue(null, "k");
                     if (tagToScaleValue.containsKey(k)) zoom_scale = tagToScaleValue.get(k);
                     switch (k) {
+                        case "place", "natural", "landuse", "building":
+                            wayKey = k;
+                            wayLandform = v;
+                            break;
                         case "highway":
                             if (tagToScaleValue.containsKey(v)) zoom_scale = tagToScaleValue.get(v);
                             roadtype = v;
@@ -411,7 +427,7 @@ public class Model implements Serializable {
 
                     if(k.equals("type")){
                         RelationsType = v;
-                    } else if (allowedRelationTypes.contains(k)) {
+                    } else if (allowedKeyTypes.contains(k)) {
                         validRelation = true;
                         relationKey = k;
                         relationLandform = v;

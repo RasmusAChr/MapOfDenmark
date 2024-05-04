@@ -103,15 +103,6 @@ public class View {
             relation.Draw(gc,slider_value,dark);
         }
 
-        // Drawing ways
-        for (Node nodeSpatial : nodesFromKD) {
-            Way way = nodeSpatial.getWay();
-            if (way != null && way.getZoom_scale() < slider_value) {
-                gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark, model.getColorScheme());
-            }
-        }
-
         // Drawing natural relations
         for(Node naturalsNode : naturalsNodesFromKD){
             Relation relation = naturalsNode.getRefRelation();
@@ -128,6 +119,15 @@ public class View {
         for(Node buildingNode : buildingNodesFromKD){
             Relation relation = buildingNode.getRefRelation();
             relation.Draw(gc,slider_value,dark);
+        }
+
+        // Drawing ways
+        for (Node nodeSpatial : nodesFromKD) {
+            Way way = nodeSpatial.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+            }
         }
 
 
