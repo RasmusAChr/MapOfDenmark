@@ -22,6 +22,7 @@ import com.telos.mapofdenmark.Shortest_Route.DirectedEdge;
 import com.telos.mapofdenmark.Shortest_Route.EdgeWeightedDigraph;
 import com.telos.mapofdenmark.Shortest_Route.SP;
 import com.telos.mapofdenmark.TrieClasses.Address;
+import com.telos.mapofdenmark.TrieClasses.RadixTrie;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.geometry.Point2D;
 
@@ -54,6 +55,7 @@ public class Model implements Serializable {
     List<Node> centerPointNodesWaysRoad = new ArrayList<>();
     SP Dijkstra = null;
     private Trie trie;
+    private RadixTrie radixTrie;
     double minlat, maxlat, minlon, maxlon;
     List<Address> addressList;
     Map<String, Node> addressIdMap;
@@ -189,9 +191,15 @@ public class Model implements Serializable {
         } else if (filename.endsWith(".osm")) {
             parseRouteNet(inputStream);
         }
+
         this.trie = new Trie();
+        this.radixTrie = new RadixTrie();
         for(Address address : addressList){
-            trie.insert(address.getFullAddress());
+            if(address != null){
+//                trie.insert(address.getStreet());
+                // RadixTrie insert put here
+                radixTrie.insert(address.getFullAddress());
+            } else System.out.println("Address is null");
         }
         // KD-Tree for all ways
         this.kdTree = new KDTree();
@@ -649,7 +657,6 @@ public class Model implements Serializable {
     }
 
     public void parseAddressFromOSM(String v, String k){
-        // Assuming you have a Trie instance called 'trie'
         if(address.getStreet().equals(null) || address.getStreet().isEmpty()) {
             if (k.contains("street")) {
                 address.setStreet(v);
@@ -658,6 +665,7 @@ public class Model implements Serializable {
             } else if (k.contains("city")) {
                 address.setCity(v);
             } else if (k.contains("municipality")) {
+                // To save performance it may be easier to not store the municipality in the trie but instead map city to municipality
                 address.setMunicipality(v);
             } else if (k.contains("country")) {
                 address.setCountry(v);
@@ -691,9 +699,10 @@ public class Model implements Serializable {
     public Map<String, Node> getAddressIdMap() {
         return addressIdMap;
     }
-    public List<String> getSuggestionList(String input){
-        return trie.getAddressSuggestions(input.toLowerCase(), 4);
 
+    public List<String> getSuggestionList(String input){
+//        return trie.getAddressSuggestions(input.toLowerCase(), 4);
+        return radixTrie.getAddressSuggestions(input.toLowerCase(), 5);
     }
 
     // finds the center lat and lon among a collection of nodes

@@ -4,31 +4,28 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-// This is the node structure for the trie data structure
-
-/**
- * The class "TrieNode" defines the structure of the nodes contained inside the Trie.
- * It contains a map to store all child nodes of a character, and also contains a Boolean called endOfWord that indicates if the node is the end of a word or not.
- */
-public class TrieNode implements Serializable {
+public class RadixNode implements Serializable {
     final static long serialVersionUID = 88214124998L;
-    Map<Character, TrieNode> children; // This map stores all the child nodes. We map characters to corresponding child nodes
+    Map<Character, RadixNode> children; // Map to store child nodes, where the key is a sequence of characters
     boolean endOfWord; // boolean to indicate whether this node is at the end of a word or not
+    String value; // The sequence of characters stored in this node
 
     /**
      * Default constructor for non-root nodes.
      */
-    public TrieNode() {
-        children = new HashMap<>();
-        endOfWord = false;
+    public RadixNode(String value, boolean endOfWord) {
+        this.children = new HashMap<>();
+        this.endOfWord = endOfWord;
+        this.value = value;
     }
 
     /**
      * Constructor with initial capacity, mainly used for the root node.
      * @param initialCapacity The initial capacity for the hashmap, based on the estimated size of unique children.
      */
-    public TrieNode(int initialCapacity) {
+    public RadixNode(int initialCapacity) {
         this.children = new HashMap<>(initialCapacity);
         this.endOfWord = false;
+        this.value = "";
     }
 }
