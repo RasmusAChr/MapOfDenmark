@@ -8,7 +8,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // Inspired from https://leetcode.com/problems/implement-trie-prefix-tree/solutions/1996974/radix-tree-with-comments/
-// and https://leetcode.com/problems/implement-trie-prefix-tree/solutions/467046/Java-Radix-tree-(compact-prefix-tree)-beats-99.7-runtime-and-100-memory/
+// used this as ref for insertion method https://leetcode.com/problems/implement-trie-prefix-tree/solutions/467046/Java-Radix-tree-(compact-prefix-tree)-beats-99.7-runtime-and-100-memory/
+// and for collecting suggestions this was used as inspiration https://github.com/wolfgarbe/PruningRadixTrie
+
 public class RadixTrie implements Serializable {
     RadixNode rootNode;
 
@@ -96,24 +98,55 @@ public class RadixTrie implements Serializable {
      * @param limit The maximum number of suggestions to return.
      * @return A list of suggestions that start with the prefix.
      */
-    public List<String> getAddressSuggestions(String prefix, int limit){
+    public List<String> getAddressSuggestions(String prefix, int limit) {
         List<String> addressSuggestions = new ArrayList<>();
         RadixNode currentNode = rootNode;
-        String currentPrefix = ""; // Initialize current prefix as empty
+        String currentPrefix = "";
 
-        // Traverse to the node that matches the end of the prefix
-        for (char character : prefix.toCharArray()) {
-            currentNode = currentNode.children.get(character);
-            if (currentNode == null) {
-                return addressSuggestions; // If the prefix is not found
+        System.out.println("Starting traversal for prefix: " + prefix);
+        int prefixPosition = 0;
+
+        while (prefixPosition < prefix.length() && currentNode != null) {
+            boolean matched = false;
+            for (RadixNode child : currentNode.children.values()) {
+                if (prefix.startsWith(currentPrefix + child.value)) {
+                    System.out.println("Traversed to node: " + child.value + ", currentPrefix: " + (currentPrefix + child.value));
+                    currentNode = child;
+                    currentPrefix += child.value;
+                    prefixPosition += child.value.length();
+                    matched = true;
+                    break;
+                } else if (child.value.startsWith(prefix.substring(prefixPosition))) {
+                    // Handle partial prefix in node
+                    String matchPart = prefix.substring(prefixPosition);
+                    System.out.println("Partially matched node: " + child.value + " with prefix part: " + matchPart);
+                    currentNode = child;
+                    currentPrefix += child.value; // Ensure the entire node value is added to currentPrefix
+                    prefixPosition += matchPart.length();
+                    matched = true;
+                    break;
+                }
             }
-            currentPrefix += currentNode.value; // Build the correct prefix path
+
+            if (!matched) {
+                System.out.println("No child node extends the prefix beyond: " + currentPrefix);
+                return addressSuggestions;
+            }
         }
 
-        System.out.println("Collecting suggestions for prefix: " + prefix);
-        collectAddressSuggestions(currentNode, currentPrefix, addressSuggestions, limit);
-        return formatAddressSuggestions(addressSuggestions); // Assuming this method
+        if (prefixPosition >= prefix.length()) {
+            System.out.println("Collecting suggestions for built prefix: " + currentPrefix);
+            collectAddressSuggestions(currentNode, currentPrefix, addressSuggestions, limit);
+        } else {
+            System.out.println("Prefix traversal ended prematurely.");
+        }
+
+//        return addressSuggestions;
+        return formatAddressSuggestions(addressSuggestions);
     }
+
+
+
 
     /**
      * Helper method to collect address suggestions recursively.
@@ -124,30 +157,26 @@ public class RadixTrie implements Serializable {
      */
     // A recursive method that collects suggestions from the given node
     private void collectAddressSuggestions(RadixNode node, String prefix, List<String> addressSuggestions, int limit) {
-        // Check if the limit has already been reached before proceeding
         if (addressSuggestions.size() >= limit) {
-            return; // Immediately return if the limit has been reached
+            return; // Pruning: Stop recursion if the limit is reached
         }
 
-        // Add current node to suggestions if it marks the end of a word
         if (node.endOfWord) {
             addressSuggestions.add(prefix);
             System.out.println("Adding to suggestions: " + prefix);
-            // Check the size again after adding
             if (addressSuggestions.size() >= limit) {
                 return;
             }
         }
 
-        for (Map.Entry<Character, RadixNode> entry : node.children.entrySet()) {
-            String extendedPrefix = prefix + entry.getValue().value; // Only extend prefix with the value of the current child
-            collectAddressSuggestions(entry.getValue(), extendedPrefix, addressSuggestions, limit);
-            // Early termination if the limit is reached during recursion
-            if (addressSuggestions.size() >= limit) {
-                return; // Break the loop and return to stop further processing
+        for (RadixNode child : node.children.values()) {
+            if (addressSuggestions.size() < limit) {
+                String extendedPrefix = prefix + child.value; // Build the next prefix
+                collectAddressSuggestions(child, extendedPrefix, addressSuggestions, limit);
             }
         }
     }
+
 
     /**
      * Formats a list of address suggestions for better readability.
@@ -163,7 +192,7 @@ public class RadixTrie implements Serializable {
         // Group 3: characters for the city
         // Group 4: characters for the municipality
         // Group 5: characters for the country
-        Pattern pattern = Pattern.compile("^(\\D+)(\\d+)\\s+(\\D+)\\s+(\\D+)\\s+(\\D+)$");
+        Pattern pattern = Pattern.compile("^(\\D+)(\\w+)\\s+(\\D+)\\s+(\\D+)\\s+(\\D+)$");
 
         for (String suggestion : suggestions) {
             // Create a matcher for the suggestion based on the compiled pattern
