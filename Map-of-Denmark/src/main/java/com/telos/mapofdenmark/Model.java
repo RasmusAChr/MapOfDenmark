@@ -638,7 +638,7 @@ public class Model implements Serializable {
 
     public List<String> getSuggestionList(String input){
 //        return trie.getAddressSuggestions(input.toLowerCase(), 4);
-        return radixTrie.getAddressSuggestions(input.toLowerCase(), 4);
+        return radixTrie.getAddressSuggestions(input.toLowerCase(), 5);
     }
 
     // finds the center lat and lon among a collection of nodes

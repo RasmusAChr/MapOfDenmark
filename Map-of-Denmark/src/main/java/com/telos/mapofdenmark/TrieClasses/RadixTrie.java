@@ -124,9 +124,16 @@ public class RadixTrie implements Serializable {
      */
     // A recursive method that collects suggestions from the given node
     private void collectAddressSuggestions(RadixNode node, String prefix, List<String> addressSuggestions, int limit) {
+        // Check if the limit has already been reached before proceeding
+        if (addressSuggestions.size() >= limit) {
+            return; // Immediately return if the limit has been reached
+        }
+
+        // Add current node to suggestions if it marks the end of a word
         if (node.endOfWord) {
             addressSuggestions.add(prefix);
             System.out.println("Adding to suggestions: " + prefix);
+            // Check the size again after adding
             if (addressSuggestions.size() >= limit) {
                 return;
             }
@@ -135,6 +142,10 @@ public class RadixTrie implements Serializable {
         for (Map.Entry<Character, RadixNode> entry : node.children.entrySet()) {
             String extendedPrefix = prefix + entry.getValue().value; // Only extend prefix with the value of the current child
             collectAddressSuggestions(entry.getValue(), extendedPrefix, addressSuggestions, limit);
+            // Early termination if the limit is reached during recursion
+            if (addressSuggestions.size() >= limit) {
+                return; // Break the loop and return to stop further processing
+            }
         }
     }
 
