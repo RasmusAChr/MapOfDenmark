@@ -13,8 +13,9 @@ public class Way implements Serializable {
     double zoom_scale;
     ArrayList<Node> nodesInWay;
     String landform;
+    String type;
 
-    public Way(ArrayList<Node> way, double zoom_scale, String landform) {
+    public Way(ArrayList<Node> way, double zoom_scale, String landform, String type) {
         this.nodesInWay = new ArrayList<>();
         nodesInWay.addAll(way);
         coords = new double[way.size() * 2];
@@ -27,6 +28,7 @@ public class Way implements Serializable {
         this.refNode = way.get(0);
         this.zoom_scale = zoom_scale;
         this.landform = landform;
+        this.type = type;
     }
     public double[] getCoords() {
         return coords;
@@ -40,6 +42,12 @@ public class Way implements Serializable {
         }
         gc.stroke();
     }
+
+    public void fill(GraphicsContext gc, boolean darkMode, ColorScheme cs, String type){
+        gc.setFill(cs.getColor(landform,darkMode,type));
+        gc.fill();
+    }
+
     public ArrayList<Node> getNodes(){
         return nodesInWay;
     }

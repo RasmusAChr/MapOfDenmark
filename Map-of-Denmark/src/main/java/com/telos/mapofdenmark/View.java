@@ -86,7 +86,7 @@ public class View {
 //            gc.setFill(Color.WHITE);
 //            gc.setStroke(Color.BLACK);
 //        }
-        gc.setFill(model.cs.getColor("water", dark));
+        gc.setFill(model.cs.getColor("water", dark, "natural"));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
         gc.setLineWidth(0.000005);
@@ -106,7 +106,7 @@ public class View {
 
         // Draws place relations (land border)
         for (var relation : model.RelationsPlace) {
-            relation.Draw(gc,slider_value,dark);
+            relation.Draw(gc,slider_value,dark,"place");
         }
 
         // Drawing place ways
@@ -115,13 +115,14 @@ public class View {
             if (way != null && way.getZoom_scale() < slider_value) {
                 gc.setStroke(Color.BLACK);
                 way.draw(gc, slider_value, dark, model.getColorScheme());
+                way.fill(gc, dark, model.getColorScheme(), "place");
             }
         }
 
         // Drawing natural relations
         for(Node naturalsNode : naturalsNodesFromKD){
             Relation relation = naturalsNode.getRefRelation();
-            relation.Draw(gc,slider_value,dark);
+            relation.Draw(gc,slider_value,dark,"natural");
         }
 
         // Drawing natural ways
@@ -130,28 +131,30 @@ public class View {
             if (way != null && way.getZoom_scale() < slider_value) {
                 gc.setStroke(Color.BLACK);
                 way.draw(gc, slider_value, dark, model.getColorScheme());
+                way.fill(gc, dark, model.getColorScheme(), "natural");
             }
         }
 
         // Drawing landuse relations
         for(Node landuseNode : landuseNodesFromKD){
             Relation relation = landuseNode.getRefRelation();
-            relation.Draw(gc,slider_value,dark);
+            relation.Draw(gc,slider_value,dark,"landuse");
         }
 
-        // Drawing natural ways
+        // Drawing landuse ways
         for (Node landuseNode : waysLanduseNodesFromKD) {
             Way way = landuseNode.getWay();
             if (way != null && way.getZoom_scale() < slider_value) {
                 gc.setStroke(Color.BLACK);
                 way.draw(gc, slider_value, dark, model.getColorScheme());
+                way.fill(gc, dark, model.getColorScheme(), "landuse");
             }
         }
 
         // Drawing building relations
         for(Node buildingNode : buildingNodesFromKD){
             Relation relation = buildingNode.getRefRelation();
-            relation.Draw(gc,slider_value,dark);
+            relation.Draw(gc,slider_value,dark,"building");
         }
 
         // Drawing building ways
@@ -160,6 +163,7 @@ public class View {
             if (way != null && way.getZoom_scale() < slider_value) {
                 gc.setStroke(Color.BLACK);
                 way.draw(gc, slider_value, dark, model.getColorScheme());
+                way.fill(gc, dark, model.getColorScheme(), "building");
             }
         }
 

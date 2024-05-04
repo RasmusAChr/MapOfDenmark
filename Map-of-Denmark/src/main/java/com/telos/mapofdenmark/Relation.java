@@ -109,8 +109,8 @@ public class Relation implements Serializable {
         return leftOverMembers;
     }
 
-    public void Draw(GraphicsContext gc, double zoom, boolean darkMode) {
-        gc.setFill(cs.getColor(landform,darkMode));
+    public void Draw(GraphicsContext gc, double zoom, boolean darkMode, String type) {
+        gc.setFill(cs.getColor(landform,darkMode,type));
         gc.setFillRule(FillRule.EVEN_ODD);
         gc.beginPath();
 

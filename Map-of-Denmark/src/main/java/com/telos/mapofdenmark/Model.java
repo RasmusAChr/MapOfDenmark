@@ -87,6 +87,7 @@ public class Model implements Serializable {
     ColorScheme cs;
     LineThickness lt;
     Set<String> allowedKeyTypes;
+    Set<String> bannedLandforms;
 
     static Model load(InputStream inputStream, String fileName) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if(fileName.endsWith(".obj")){
@@ -182,6 +183,7 @@ public class Model implements Serializable {
         this.address = new Address();
         this.addressIdMap = new TreeMap<>(); // Used for ref a node id to an adress
         this.allowedKeyTypes = new HashSet<>(Arrays.asList("place", "natural", "landuse", "building")); // Allowed types for relations and ways
+        this.bannedLandforms = new HashSet<>(Arrays.asList("coastline", "military", "port", "industrial"));
         if (filename.endsWith(".osm.zip")) {
             parseZIP(inputStream);
         } else if (filename.endsWith(".osm")) {
@@ -479,11 +481,19 @@ public class Model implements Serializable {
                         addToCenterPointNodes(way, tmpRoad, true, "road");
                         id2way.put(wayid,tmpRoad);
                     } else { // Is not a road
-                        System.out.println("wayKey: " + wayKey);
-                        System.out.println("wayLandform: " + wayLandform);
-                        Way tmpWay = new Way(way, zoom_scale, wayLandform);
+                        //System.out.println("wayKey: " + wayKey);
+                        //System.out.println("wayLandform: " + wayLandform);
+                        Way tmpWay = new Way(way, zoom_scale, wayLandform, wayKey);
                         ways.add(tmpWay);
-                        addToCenterPointNodes(way, tmpWay, false, wayKey);
+                        if (!bannedLandforms.contains(wayLandform)) {
+                            // If the last node isn't the same as the first then don't draw it.
+                            // This makes sure we don't get any lines that isn't roads.
+                            // We want to have closed ways, so we can fill them with color.
+                            if (way.get(0) == way.get(way.size()-1)){
+                            addToCenterPointNodes(way, tmpWay, false, wayKey);
+                            }
+
+                        }
                         id2way.put(wayid,tmpWay);
                     }
                     // Ensuring that every node has a ref to the way it is apart of
