@@ -75,7 +75,7 @@ public class Model implements Serializable {
     EdgeWeightedDigraph EWD;
    // HashMap<Node, Integer> DigraphNodeToIndex;
   //  HashMap<Integer, Node> DigraphIndexToNode;
-    TreeMap<Long, Node> id2node;
+    TreeMap<String, Integer> id2node;
     HashMap<String, Double> tagToScaleValue;
     List<Member> relationsMembers;
     HashMap<Long, Way> id2way;
@@ -243,7 +243,7 @@ public class Model implements Serializable {
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-        long addressId = 0;
+        int addressId = 0;
         int NodeCount = 0;
         while (input.hasNext()) {
 
@@ -258,13 +258,13 @@ public class Model implements Serializable {
                         maxlon = Double.parseDouble(input.getAttributeValue(null, "maxlon"));
                     }
                     case "node" -> {
-                        var id = Long.parseLong(input.getAttributeValue(null, "id"));
+                        var id = input.getAttributeValue(null, "id");
                         var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
                         var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
                         Node node = new Node(NodeCount, lat, lon);
-                        id2node.put(id, node);
+                        id2node.put(id, NodeCount);
                         nodeList.add(node);
-                        addressId = id;
+                        addressId = NodeCount;
                         NodeCount++;
 
                     }
@@ -292,7 +292,7 @@ public class Model implements Serializable {
                     if (address != null && !address.getStreet().isBlank()) {
                         addressList.add(address);
                         //System.out.println(addressId);
-                        addressIdMap.put(address.getFullAddress().toLowerCase(), id2node.get(addressId));
+                        addressIdMap.put(address.getFullAddress().toLowerCase(), nodeList.get(addressId));
                         addressId = 0;
                         address = null; // Reset for the next address
                     }
@@ -440,8 +440,8 @@ public class Model implements Serializable {
                     }
 
                 } else if (name.equals("nd")) {
-                    var ref = Long.parseLong(input1.getAttributeValue(null, "ref"));
-                    var node = id2node.get(ref);
+                    var ref = input1.getAttributeValue(null, "ref");
+                    var node = nodeList.get(id2node.get(ref));
                     way.add(node);
                 } else if (name.equals("relation")) {
                     relationsMembers = new ArrayList<>();
@@ -622,12 +622,12 @@ public class Model implements Serializable {
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
             for(DirectedEdge i: Dijkstra.pathTo(tmpNode.id)) {
-             if(!NodeAdded.contains(id2node.get(i.to()))){
-                 NodeAdded.add(id2node.get(i.to()));
-                 path.add(id2node.get(i.to()));
-             } else if (!NodeAdded.contains(id2node.get(i.from()))){
-                 NodeAdded.add(id2node.get(i.from()));
-                 path.add(id2node.get(i.from()));
+             if(!NodeAdded.contains(nodeList.get(i.to()))){
+                 NodeAdded.add(nodeList.get(i.to()));
+                 path.add(nodeList.get(i.to()));
+             } else if (!NodeAdded.contains(nodeList.get(i.from()))){
+                 NodeAdded.add(nodeList.get(i.from()));
+                 path.add(nodeList.get(i.from()));
              }
 
          }
