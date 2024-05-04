@@ -124,15 +124,18 @@ public class RadixTrie implements Serializable {
         if(node.endOfWord){
             addressSuggestions.add(prefix + node.value);
             if(addressSuggestions.size() >= limit){
-                System.out.println("Limit has been reached");
+//                System.out.println("Limit has been reached");
                 return; // If the limit has been reached, we stop collecting anymore suggestions.
             }
         }
 
         // Recursively traverse each child node to collect suggestions
         for (char charValue : node.children.keySet()) {
+            if (addressSuggestions.size() >= limit) {
+                return; // Stop collecting if the limit has been reached
+            }
             // Append the remaining characters of node.value to prefix
-            collectAddressSuggestions(node.children.get(charValue), prefix + node.value.substring(1), addressSuggestions, limit);
+            collectAddressSuggestions(node.children.get(charValue), prefix + node.value, addressSuggestions, limit);
         }
     }
 
