@@ -98,9 +98,24 @@ public class View {
         Queue<Node> naturalsNodesFromKD = model.kdTreeNaturals.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         Queue<Node> landuseNodesFromKD = model.kdTreeLanduses.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
 
-        // Draws land border
+        Queue<Node> waysPlaceNodesFromKD = model.kdTreeWaysPlace.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> waysNaturalNodesFromKD = model.kdTreeWaysNatural.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> waysLanduseNodesFromKD = model.kdTreeWaysLanduse.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> waysBuildingNodesFromKD = model.kdTreeWaysBuilding.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> waysRoadNodesFromKD = model.kdTreeWaysRoad.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+
+        // Draws place relations (land border)
         for (var relation : model.RelationsPlace) {
             relation.Draw(gc,slider_value,dark);
+        }
+
+        // Drawing place ways
+        for (Node placeNode : waysPlaceNodesFromKD) {
+            Way way = placeNode.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+            }
         }
 
         // Drawing natural relations
@@ -109,10 +124,28 @@ public class View {
             relation.Draw(gc,slider_value,dark);
         }
 
+        // Drawing natural ways
+        for (Node naturalsNode : waysNaturalNodesFromKD) {
+            Way way = naturalsNode.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+            }
+        }
+
         // Drawing landuse relations
         for(Node landuseNode : landuseNodesFromKD){
             Relation relation = landuseNode.getRefRelation();
             relation.Draw(gc,slider_value,dark);
+        }
+
+        // Drawing natural ways
+        for (Node landuseNode : waysLanduseNodesFromKD) {
+            Way way = landuseNode.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+            }
         }
 
         // Drawing building relations
@@ -121,14 +154,33 @@ public class View {
             relation.Draw(gc,slider_value,dark);
         }
 
-        // Drawing ways
-        for (Node nodeSpatial : nodesFromKD) {
-            Way way = nodeSpatial.getWay();
+        // Drawing building ways
+        for (Node buildingNode : waysBuildingNodesFromKD) {
+            Way way = buildingNode.getWay();
             if (way != null && way.getZoom_scale() < slider_value) {
                 gc.setStroke(Color.BLACK);
                 way.draw(gc, slider_value, dark, model.getColorScheme());
             }
         }
+
+        // Drawing road ways
+        for (Node roadNode : waysRoadNodesFromKD) {
+            Way way = roadNode.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+            }
+        }
+
+
+        // Drawing ways
+        /*for (Node nodeSpatial : nodesFromKD) {
+            Way way = nodeSpatial.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+            }
+        }*/
 
 
 
