@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// Inspired from https://leetcode.com/problems/implement-trie-prefix-tree/solutions/1996974/radix-tree-with-comments/
+// Used this to grasp the general structure https://leetcode.com/problems/implement-trie-prefix-tree/solutions/1996974/radix-tree-with-comments/
 // used this as ref for insertion method https://leetcode.com/problems/implement-trie-prefix-tree/solutions/467046/Java-Radix-tree-(compact-prefix-tree)-beats-99.7-runtime-and-100-memory/
 // and for collecting suggestions this was used as inspiration https://github.com/wolfgarbe/PruningRadixTrie
 
