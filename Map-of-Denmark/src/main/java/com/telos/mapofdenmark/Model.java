@@ -59,7 +59,6 @@ public class Model implements Serializable {
     List<Address> addressList;
     Map<String, Node> addressIdMap;
 
-    KDTree kdTree; // KDTree holds all ways
     KDTree kdTreeBuildings; // KDTree holds relation buildings
     KDTree kdTreeNaturals; // KDTree holds relation naturals
     KDTree kdTreeLanduses; // KDTree holds relation landuses
@@ -192,8 +191,6 @@ public class Model implements Serializable {
                 radixTrie.insert(address.getFullAddress());
             } else System.out.println("Address is null");
         }
-        // KD-Tree for all ways
-        this.kdTree = new KDTree();
 
         // KD-Tree for relations
         this.kdTreeBuildings = new KDTree();
@@ -207,9 +204,6 @@ public class Model implements Serializable {
         for (String s : uniqueWayTypes) System.out.println(s);
 
         // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
-        // KD-Tree for ways
-        kdTree.populate(centerPointNodes);
-        System.out.println("size of KD-Tree all ways: " + centerPointNodesBuilding.size());
 
         // KD-Trees for Relations
         kdTreeBuildings.populate(centerPointNodesBuilding);
@@ -577,7 +571,7 @@ public class Model implements Serializable {
     public void StartDijkstra(Node startaddress,boolean vehicle){
         double x = startaddress.getLon();
         double y = startaddress.getLat();
-        Node tmpNode = kdTree.getNearestNeighbor(x,y,true).getWay().getArbitraryNode();
+        Node tmpNode = kdTreeWaysRoad.getNearestNeighbor(x,y,true).getWay().getArbitraryNode();
         list.clear();
       //  this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(tmpNode),vehicle); // this starts the dijkstra search from the index that refferes to a node
         this.Dijkstra = new SP(EWD,tmpNode.id,vehicle);
@@ -600,7 +594,7 @@ public class Model implements Serializable {
     public List<Node> getDijkstraPath(Node Endaddress) {
         double x = Endaddress.getLon();
         double y = Endaddress.getLat();
-        Node tmpNode = kdTree.getNearestNeighbor(x,y,true).getWay().getArbitraryNode();
+        Node tmpNode = kdTreeWaysRoad.getNearestNeighbor(x,y,true).getWay().getArbitraryNode();
 
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
