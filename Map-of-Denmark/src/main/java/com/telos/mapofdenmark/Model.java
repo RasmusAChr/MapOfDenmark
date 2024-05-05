@@ -29,7 +29,7 @@ import javafx.geometry.Point2D;
 public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
 
-    List<Line> list = new ArrayList<Line>();
+    List<Line> list = new ArrayList<>();
     List<Node> nodeList = new ArrayList<>();
     List<Relation> RelationsPlace = new ArrayList<>();
     List<Relation> RelationsNatural = new ArrayList<>();
@@ -237,7 +237,6 @@ public class Model implements Serializable {
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         int NodeCount = 0;
-        int addressId = 0;
         while (input.hasNext()) {
             var tagKind = input.next();
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
@@ -256,7 +255,6 @@ public class Model implements Serializable {
                         Node node = new Node(NodeCount, lat, lon);
                         id2node.put(id, NodeCount);
                         nodeList.add(node);
-                        addressId = NodeCount;
                         NodeCount++;
                     }
                     case "tag" -> {
@@ -283,7 +281,7 @@ public class Model implements Serializable {
                     if (address != null && !address.getStreet().isBlank()) {
                         addressList.add(address);
                         //System.out.println(addressId);
-                        addressIdMap.put(address.getFullAddress().toLowerCase(), nodeList.get(addressId));
+                        addressIdMap.put(address.getFullAddress().toLowerCase(), nodeList.get(NodeCount-1));
                         address = null; // Reset for the next address
                     }
 
@@ -526,6 +524,7 @@ public class Model implements Serializable {
                     insideRelation = false;
                     RelationsType = "";
                     zoom_scale = -1.0;
+                    startNode = null;
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
