@@ -97,6 +97,7 @@ public class Controller {
     }
     @FXML
     private void initialize(){
+        zoomSlider.setValue(50.0);
         vehicle = false;
         // Sets the visuals of the theme toggle
         themeToggleBtn.getStyleClass().add("root-light");
