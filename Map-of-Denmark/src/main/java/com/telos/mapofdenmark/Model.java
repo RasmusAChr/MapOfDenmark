@@ -77,7 +77,6 @@ public class Model implements Serializable {
     HashMap<String, Double> tagToScaleValue;
     List<Member> relationsMembers;
     HashMap<Long, Way> id2way;
-    int roadCount;
     int indexForCenterPoints = 0;
     long wayid = 0;
     Set<String> uniqueWayTypes = new HashSet<>();
@@ -174,7 +173,6 @@ public class Model implements Serializable {
         this.id2way = new HashMap<>();
         this.id2node = new TreeMap<>();
         this.relationsMembers = new ArrayList<>();
-        this.roadCount = 0;
         this.addressList = new ArrayList<>();
         this.address = new Address();
         this.addressIdMap = new TreeMap<>(); // Used for ref a node id to an adress
@@ -261,7 +259,6 @@ public class Model implements Serializable {
                         nodeList.add(node);
                         addressId = NodeCount;
                         NodeCount++;
-
                     }
                     case "tag" -> {
                         var v = input.getAttributeValue(null, "v");
