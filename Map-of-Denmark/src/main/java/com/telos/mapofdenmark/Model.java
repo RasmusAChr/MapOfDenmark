@@ -15,7 +15,6 @@ import java.util.zip.ZipInputStream;
 import javax.xml.stream.*;
 import java.util.TreeMap;
 
-import com.telos.mapofdenmark.KDTreeClasses.KDTree;
 import com.telos.mapofdenmark.KDTreeClasses.KDTreeWay;
 import com.telos.mapofdenmark.Shortest_Route.DirectedEdge;
 import com.telos.mapofdenmark.Shortest_Route.EdgeWeightedDigraph;
@@ -560,6 +559,7 @@ public class Model implements Serializable {
                 }
             }
         }
+        nodeList.clear();
         id2node.clear();
     }
 
@@ -592,19 +592,46 @@ public class Model implements Serializable {
         double y = Endaddress.getLat();
         Node tmpNode = kdTreeWaysRoad.getNearestNeighbor(x,y,true).getArbitraryNode();
 
+        // returns an arraylist of all ways in the KDTree
+        kdTreeWaysRoad.getAllWays();
+
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
             for(DirectedEdge i: Dijkstra.pathTo(tmpNode.id)) {
+
+                Node node1 = getNodeFromKDTree(i.to());
+                if (!NodeAdded.contains(node1)) {
+                    NodeAdded.add(node1);
+                    path.add(node1);
+                    continue;
+                }
+                Node node2 = getNodeFromKDTree(i.from());
+                if (!NodeAdded.contains(node2)) {
+                    NodeAdded.add(node2);
+                    path.add(node2);
+                }
+                /*
+
              if(!NodeAdded.contains(nodeList.get(i.to()))){
                  NodeAdded.add(nodeList.get(i.to()));
                  path.add(nodeList.get(i.to()));
              } else if (!NodeAdded.contains(nodeList.get(i.from()))){
                  NodeAdded.add(nodeList.get(i.from()));
                  path.add(nodeList.get(i.from()));
-             }
+             }*/
 
          }
          return path;
+    }
+    private Node getNodeFromKDTree(int id) {
+        for (Way way: kdTreeWaysRoad.getAllWays()) {
+            for (Node node: way.getNodes()) {
+                if (node.id == id) {
+                    return node;
+                }
+            }
+        }
+        return null;
     }
 
     public void parseAddressFromOSM(String v, String k){

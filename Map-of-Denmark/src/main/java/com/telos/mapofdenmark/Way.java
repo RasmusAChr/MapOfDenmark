@@ -15,7 +15,7 @@ public class Way implements Serializable {
     private Relation refRelation;
 
     Node refNode;
-    ArrayList<Node> nodesInWay;
+    private ArrayList<Node> nodesInWay;
     String landform;
     String type;
 
@@ -28,7 +28,7 @@ public class Way implements Serializable {
         coords = new double[way.size() * 2];
         for (int i = 0 ; i < way.size() ; ++i) {
             var node = way.get(i);
-            node.setWay(this);
+            //node.setWay(this);
             coords[2 * i] = 0.56 * node.lon;
             coords[2 * i + 1] = -node.lat;
 

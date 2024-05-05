@@ -500,4 +500,31 @@ public class KDTreeWay implements Serializable
         if (cmplo <= 0 && cmphi >= 0) waySet.add(x.val);
         if (cmphi > 0) rangeSearchSet(x.right, waySet, xMin, xMax, yMin, yMax, depth+1);
     }
+
+    /**
+     * Returns all nodes in the KDTree as an ArrayList.
+     * @return ArrayList containing all ways in the KDTree
+     */
+    public List<Way> getAllWays() {
+        List<Way> nodeList = new ArrayList<>();
+        // Start recursive traversal from the root node
+        getAllWays(root, nodeList);
+        return nodeList;
+    }
+
+    /**
+     * Helper method to recursively traverse the KDTree and add nodes to the ArrayList.
+     * @param x - current kdnode being traversed
+     * @param nodeList - ArrayList to store nodes
+     */
+    private void getAllWays(KDNode x, List<Way> nodeList) {
+        if (x == null) return;
+        // Recursively traverse left subtree
+        getAllWays(x.left, nodeList);
+        // Add current node to the ArrayList
+        nodeList.add(x.val);
+        // Recursively traverse right subtree
+        getAllWays(x.right, nodeList);
+    }
+
 }
