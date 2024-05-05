@@ -19,15 +19,21 @@ public class Line implements Serializable {
         }
     }
 
-    public void draw(GraphicsContext gc, boolean dark) {
+    public void draw(GraphicsContext gc, boolean dark, double zoom) {
+        double zoomValue;
         gc.beginPath();
         gc.moveTo(coords[0], coords[1]);
         for (int i = 2 ; i < coords.length ; i += 2) {
             gc.lineTo(coords[i], coords[i+1]);
         }
+        if (zoom < 10.0) {
+            zoomValue = 0.002;
+        } else {
+            zoomValue = 0.0001 / (zoom/120);
+        }
+        gc.setLineWidth(zoomValue);
         gc.setStroke(Color.BLUE);
         if (dark) gc.setStroke(Color.YELLOW);
-        gc.setLineWidth(0.0001);
         gc.stroke();
     }
 

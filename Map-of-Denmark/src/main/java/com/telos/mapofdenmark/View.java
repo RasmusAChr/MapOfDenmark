@@ -110,7 +110,7 @@ public class View {
         drawRoad(canvasTopLeft, canvasBottomRight);
 
         for (var line : model.list) {
-            line.draw(gc, dark);
+            line.draw(gc, dark, slider_value);
         }
         drawPOI();
 

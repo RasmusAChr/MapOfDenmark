@@ -11,10 +11,6 @@ public class LineThickness implements Serializable {
         defaultScheme();
     }
 
-    public double getDefaultWidth(){
-        return linewidth.get("default");
-    }// Scheme for all the colors
-
     public double getWidth(String key) {
         return linewidth.get(key);
     }
