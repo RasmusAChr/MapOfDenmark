@@ -181,6 +181,8 @@ public class ColorScheme implements Serializable{
         naturalDarkColors.put("forest", "#5c7a58");
         naturalColors.put("tree_group", "#7aa66f");
         naturalDarkColors.put("tree_group", "#5c7a58");
+        naturalColors.put("farmland", "#8cbf80");
+        naturalDarkColors.put("farmland", "#5e8e5b");
     }
 
     public void landuseScheme(){

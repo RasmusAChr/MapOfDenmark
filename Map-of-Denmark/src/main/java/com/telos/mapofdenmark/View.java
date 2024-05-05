@@ -63,12 +63,14 @@ public class View {
         mapPane = (Pane) scene.lookup("#mapPane");
         mapPane.getChildren().add(canvas); //Adds the canvas to the mapPane
 
+        this.slider_value = 50.0;
+
         //Scene scene = new Scene(pane);
         primaryStage.setScene(scene);
         primaryStage.show();
         redraw();
         panToMap(model.minlat, model.minlon, model.maxlat, model.maxlon);
-        zoom(0, 0, 25000); // THIS IS SETTING THE ZOOM DYNAMICALLY: zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
+        zoom(0, 0, 10000); // THIS IS SETTING THE ZOOM DYNAMICALLY: zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
         //Listens for changes done to the width then changes the canvas acordingly
         primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> resizePanes(primaryStage.getWidth(), primaryStage.getHeight()));
         //Listens for changes done to the Height then changes the canvas acordingly
@@ -99,16 +101,24 @@ public class View {
         // Drawing place
         drawPlace(canvasTopLeft, canvasBottomRight);
 
-        // Drawing natural
-        drawNatural(canvasTopLeft, canvasBottomRight);
-
         // Drawing landuse
-        drawLanduse(canvasTopLeft, canvasBottomRight);
+        if (slider_value >= 20){
+            drawLanduse(canvasTopLeft, canvasBottomRight);
+        }
+
+        // Drawing natural
+        if (slider_value >= 20){
+            drawNatural(canvasTopLeft, canvasBottomRight);
+        }
 
         // Drawing building
-        drawBuilding(canvasTopLeft, canvasBottomRight);
+        if (slider_value >= 50){
+            drawBuilding(canvasTopLeft, canvasBottomRight);
+        }
 
-        // Drawing road ways
+
+        // Drawing road
+        // Slider values are inside the function
         drawRoad(canvasTopLeft, canvasBottomRight);
 
         for (var line : model.list) {
@@ -294,7 +304,20 @@ public class View {
             Way way = roadNode.getWay();
             if (way != null && way.getZoom_scale() < slider_value) {
                 gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark, model.getColorScheme());
+
+                if (model.xsmallRoads.contains(((Road) way).getRoadType()) && slider_value >= 60) {
+                    way.draw(gc, slider_value, dark, model.getColorScheme());
+                }
+                else if (model.smallRoads.contains(((Road) way).getRoadType()) && slider_value >= 50){
+                    way.draw(gc, slider_value, dark, model.getColorScheme());
+                }
+                else if (model.mediumRoads.contains(((Road) way).getRoadType()) && slider_value >= 40){
+                    way.draw(gc, slider_value, dark, model.getColorScheme());
+                }
+                else if (model.bigRoads.contains(((Road) way).getRoadType()) && slider_value >= 30){
+                    way.draw(gc, slider_value, dark, model.getColorScheme());
+                }
+
             }
         }
     }
