@@ -76,13 +76,17 @@ public class Model implements Serializable {
     HashMap<Long, Way> id2way;
     int indexForCenterPoints = 0;
     long wayid = 0;
-    Set<String> uniqueWayTypes = new HashSet<>();
     HashMap<String, Double> roadIdSet;
     HashSet<String> cycleTags;
     ColorScheme cs;
     LineThickness lt;
     Set<String> allowedKeyTypes;
     Set<String> bannedLandforms;
+    Set<String> xsmallRoads;
+    Set<String> smallRoads;
+    Set<String> mediumRoads;
+    Set<String> bigRoads;
+
 
     static Model load(InputStream inputStream, String fileName) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if(fileName.endsWith(".obj")){
@@ -172,7 +176,7 @@ public class Model implements Serializable {
         this.relationsMembers = new ArrayList<>();
         this.addressList = new ArrayList<>();
         this.address = new Address();
-        this.addressIdMap = new TreeMap<>(); // Used for ref a node id to an adress
+        this.addressIdMap = new TreeMap<>(); // Used for ref a node id to an address
         this.allowedKeyTypes = new HashSet<>(Arrays.asList("place", "natural", "landuse", "building")); // Allowed types for relations and ways
         this.bannedLandforms = new HashSet<>(Arrays.asList("coastline", "military", "port", "industrial", "harbour", "strait", "recreation_ground"));
         if (filename.endsWith(".osm.zip")) {
@@ -200,8 +204,6 @@ public class Model implements Serializable {
         this.kdTreeWaysLanduse = new KDTreeWay();
         this.kdTreeWaysBuilding = new KDTreeWay();
         this.kdTreeWaysRoad = new KDTreeWay();
-
-        for (String s : uniqueWayTypes) System.out.println(s);
 
         // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
 
@@ -470,6 +472,7 @@ public class Model implements Serializable {
                             if (way.get(0) == way.get(way.size()-1)){
                             addToCenterWays(tmpWay, wayKey);
                             }
+
                         }
                         id2way.put(wayid,tmpWay);
                     }
@@ -520,7 +523,7 @@ public class Model implements Serializable {
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
-                        if (validRelation) {
+                        if (validRelation && !bannedLandforms.contains(relationLandform)) {
                             if (relationKey.equals("place")) {
                                 RelationsPlace.add(new Relation(RelationsType,relationsMembers,relationLandform, cs));
                             } else if (relationKey.equals("building")) {
@@ -567,7 +570,7 @@ public class Model implements Serializable {
     public void StartDijkstra(Node startaddress,boolean vehicle){
         double x = startaddress.getLon();
         double y = startaddress.getLat();
-        Node tmpNode = kdTreeWaysRoad.getNearestNeighbor(x,y,true).getArbitraryNode();
+        Node tmpNode = kdTreeWaysRoad.getNearestNeighbor(x,y,true).getWay().getArbitraryNode();
         list.clear();
       //  this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(tmpNode),vehicle); // this starts the dijkstra search from the index that refferes to a node
         this.Dijkstra = new SP(EWD,tmpNode.id,vehicle);

@@ -63,12 +63,14 @@ public class View {
         mapPane = (Pane) scene.lookup("#mapPane");
         mapPane.getChildren().add(canvas); //Adds the canvas to the mapPane
 
+        this.slider_value = 50.0;
+
         //Scene scene = new Scene(pane);
         primaryStage.setScene(scene);
         primaryStage.show();
         redraw();
-        pan(-0.56*model.minlon, model.maxlat);
-        zoom(0, 0, 25000); // THIS IS SETTING THE ZOOM DYNAMICALLY: zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
+        panToMap(model.minlat, model.minlon, model.maxlat, model.maxlon);
+        zoom(0, 0, 10000); // THIS IS SETTING THE ZOOM DYNAMICALLY: zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
         //Listens for changes done to the width then changes the canvas acordingly
         primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> resizePanes(primaryStage.getWidth(), primaryStage.getHeight()));
         //Listens for changes done to the Height then changes the canvas acordingly
@@ -93,20 +95,30 @@ public class View {
         // Logic for drawing ways from KDTree instead of all ways
         Point2D canvasTopLeft =  mousetoModel(-200,-200);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth() + 200,canvas.getHeight() + 200);
+        //Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+
 
         // Drawing place
         drawPlace(canvasTopLeft, canvasBottomRight);
 
-        // Drawing natural
-        drawNatural(canvasTopLeft, canvasBottomRight);
-
         // Drawing landuse
-        drawLanduse(canvasTopLeft, canvasBottomRight);
+        if (slider_value >= 20){
+            drawLanduse(canvasTopLeft, canvasBottomRight);
+        }
+
+        // Drawing natural
+        if (slider_value >= 20){
+            drawNatural(canvasTopLeft, canvasBottomRight);
+        }
 
         // Drawing building
-        drawBuilding(canvasTopLeft, canvasBottomRight);
+        if (slider_value >= 50){
+            drawBuilding(canvasTopLeft, canvasBottomRight);
+        }
 
-        // Drawing road ways
+
+        // Drawing road
+        // Slider values are inside the function
         drawRoad(canvasTopLeft, canvasBottomRight);
 
         for (var line : model.list) {
@@ -140,6 +152,13 @@ public class View {
         gc.fillOval(x - radius, y - radius, 2 * radius, 2 * radius);
         gc.setFill(Color.RED);  // Set the fill color for the circle
         gc.fillOval(x - radius+0.000025, y - radius+0.000025, 1.5 * radius, 1.5 * radius);
+    }
+
+    void panToMap(double minlat, double minlon, double maxlat, double maxlon) {
+        double midpointLat = (minlat + maxlat) / 2.0;
+        double midpointLon = (minlon + maxlon) / 2.0;
+        trans.prependTranslation(-0.56 * midpointLon, midpointLat);
+        redraw();
     }
 
     void pan(double dx, double dy) {
@@ -280,7 +299,20 @@ public class View {
         for (Way roadWay : waysRoadNodesFromKD) {
             if (roadWay != null && roadWay.getZoom_scale() < slider_value) {
                 gc.setStroke(Color.BLACK);
-                roadWay.draw(gc, slider_value, dark, model.getColorScheme());
+
+                if (model.xsmallRoads.contains(((Road) roadWay).getRoadType) && slider_value >= 60) {
+                    roadWay.draw(gc, slider_value, dark, model.getColorScheme());
+                }
+                else if (model.smallRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 50){
+                    roadWay.draw(gc, slider_value, dark, model.getColorScheme());
+                }
+                else if (model.mediumRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 40){
+                    roadWay.draw(gc, slider_value, dark, model.getColorScheme());
+                }
+                else if (model.bigRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 30){
+                    roadWay.draw(gc, slider_value, dark, model.getColorScheme());
+                }
+
             }
         }
     }
