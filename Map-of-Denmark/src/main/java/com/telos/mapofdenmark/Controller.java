@@ -66,7 +66,8 @@ public class Controller {
 
     private Node lastPannedToAddress;
 
-    private boolean allowedToPan = true;
+    private boolean allowedToPan = false;
+    private boolean switchToRadix = false;
 
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
@@ -97,6 +98,7 @@ public class Controller {
     }
     @FXML
     private void initialize(){
+
         zoomSlider.setValue(50.0);
         vehicle = false;
         // Sets the visuals of the theme toggle
@@ -113,13 +115,13 @@ public class Controller {
                 // Puts the text into the first searchbar
                 if(searchBarCounter == 0){
                     searchBar.setText(chosenSelection);
+                    checkForIfTextIsStreet(searchBar);
                     panToAddress(chosenSelection);
-
-
                 }
                 // Puts it into the second searchbar
                 else{
                     searchBar1.setText(chosenSelection);
+                    checkForIfTextIsStreet(searchBar1);
                 }
                 suggestionsBox.setVisible(false);
             }
@@ -133,6 +135,9 @@ public class Controller {
         searchBar.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar.getText().isEmpty())) {
                 System.out.println(searchBar.getText());
+
+                checkForIfTextIsStreet(searchBar);
+
                 addressParsing(searchBar.getText());
                 searchBarCounter = 0;
             }
@@ -145,6 +150,7 @@ public class Controller {
         searchBar1.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar1.getText().isEmpty())) {
                 System.out.println(searchBar1.getText());
+                checkForIfTextIsStreet(searchBar1);
                 addressParsing(searchBar1.getText());
                 searchBarCounter = 1;
             }
@@ -172,9 +178,23 @@ public class Controller {
           });
     }
 
-    private void checkForIfTextIsStreet(TextField searchBar, int searchBarCounter, Trie trie){
-        if(trie.contains(searchBar.getText())){
-            
+    /**
+     * Method that checks if the searchBar contains a street name, and switches from a Trie that only contains street names to a RadixTrue for whole addresses
+     * if it does contain a street name
+     * @param modularSearchBar - the given searchbar
+     */
+    private void checkForIfTextIsStreet(TextField modularSearchBar){
+        if(model.isWordInTrie(modularSearchBar.getText())){
+            if(modularSearchBar == searchBar){
+                allowedToPan = true;
+            }
+            switchToRadix = true;
+        }
+        else{
+            if(modularSearchBar == searchBar){
+                allowedToPan = false;
+            }
+            switchToRadix = false;
         }
     }
 
@@ -277,8 +297,16 @@ public class Controller {
         suggestionsBox.getItems().clear(); // Clear previous suggestions
             // Only proceed if the new value is not empty
             if (!newValue.isEmpty()) {
-                // Get new suggestions based on the current text in the search bar
-                List<String> suggestionsList = model.getSuggestionList(newValue);
+                List<String> suggestionsList;
+                if(!switchToRadix){
+                    // Get new suggestions based on the current text in the search bar
+                    suggestionsList = model.getStreetNamesList(newValue);
+                }
+                else{
+                    suggestionsList = model.getSuggestionList(newValue);
+                }
+
+
 
                 // Logic for the suggestionsBox in UI
                 if (!suggestionsList.isEmpty()) {
@@ -307,7 +335,7 @@ public class Controller {
     private void panToAddress(String selectedAddress){
         String addressToLowerCase = selectedAddress.toLowerCase();
         if(model.getAddressIdMap().get(addressToLowerCase) != null && lastPannedToAddress != model.getAddressIdMap().get(addressToLowerCase)
-        && allowedToPan){
+        && allowedToPan && switchToRadix){
             Node addressNode = model.getAddressIdMap().get(addressToLowerCase);
             lastPannedToAddress = addressNode;
             double addressX = addressNode.getLon() * 0.56;

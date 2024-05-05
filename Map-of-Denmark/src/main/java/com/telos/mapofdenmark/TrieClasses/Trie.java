@@ -49,6 +49,7 @@ public class Trie implements Serializable {
      * Credit for original implementation of method: https://www.baeldung.com/trie-java
      */
     public boolean contains(String inputWord) {
+        inputWord = inputWord.toLowerCase();
         // Start traversal at root node
         TrieNode currentNode = rootNode;
         // Iterate through each character of the input word
@@ -73,9 +74,10 @@ public class Trie implements Serializable {
      * Retrieves a list of all words in the trie that start with the given prefix.
      * @param prefix The prefix to search for.
      * @param limit The maximum number of suggestions to return.
+     * @param onlyStreetName true = input is only street names, false = input is whole addresses
      * @return A list of suggestions that start with the prefix.
      */
-    public List<String> getAddressSuggestions(String prefix, int limit){
+    public List<String> getAddressSuggestions(String prefix, int limit, boolean onlyStreetName){
         List<String> addressSuggestions = new ArrayList<>(); // A list that stores the suggestions
         TrieNode currentNode = rootNode; // Start the traversal from the root node
         // Traverse through each character from the prefix
@@ -90,7 +92,7 @@ public class Trie implements Serializable {
         collectAddressSuggestions(currentNode, prefix, addressSuggestions, limit);
 
         // instead of just returning the collected strings we format them before returning
-        return formatAddressSuggestions(addressSuggestions);
+        return formatAddressSuggestions(addressSuggestions, onlyStreetName);
     }
 
     /**
@@ -124,33 +126,50 @@ public class Trie implements Serializable {
     /**
      * Formats a list of address suggestions for better readability.
      * @param suggestions List of unformatted suggestions.
+     * @param onlyStreetName true = input is only street names, false = input is whole addresses
      * @return A list of formatted suggestions.
      */
     //Logic for formatting the output of the TRIE
-    private List<String> formatAddressSuggestions(List<String> suggestions) {
+    private List<String> formatAddressSuggestions(List<String> suggestions, boolean onlyStreetName) {
         List<String> formattedSuggestions = new ArrayList<>();
-        // Compile a regex pattern to extract components of the address. The pattern captures:
-        // Group 1: characters for the street
-        // Group 2: Digits for the house number
-        // Group 3: characters for the city
-        // Group 4: characters for the municipality
-        // Group 5: characters for the country
-        Pattern pattern = Pattern.compile("^(\\D+)(\\d+)\\s+(\\D+)\\s+(\\D+)\\s+(\\D+)$");
+        String formatted;
+        Pattern pattern;
+
+        // Instantiate patterns depending on if the input is only street names or whole addresses
+        if(onlyStreetName){
+            pattern = Pattern.compile("^(\\D+)");
+
+        }
+        else{
+            // Compile a regex pattern to extract components of the address. The pattern captures:
+            // Group 1: characters for the street
+            // Group 2: Digits for the house number
+            // Group 3: characters for the city
+            // Group 4: characters for the municipality
+            // Group 5: characters for the country
+            pattern = Pattern.compile("^(\\D+)(\\d+)\\s+(\\D+)\\s+(\\D+)\\s+(\\D+)$");
+        }
+
 
         for (String suggestion : suggestions) {
             // Create a matcher for the suggestion based on the compiled pattern
             Matcher matcher = pattern.matcher(suggestion);
             if (matcher.find()) {
-                // Format the extracted groups and capitalize appropriate parts
-                // "," could be added in front of "%s" but would create exception when running djikstra
-                String formatted = String.format("%s %s %s %s %s",
-                        capitalizeWord(matcher.group(1).trim()), // Street
-                        matcher.group(2).trim(), // House number
-                        capitalizeWord(matcher.group(3).trim()), // City
-                        capitalizeWord(matcher.group(4).trim()), // Municipality
-                        matcher.group(5).trim().toUpperCase()); // Country
+                if(onlyStreetName){
+                    formatted = capitalizeWord(matcher.group(1).trim());
+                }
+                else{
+                    // Format the extracted groups and capitalize appropriate parts
+                    // "," could be added in front of "%s" but would create exception when running djikstra
+                    formatted = String.format("%s %s %s %s %s",
+                            capitalizeWord(matcher.group(1).trim()), // Street
+                            matcher.group(2).trim(), // House number
+                            capitalizeWord(matcher.group(3).trim()), // City
+                            capitalizeWord(matcher.group(4).trim()), // Municipality
+                            matcher.group(5).trim().toUpperCase()); // Country
 
-                // Add the formatted address to the list of formatted suggestions
+                    // Add the formatted address to the list of formatted suggestions
+                }
                 formattedSuggestions.add(formatted);
             }
         }

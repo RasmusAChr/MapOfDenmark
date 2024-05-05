@@ -52,6 +52,7 @@ public class Model implements Serializable {
     List<Node> centerPointNodesWaysRoad = new ArrayList<>();
     SP Dijkstra = null;
     private Trie trie;
+    private RadixTrie streetTrie;
     private RadixTrie radixTrie;
     double minlat, maxlat, minlon, maxlon;
     List<Address> addressList;
@@ -184,8 +185,7 @@ public class Model implements Serializable {
         this.radixTrie = new RadixTrie();
         for(Address address : addressList){
             if(address != null){
-//                trie.insert(address.getStreet());
-                // RadixTrie insert put here
+                trie.insert(address.getStreet());
                 radixTrie.insert(address.getFullAddress());
             } else System.out.println("Address is null");
         }
@@ -654,7 +654,15 @@ public class Model implements Serializable {
 
     public List<String> getSuggestionList(String input){
 //        return trie.getAddressSuggestions(input.toLowerCase(), 4);
-        return radixTrie.getAddressSuggestions(input.toLowerCase(), 5);
+        return radixTrie.getAddressSuggestions(input.toLowerCase(), 4);
+    }
+    public List<String> getStreetNamesList(String input){
+//        return trie.getAddressSuggestions(input.toLowerCase(), 4);
+        return trie.getAddressSuggestions(input.toLowerCase(), 4, true);
+    }
+
+    public boolean isWordInTrie(String inputWord){
+        return trie.contains(inputWord);
     }
 
     // finds the center lat and lon among a collection of nodes

@@ -36,7 +36,7 @@ public class TrieTests {
     void testNordicChars() {
         // Test inserting a single city and retrieving it
         trie.insert("Åkirkeby");
-        suggestionList = trie.getAddressSuggestions("å",1);
+        suggestionList = trie.getAddressSuggestions("å",1,false);
         assertEquals("åkirkeby", suggestionList.get(0));
     }
 
@@ -44,7 +44,7 @@ public class TrieTests {
     void testCaseInsensitivity() {
         // Test that suggestions work regardless of case
         trie.insert("Lemmino");
-        suggestionList = trie.getAddressSuggestions("lemmino",1);
+        suggestionList = trie.getAddressSuggestions("lemmino",1, false);
         assertEquals("lemmino", suggestionList.get(0));
     }
     @Test
@@ -53,7 +53,7 @@ public class TrieTests {
         trie.insert("abe");
         trie.insert("Aka");
         // Test inserting multiple cities and retrieving suggestions for a prefix
-        suggestionList = trie.getAddressSuggestions("a",3);
+        suggestionList = trie.getAddressSuggestions("a",3, false);
         for(String word : suggestionList){
             System.out.println(word);
         }

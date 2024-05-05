@@ -255,4 +255,8 @@ public class RadixTrie implements Serializable {
             collectAllAddresses(node.children.get(charValue), currentAddress + node.value, allAddresses);
         }
     }
+
+    public boolean isEmpty() {
+        return rootNode.children.isEmpty();
+    }
 }
