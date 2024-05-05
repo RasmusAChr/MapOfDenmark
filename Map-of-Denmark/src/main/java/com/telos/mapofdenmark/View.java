@@ -300,7 +300,7 @@ public class View {
             if (roadWay != null && roadWay.getZoom_scale() < slider_value) {
                 gc.setStroke(Color.BLACK);
 
-                if (model.xsmallRoads.contains(((Road) roadWay).getRoadType) && slider_value >= 60) {
+                if (model.xsmallRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 60) {
                     roadWay.draw(gc, slider_value, dark, model.getColorScheme());
                 }
                 else if (model.smallRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 50){
