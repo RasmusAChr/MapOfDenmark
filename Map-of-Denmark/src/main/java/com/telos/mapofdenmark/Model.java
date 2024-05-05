@@ -76,13 +76,17 @@ public class Model implements Serializable {
     HashMap<Long, Way> id2way;
     int indexForCenterPoints = 0;
     long wayid = 0;
-    Set<String> uniqueWayTypes = new HashSet<>();
     HashMap<String, Double> roadIdSet;
     HashSet<String> cycleTags;
     ColorScheme cs;
     LineThickness lt;
     Set<String> allowedKeyTypes;
     Set<String> bannedLandforms;
+    Set<String> xsmallRoads;
+    Set<String> smallRoads;
+    Set<String> mediumRoads;
+    Set<String> bigRoads;
+
 
     static Model load(InputStream inputStream, String fileName) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if(fileName.endsWith(".obj")){
@@ -172,9 +176,15 @@ public class Model implements Serializable {
         this.relationsMembers = new ArrayList<>();
         this.addressList = new ArrayList<>();
         this.address = new Address();
-        this.addressIdMap = new TreeMap<>(); // Used for ref a node id to an adress
+        this.addressIdMap = new TreeMap<>(); // Used for ref a node id to an address
         this.allowedKeyTypes = new HashSet<>(Arrays.asList("place", "natural", "landuse", "building")); // Allowed types for relations and ways
         this.bannedLandforms = new HashSet<>(Arrays.asList("coastline", "military", "port", "industrial", "harbour", "strait", "recreation_ground"));
+
+        this.xsmallRoads = new HashSet<>(Arrays.asList("path", "footway"));
+        this.smallRoads = new HashSet<>(Arrays.asList("pedestrian", "service", "desination", "permissive", "optional_sidepath", "use_sidepath", "designated", "yes", "default", "cycleway", "track", "living_street", "residential", "unclassified"));
+        this.mediumRoads = new HashSet<>(Arrays.asList("tertiary_link", "secondary_link", "primary_link", "trunk_link", "motorway_link", "tertiary", "secondary"));
+        this.bigRoads = new HashSet<>(Arrays.asList("primary", "trunk", "highway"));
+
         if (filename.endsWith(".osm.zip")) {
             parseZIP(inputStream);
         } else if (filename.endsWith(".osm")) {
@@ -200,8 +210,6 @@ public class Model implements Serializable {
         this.kdTreeWaysLanduse = new KDTreeWay();
         this.kdTreeWaysBuilding = new KDTreeWay();
         this.kdTreeWaysRoad = new KDTreeWay();
-
-        for (String s : uniqueWayTypes) System.out.println(s);
 
         // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
 
@@ -470,6 +478,7 @@ public class Model implements Serializable {
                             if (way.get(0) == way.get(way.size()-1)){
                             addToCenterWays(tmpWay, wayKey);
                             }
+
                         }
                         id2way.put(wayid,tmpWay);
                     }
@@ -520,7 +529,7 @@ public class Model implements Serializable {
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
-                        if (validRelation) {
+                        if (validRelation && !bannedLandforms.contains(relationLandform)) {
                             if (relationKey.equals("place")) {
                                 RelationsPlace.add(new Relation(RelationsType,relationsMembers,relationLandform, cs));
                             } else if (relationKey.equals("building")) {

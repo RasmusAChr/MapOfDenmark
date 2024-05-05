@@ -41,6 +41,10 @@ public class Road extends Way implements Serializable {
         gc.setLineWidth(0.00001);
     }
 
+    public String getRoadType(){
+        return roadType;
+    }
+
     /*@Override
     public void fill(GraphicsContext gc, boolean darkMode, ColorScheme cs, String type){
         return;

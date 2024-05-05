@@ -81,7 +81,7 @@ public class Controller_Boot {
         File file = fileChooser.showOpenDialog(stage);
 
         if (file != null) {
-            System.out.println("This is the file name" + file.getName());
+            System.out.println("File loading: " + file.getName());
             userFilename = file.getName();
             try (InputStream inputStream = new FileInputStream(file)) {
                 chosen = true;
