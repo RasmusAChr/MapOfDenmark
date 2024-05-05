@@ -68,7 +68,7 @@ public class View {
         primaryStage.show();
         redraw();
         pan(-0.56*model.minlon, model.maxlat);
-        zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
+        zoom(0, 0, 25000); // THIS IS SETTING THE ZOOM DYNAMICALLY: zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
         //Listens for changes done to the width then changes the canvas acordingly
         primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> resizePanes(primaryStage.getWidth(), primaryStage.getHeight()));
         //Listens for changes done to the Height then changes the canvas acordingly
@@ -93,7 +93,7 @@ public class View {
         // Logic for drawing ways from KDTree instead of all ways
         Point2D canvasTopLeft =  mousetoModel(-200,-200);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth() + 200,canvas.getHeight() + 200);
-        Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        //Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         Queue<Node> buildingNodesFromKD = model.kdTreeBuildings.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         Queue<Node> naturalsNodesFromKD = model.kdTreeNaturals.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         Queue<Node> landuseNodesFromKD = model.kdTreeLanduses.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
@@ -118,8 +118,6 @@ public class View {
                 way.fill(gc, dark, model.getColorScheme(), "place");
             }
         }
-
-
 
         // Drawing landuse relations
         for(Node landuseNode : landuseNodesFromKD){
@@ -153,6 +151,8 @@ public class View {
             }
         }
 
+
+
         // Drawing building relations
         for(Node buildingNode : buildingNodesFromKD){
             Relation relation = buildingNode.getRefRelation();
@@ -168,6 +168,7 @@ public class View {
                 way.fill(gc, dark, model.getColorScheme(), "building");
             }
         }
+
 
         // Drawing road ways
         for (Node roadNode : waysRoadNodesFromKD) {
