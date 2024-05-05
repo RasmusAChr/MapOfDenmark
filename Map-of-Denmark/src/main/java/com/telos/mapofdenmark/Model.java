@@ -14,8 +14,6 @@ import java.util.*;
 import java.util.zip.ZipInputStream;
 import javax.xml.stream.*;
 import java.util.TreeMap;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 
 import com.telos.mapofdenmark.KDTreeClasses.KDTree;
 import com.telos.mapofdenmark.Shortest_Route.DirectedEdge;
@@ -278,7 +276,6 @@ public class Model implements Serializable {
                         addressIdMap.put(address.getFullAddress().toLowerCase(), nodeList.get(NodeCount-1));
                         address = null; // Reset for the next address
                     }
-
                 }
             }
         }
