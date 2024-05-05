@@ -38,4 +38,9 @@ public class Road extends Way implements Serializable {
     public void fill(GraphicsContext gc, boolean darkMode, ColorScheme cs, String type){
         return;
     }*/
+
+    @Override
+    public boolean isRoad(){
+        return true;
+    }
 }
