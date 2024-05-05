@@ -15,7 +15,6 @@ public class ColorScheme implements Serializable{
     Map<String, String> landuseDarkColors;
     Map<String, String> roadColors;
     Map<String, String> roadDarkColors;
-    Set<String> missingColors;
 
 
     public ColorScheme(){
@@ -31,7 +30,6 @@ public class ColorScheme implements Serializable{
         naturalScheme();
         landuseScheme();
         roadScheme();
-        missingColors = new HashSet<>();
     }
 
     public Color getColor(String landform, boolean dark, String type){
@@ -78,8 +76,7 @@ public class ColorScheme implements Serializable{
             return Color.web(hex);
         } catch (NullPointerException e) {
             if (!landform.isEmpty()) {
-                missingColors.add("missing color on: " + type + " " + landform);
-                //System.out.println("missing color on: " + type + " " + landform);
+                System.out.println("missing color on: " + type + " " + landform);
             }
             return getDefaultColor(dark);
         }

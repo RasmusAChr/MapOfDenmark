@@ -67,8 +67,7 @@ public class View {
         primaryStage.setScene(scene);
         primaryStage.show();
         redraw();
-        for (String s : model.getColorScheme().missingColors) System.out.println(s);
-        pan(model.minlat, model.minlon, model.maxlat, model.maxlon);
+        panToMap(model.minlat, model.minlon, model.maxlat, model.maxlon);
         zoom(0, 0, 25000); // THIS IS SETTING THE ZOOM DYNAMICALLY: zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
         //Listens for changes done to the width then changes the canvas acordingly
         primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> resizePanes(primaryStage.getWidth(), primaryStage.getHeight()));
@@ -95,114 +94,22 @@ public class View {
         Point2D canvasTopLeft =  mousetoModel(-200,-200);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth() + 200,canvas.getHeight() + 200);
         //Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-        Queue<Node> buildingNodesFromKD = model.kdTreeBuildings.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-        Queue<Node> naturalsNodesFromKD = model.kdTreeNaturals.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-        Queue<Node> landuseNodesFromKD = model.kdTreeLanduses.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-
-        Queue<Node> waysPlaceNodesFromKD = model.kdTreeWaysPlace.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-        Queue<Node> waysNaturalNodesFromKD = model.kdTreeWaysNatural.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-        Queue<Node> waysLanduseNodesFromKD = model.kdTreeWaysLanduse.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-        Queue<Node> waysBuildingNodesFromKD = model.kdTreeWaysBuilding.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-        Queue<Node> waysRoadNodesFromKD = model.kdTreeWaysRoad.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-
-        // Draws place relations (land border)
-        for (var relation : model.RelationsPlace) {
-            relation.Draw(gc,slider_value,dark,"place");
-        }
-
-        // Drawing place ways
-        for (Node placeNode : waysPlaceNodesFromKD) {
-            Way way = placeNode.getWay();
-            if (way != null && way.getZoom_scale() < slider_value) {
-                gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark, model.getColorScheme());
-                way.fill(gc, dark, model.getColorScheme(), "place");
-            }
-        }
-
-        // Drawing landuse relations
-        for(Node landuseNode : landuseNodesFromKD){
-            Relation relation = landuseNode.getRefRelation();
-            relation.Draw(gc,slider_value,dark,"landuse");
-        }
-
-        // Drawing landuse ways
-        for (Node landuseNode : waysLanduseNodesFromKD) {
-            Way way = landuseNode.getWay();
-            if (way != null && way.getZoom_scale() < slider_value) {
-                gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark, model.getColorScheme());
-                way.fill(gc, dark, model.getColorScheme(), "landuse");
-            }
-        }
-
-        // Drawing natural relations
-        for(Node naturalsNode : naturalsNodesFromKD){
-            Relation relation = naturalsNode.getRefRelation();
-            relation.Draw(gc,slider_value,dark,"natural");
-        }
-
-        // Drawing natural ways
-        for (Node naturalsNode : waysNaturalNodesFromKD) {
-            Way way = naturalsNode.getWay();
-            if (way != null && way.getZoom_scale() < slider_value) {
-                gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark, model.getColorScheme());
-                way.fill(gc, dark, model.getColorScheme(), "natural");
-            }
-        }
 
 
+        // Drawing place
+        drawPlace(canvasTopLeft, canvasBottomRight);
 
-        // Drawing building relations
-        for(Node buildingNode : buildingNodesFromKD){
-            Relation relation = buildingNode.getRefRelation();
-            relation.Draw(gc,slider_value,dark,"building");
-        }
+        // Drawing natural
+        drawNatural(canvasTopLeft, canvasBottomRight);
 
-        // Drawing building ways
-        for (Node buildingNode : waysBuildingNodesFromKD) {
-            Way way = buildingNode.getWay();
-            if (way != null && way.getZoom_scale() < slider_value) {
-                gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark, model.getColorScheme());
-                way.fill(gc, dark, model.getColorScheme(), "building");
-            }
-        }
+        // Drawing landuse
+        drawLanduse(canvasTopLeft, canvasBottomRight);
 
+        // Drawing building
+        drawBuilding(canvasTopLeft, canvasBottomRight);
 
         // Drawing road ways
-        for (Node roadNode : waysRoadNodesFromKD) {
-            Way way = roadNode.getWay();
-            if (way != null && way.getZoom_scale() < slider_value) {
-                gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark, model.getColorScheme());
-            }
-        }
-
-
-        // Drawing ways
-        /*for (Node nodeSpatial : nodesFromKD) {
-            Way way = nodeSpatial.getWay();
-            if (way != null && way.getZoom_scale() < slider_value) {
-                gc.setStroke(Color.BLACK);
-                way.draw(gc, slider_value, dark, model.getColorScheme());
-            }
-        }*/
-
-
-
-//        // Drawing relations
-//        for (var relation : model.RelationsPlace) {
-//            relation.Draw(gc,slider_value,dark);
-//        }
-//        for (var relation : model.RelationsBuilding) {
-//            relation.Draw(gc,slider_value,dark);
-//        }
-//        for (var relation : model.RelationsNatural) {
-//            relation.Draw(gc,slider_value,dark);
-//        }
-
+        drawRoad(canvasTopLeft, canvasBottomRight);
 
         for (var line : model.list) {
             line.draw(gc, dark);
@@ -237,7 +144,7 @@ public class View {
         gc.fillOval(x - radius+0.000025, y - radius+0.000025, 1.5 * radius, 1.5 * radius);
     }
 
-    void pan(double minlat, double minlon, double maxlat, double maxlon) {
+    void panToMap(double minlat, double minlon, double maxlat, double maxlon) {
         double midpointLat = (minlat + maxlat) / 2.0;
         double midpointLon = (minlon + maxlon) / 2.0;
         trans.prependTranslation(-0.56 * midpointLon, midpointLat);
@@ -299,6 +206,96 @@ public class View {
             tempAddressPoint = null;
         } else {
             tempAddressPoint = new Point2D(x, y);
+        }
+    }
+
+    private void drawPlace(Point2D canvasTopLeft, Point2D canvasBottomRight){
+        Queue<Node> waysPlaceNodesFromKD = model.kdTreeWaysPlace.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+
+        for (var relation : model.RelationsPlace) {
+            relation.Draw(gc,slider_value,dark,"place");
+        }
+
+        for (Node placeNode : waysPlaceNodesFromKD) {
+            Way way = placeNode.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+                way.fill(gc, dark, model.getColorScheme(), "place");
+            }
+        }
+    }
+
+    private void drawNatural(Point2D canvasTopLeft, Point2D canvasBottomRight){
+        Queue<Node> naturalsNodesFromKD = model.kdTreeNaturals.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> waysNaturalNodesFromKD = model.kdTreeWaysNatural.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+
+        for(Node naturalsNode : naturalsNodesFromKD){
+            Relation relation = naturalsNode.getRefRelation();
+            relation.Draw(gc,slider_value,dark,"natural");
+        }
+
+        // Drawing natural ways
+        for (Node naturalsNode : waysNaturalNodesFromKD) {
+            Way way = naturalsNode.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+                way.fill(gc, dark, model.getColorScheme(), "natural");
+            }
+        }
+    }
+
+    private void drawLanduse(Point2D canvasTopLeft, Point2D canvasBottomRight){
+        Queue<Node> landuseNodesFromKD = model.kdTreeLanduses.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> waysLanduseNodesFromKD = model.kdTreeWaysLanduse.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+
+        for(Node landuseNode : landuseNodesFromKD){
+            Relation relation = landuseNode.getRefRelation();
+            relation.Draw(gc,slider_value,dark,"landuse");
+        }
+
+        // Drawing landuse ways
+        for (Node landuseNode : waysLanduseNodesFromKD) {
+            Way way = landuseNode.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+                way.fill(gc, dark, model.getColorScheme(), "landuse");
+            }
+        }
+
+    }
+
+    private void drawBuilding(Point2D canvasTopLeft, Point2D canvasBottomRight){
+        Queue<Node> buildingNodesFromKD = model.kdTreeBuildings.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+        Queue<Node> waysBuildingNodesFromKD = model.kdTreeWaysBuilding.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+
+        for(Node buildingNode : buildingNodesFromKD){
+            Relation relation = buildingNode.getRefRelation();
+            relation.Draw(gc,slider_value,dark,"building");
+        }
+
+        // Drawing building ways
+        for (Node buildingNode : waysBuildingNodesFromKD) {
+            Way way = buildingNode.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+                way.fill(gc, dark, model.getColorScheme(), "building");
+            }
+        }
+    }
+
+    private void drawRoad(Point2D canvasTopLeft, Point2D canvasBottomRight){
+        Queue<Node> waysRoadNodesFromKD = model.kdTreeWaysRoad.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
+
+        for (Node roadNode : waysRoadNodesFromKD) {
+            Way way = roadNode.getWay();
+            if (way != null && way.getZoom_scale() < slider_value) {
+                gc.setStroke(Color.BLACK);
+                way.draw(gc, slider_value, dark, model.getColorScheme());
+            }
         }
     }
 }
