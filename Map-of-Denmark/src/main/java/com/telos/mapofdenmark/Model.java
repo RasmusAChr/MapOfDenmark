@@ -30,7 +30,6 @@ public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
 
     List<Line> list = new ArrayList<Line>();
-    List<Way> ways = new ArrayList<Way>();
     List<Node> nodeList = new ArrayList<>();
     List<Relation> RelationsPlace = new ArrayList<>();
     List<Relation> RelationsNatural = new ArrayList<>();
@@ -237,8 +236,8 @@ public class Model implements Serializable {
     }
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-        int addressId = 0;
         int NodeCount = 0;
+        int addressId = 0;
         while (input.hasNext()) {
             var tagKind = input.next();
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
@@ -285,7 +284,6 @@ public class Model implements Serializable {
                         addressList.add(address);
                         //System.out.println(addressId);
                         addressIdMap.put(address.getFullAddress().toLowerCase(), nodeList.get(addressId));
-                        addressId = 0;
                         address = null; // Reset for the next address
                     }
 
@@ -468,14 +466,12 @@ public class Model implements Serializable {
                 if (name.equals("way")) {
                     if (!roadtype.isEmpty()) { // Is a road
                         Road tmpRoad = new Road(way, roadtype, zoom_scale, lt);
-                        ways.add(tmpRoad);
                         addToCenterPointNodes(way, tmpRoad, true, "road");
                         id2way.put(wayid,tmpRoad);
                     } else { // Is not a road
                         //System.out.println("wayKey: " + wayKey);
                         //System.out.println("wayLandform: " + wayLandform);
                         Way tmpWay = new Way(way, zoom_scale, wayLandform, wayKey);
-                        ways.add(tmpWay);
                         if (!bannedLandforms.contains(wayLandform)) {
                             // If the last node isn't the same as the first then don't draw it.
                             // This makes sure we don't get any lines that isn't roads.
