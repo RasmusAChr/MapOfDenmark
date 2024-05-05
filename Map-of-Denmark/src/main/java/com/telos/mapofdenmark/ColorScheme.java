@@ -2,7 +2,9 @@ package com.telos.mapofdenmark;
 import javafx.scene.paint.Color;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class ColorScheme implements Serializable{
     Map<String, String> placeColors;
@@ -13,6 +15,7 @@ public class ColorScheme implements Serializable{
     Map<String, String> landuseDarkColors;
     Map<String, String> roadColors;
     Map<String, String> roadDarkColors;
+    Set<String> missingColors;
 
 
     public ColorScheme(){
@@ -28,6 +31,7 @@ public class ColorScheme implements Serializable{
         naturalScheme();
         landuseScheme();
         roadScheme();
+        missingColors = new HashSet<>();
     }
 
     public Color getColor(String landform, boolean dark, String type){
@@ -73,7 +77,10 @@ public class ColorScheme implements Serializable{
             }
             return Color.web(hex);
         } catch (NullPointerException e) {
-            if (!landform.isEmpty()) System.out.println("missing color on: " + type + " " + landform);
+            if (!landform.isEmpty()) {
+                missingColors.add("missing color on: " + type + " " + landform);
+                //System.out.println("missing color on: " + type + " " + landform);
+            }
             return getDefaultColor(dark);
         }
 
@@ -99,6 +106,14 @@ public class ColorScheme implements Serializable{
         placeDarkColors.put("square", "#a0a0a0");
         placeColors.put("neighbourhood", "#dadada");
         placeDarkColors.put("neighbourhood", "#a0a0a0");
+        placeColors.put("quarter", "#dadada");
+        placeDarkColors.put("quarter", "#a0a0a0");
+        placeColors.put("suburb", "#dadada");
+        placeDarkColors.put("suburb", "#a0a0a0");
+        placeColors.put("plot", "#dadada");
+        placeDarkColors.put("plot", "#a0a0a0");
+        placeColors.put("city", "#dadada");
+        placeDarkColors.put("city", "#a0a0a0");
         placeColors.put("allotments", "#c5d9c3");
         placeDarkColors.put("allotments", "#9aae98");
         placeColors.put("isolated_dwelling", "#c5d9c3");
@@ -117,6 +132,8 @@ public class ColorScheme implements Serializable{
         naturalDarkColors.put("heath", "#b0b283");
         naturalColors.put("scrub", "#c9d8ac");
         naturalDarkColors.put("scrub", "#a3b292");
+        naturalColors.put("scrubby", "#c9d8ac");
+        naturalDarkColors.put("scrubby", "#a3b292");
         naturalColors.put("water", "#aad3df");
         naturalDarkColors.put("water", "#495f66");
         naturalColors.put("beach", "#fff1bb");
@@ -149,6 +166,24 @@ public class ColorScheme implements Serializable{
         naturalDarkColors.put("earth_bank", "#bfaea0");
         naturalColors.put("earth_bank", "#c3c3c3");
         naturalDarkColors.put("earth_bank", "#a6a6a6");
+        naturalColors.put("strait", "#aad3df");
+        naturalDarkColors.put("strait", "#495f66");
+        naturalColors.put("mud", "#d6c29f");
+        naturalDarkColors.put("mud", "#a38866");
+        naturalColors.put("grass", "#8cbf80");
+        naturalDarkColors.put("grass", "#5e8e5b");
+        naturalColors.put("shrubbery", "#c9d8ac");
+        naturalDarkColors.put("shrubbery", "#a3b292");
+        naturalColors.put("hill", "#d6d99f");
+        naturalDarkColors.put("hill", "#b0b283");
+        naturalColors.put("cape", "#c3c3c3");
+        naturalDarkColors.put("cape", "#a6a6a6");
+        naturalColors.put("shrub", "#c9d8ac");
+        naturalDarkColors.put("shrub", "#a3b292");
+        naturalColors.put("forest", "#7aa66f");
+        naturalDarkColors.put("forest", "#5c7a58");
+        naturalColors.put("tree_group", "#7aa66f");
+        naturalDarkColors.put("tree_group", "#5c7a58");
     }
 
     public void landuseScheme(){
@@ -185,6 +220,8 @@ public class ColorScheme implements Serializable{
         landuseDarkColors.put("greenfield", "#b5b2a9");
         landuseColors.put("construction", "#c7c7b4");
         landuseDarkColors.put("construction", "#9b9b85");
+        landuseColors.put("construction_site", "#c7c7b4");
+        landuseDarkColors.put("construction_site", "#9b9b85");
         landuseColors.put("retail", "#fecac5");
         landuseDarkColors.put("retail", "#d39e99");
         landuseColors.put("pasture", "#8cbf80");
@@ -215,6 +252,50 @@ public class ColorScheme implements Serializable{
         landuseDarkColors.put("bare_rock", "#a6a6a6");
         landuseColors.put("scree", "#e4dcd4");
         landuseDarkColors.put("scree", "#c5bdb5");
+        landuseColors.put("grassland", "#8cbf80");
+        landuseDarkColors.put("grassland", "#5e8e5b");
+        landuseColors.put("sand", "#fff1bb");
+        landuseDarkColors.put("sand", "#e0c77a");
+        landuseColors.put("bay", "#aad3df");
+        landuseDarkColors.put("bay", "#aad3df");
+        landuseColors.put("railway", "#dadada");
+        landuseDarkColors.put("railway", "#a0a0a0");
+        landuseColors.put("education", "#ffffe5");
+        landuseDarkColors.put("education", "#d9d9ad");
+        landuseColors.put("aquaculture", "#aad3df");
+        landuseDarkColors.put("aquaculture", "#495f66");
+        landuseColors.put("park", "#c3e8b5");
+        landuseDarkColors.put("park", "#8dbf84");
+        landuseColors.put("logistics", "#ebf0d5");
+        landuseDarkColors.put("logistics", "#c3c5a9");
+        landuseColors.put("storage", "#ebf0d5");
+        landuseDarkColors.put("storage", "#c3c5a9");
+        landuseColors.put("religious", "#fceae5");
+        landuseDarkColors.put("religious", "#dfb5a3");
+        landuseColors.put("artproject", "#f1f1f1");
+        landuseDarkColors.put("artproject", "#b7b7b7");
+        landuseColors.put("animal_keeping", "#ebf0d5");
+        landuseDarkColors.put("animal_keeping", "#c3c5a9");
+        landuseColors.put("flowerbed", "#f1f1f1");
+        landuseDarkColors.put("flowerbed", "#b7b7b7");
+        landuseColors.put("depot", "#ebf0d5");
+        landuseDarkColors.put("depot", "#c3c5a9");
+        landuseColors.put("terminal", "#ebf0d5");
+        landuseDarkColors.put("terminal", "#c3c5a9");
+        landuseColors.put("hedge", "#c3e8b5");
+        landuseDarkColors.put("hedge", "#8dbf84");
+        landuseColors.put("workyard", "#ebf0d5");
+        landuseDarkColors.put("workyard", "#c3c5a9");
+        landuseColors.put("common", "#c3e8b5");
+        landuseDarkColors.put("common", "#8dbf84");
+        landuseColors.put("apiary", "#ebf0d5");
+        landuseDarkColors.put("apiary", "#c3c5a9");
+        landuseColors.put("greenery", "#c3e8b5");
+        landuseDarkColors.put("greenery", "#8dbf84");
+        landuseColors.put("landfill", "#c3e8b5");
+        landuseDarkColors.put("landfill", "#8dbf84");
+        landuseColors.put("garages", "#ebf0d5");
+        landuseDarkColors.put("garages", "#c3c5a9");
     }
 
     public void roadScheme(){

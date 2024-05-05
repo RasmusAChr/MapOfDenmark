@@ -183,9 +183,9 @@ public class Model implements Serializable {
         this.roadCount = 0;
         this.addressList = new ArrayList<>();
         this.address = new Address();
-        this.addressIdMap = new TreeMap<>(); // Used for ref a node id to an adress
+        this.addressIdMap = new TreeMap<>(); // Used for ref a node id to an address
         this.allowedKeyTypes = new HashSet<>(Arrays.asList("place", "natural", "landuse", "building")); // Allowed types for relations and ways
-        this.bannedLandforms = new HashSet<>(Arrays.asList("coastline", "military", "port", "industrial"));
+        this.bannedLandforms = new HashSet<>(Arrays.asList("coastline", "military", "port", "industrial", "harbour", "strait"));
         if (filename.endsWith(".osm.zip")) {
             parseZIP(inputStream);
         } else if (filename.endsWith(".osm")) {
@@ -562,7 +562,7 @@ public class Model implements Serializable {
                     vertexIndex = -1;
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
-                        if (validRelation) {
+                        if (validRelation && !bannedLandforms.contains(relationLandform)) {
                             if (relationKey.equals("place")) {
                                 RelationsPlace.add(new Relation(RelationsType,relationsMembers,relationLandform, cs));
                             } else if (relationKey.equals("building")) {

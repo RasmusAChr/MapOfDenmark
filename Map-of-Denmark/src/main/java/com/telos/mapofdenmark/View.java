@@ -67,7 +67,8 @@ public class View {
         primaryStage.setScene(scene);
         primaryStage.show();
         redraw();
-        pan(-0.56*model.minlon, model.maxlat);
+        for (String s : model.getColorScheme().missingColors) System.out.println(s);
+        pan(model.minlat, model.minlon, model.maxlat, model.maxlon);
         zoom(0, 0, 25000); // THIS IS SETTING THE ZOOM DYNAMICALLY: zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
         //Listens for changes done to the width then changes the canvas acordingly
         primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> resizePanes(primaryStage.getWidth(), primaryStage.getHeight()));
@@ -234,6 +235,13 @@ public class View {
         gc.fillOval(x - radius, y - radius, 2 * radius, 2 * radius);
         gc.setFill(Color.RED);  // Set the fill color for the circle
         gc.fillOval(x - radius+0.000025, y - radius+0.000025, 1.5 * radius, 1.5 * radius);
+    }
+
+    void pan(double minlat, double minlon, double maxlat, double maxlon) {
+        double midpointLat = (minlat + maxlat) / 2.0;
+        double midpointLon = (minlon + maxlon) / 2.0;
+        trans.prependTranslation(-0.56 * midpointLon, midpointLat);
+        redraw();
     }
 
     void pan(double dx, double dy) {
