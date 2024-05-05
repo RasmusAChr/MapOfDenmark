@@ -73,8 +73,6 @@ public class Model implements Serializable {
 
     Address address;
     EdgeWeightedDigraph EWD;
-   // HashMap<Node, Integer> DigraphNodeToIndex;
-  //  HashMap<Integer, Node> DigraphIndexToNode;
     TreeMap<String, Integer> id2node;
     HashMap<String, Double> tagToScaleValue;
     List<Member> relationsMembers;
@@ -149,8 +147,6 @@ public class Model implements Serializable {
                 "pedestrian",
                 "footway",
                 "driveway"));
-     //   this.DigraphNodeToIndex = new HashMap<>();
-      //  this.DigraphIndexToNode = new HashMap<>();
         this.tagToScaleValue = new HashMap<>();
         /*
         tagToScaleValue.put("building", 70.0);
@@ -246,7 +242,6 @@ public class Model implements Serializable {
         int addressId = 0;
         int NodeCount = 0;
         while (input.hasNext()) {
-
             var tagKind = input.next();
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
                 var name = input.getLocalName();
@@ -338,7 +333,6 @@ public class Model implements Serializable {
         boolean acccesPostBollean = false;
         long wayid = 0;
         double zoom_scale = -1.0;
-        double max_speed = -1.0;
         String relationKey = "";
         Node startNode = null;
         String wayKey = "";
@@ -434,9 +428,6 @@ public class Model implements Serializable {
                             cycleable = true;
                             drivable = true;
                             }
-                            break;
-                        case "maxspeed":
-                            //max_speed = Double.parseDouble(v); Dum Bornholm way
                     }
 
                 } else if (name.equals("nd")) {
@@ -542,7 +533,6 @@ public class Model implements Serializable {
                     insideRelation = false;
                     RelationsType = "";
                     zoom_scale = -1.0;
-                    max_speed = -1.0;
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
@@ -588,6 +578,7 @@ public class Model implements Serializable {
                 }
             }
         }
+        id2node.clear();
     }
 
     //Dijkstra implementation
