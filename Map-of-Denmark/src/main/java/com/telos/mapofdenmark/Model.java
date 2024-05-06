@@ -105,70 +105,9 @@ public class Model implements Serializable {
     public Model(InputStream inputStream, String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
         cs = new ColorScheme();
         lt = new LineThickness();
-        this.roadIdSet = new HashMap<String, Double>(Map.of(
-                "motorway",0.4545,
-                "trunk", 0.625,
-                "primary", 0.625,
-                "secondary", 0.7142857,
-                "tertiary", 0.833,
-                "unclassified", 1.0,
-                "residential", 1.25,
-                "motorway_link", 0.4545,
-                "trunk_link", 0.71428574,
-                "primary_link", 0.7142857));
-        roadIdSet.put("secondary_link", 0.833);
-        roadIdSet.put("tertiary_link", 1.0);
-        roadIdSet.put("living_street", 2.5);
-        roadIdSet.put("track", 1.25);
-        roadIdSet.put("service", 1.0);
-        roadIdSet.put("pedestrian", 10.0);
-        roadIdSet.put("path", 10.0);
-        this.cycleTags = new HashSet<>(List.of(
-                "primary",
-                "secondary",
-                "tertiary",
-                "unclassified",
-                "residential",
-                "primary_link",
-                "secondary_link",
-                "tertiary_link",
-                "living_street",
-                "track",
-                "cycleway",
-                "yes",
-                "designated",
-                "use_sidepath",
-                "optional_sidepath",
-                "permissive",
-                "destination",
-                "private",
-                "pedestrian",
-                "footway",
-                "driveway"));
+        initializeRoadIdSetMap();
+        initializeCycleTagsHashSet();
         this.tagToScaleValue = new HashMap<>();
-        /*
-        tagToScaleValue.put("building", 70.0);
-        tagToScaleValue.put("shop", 70.0);
-        tagToScaleValue.put("barrier", 70.0);
-        tagToScaleValue.put("tourism", 70.0);
-        tagToScaleValue.put("public_transport", 100.0);
-        tagToScaleValue.put("power", 100.0);
-        tagToScaleValue.put("tunnel", 100.0);
-        tagToScaleValue.put("route", 100.0);
-        tagToScaleValue.put("bridge", 50.0);
-        tagToScaleValue.put("motorway", 0.1);
-        tagToScaleValue.put("primary", 20.0);
-        tagToScaleValue.put("secondary", 30.0);
-        tagToScaleValue.put("tertiary", 40.0);
-        tagToScaleValue.put("railway", 40.0);
-        tagToScaleValue.put("living_street", 60.0);
-        tagToScaleValue.put("residential", 60.0);
-                        case "building":
-                            zoom_scale = 80.0;
-                        case "building", "barrier", "tourism", "tunnel", "water", "waterway", "area", "route", "shop",
-                             "bridge", "power", "railway", "public_transport", "office", "natural", "leisure",
-                             "landuse", "cycleway", "footway":
-                            //zoom_scale = 0.1;break;*/
         this.id2way = new HashMap<>();
         this.id2node = new TreeMap<>();
         this.relationsMembers = new ArrayList<>();
@@ -176,7 +115,7 @@ public class Model implements Serializable {
         this.address = new Address();
         this.addressIdMap = new TreeMap<>(); // Used for ref a node id to an address
         this.allowedKeyTypes = new HashSet<>(Arrays.asList("place", "natural", "landuse", "building")); // Allowed types for relations and ways
-        this.bannedLandforms = new HashSet<>(Arrays.asList("coastline", "military", "port", "industrial", "harbour", "strait", "recreation_ground"));
+        this.bannedLandforms = new HashSet<>(Arrays.asList("coastline", "military", "port", "industrial", "harbour", "strait", "recreation_ground")); // Banned types for relations and ways
 
         this.xsmallRoads = new HashSet<>(Arrays.asList("path", "footway", "cycleway", "designated", "yes", "permissive", "optional_sidepath", "use_sidepath", "desination", "pedestrian"));
         this.smallRoads = new HashSet<>(Arrays.asList("service", "default", "track", "living_street", "residential", "unclassified"));
@@ -234,6 +173,53 @@ public class Model implements Serializable {
         // Saves objects to binary file
         save(filename+".obj");
     }
+
+    private void initializeRoadIdSetMap() {
+        this.roadIdSet = new HashMap<String, Double>(Map.of(
+                "motorway",0.4545,
+                "trunk", 0.625,
+                "primary", 0.625,
+                "secondary", 0.7142857,
+                "tertiary", 0.833,
+                "unclassified", 1.0,
+                "residential", 1.25,
+                "motorway_link", 0.4545,
+                "trunk_link", 0.71428574,
+                "primary_link", 0.7142857));
+        roadIdSet.put("secondary_link", 0.833);
+        roadIdSet.put("tertiary_link", 1.0);
+        roadIdSet.put("living_street", 2.5);
+        roadIdSet.put("track", 1.25);
+        roadIdSet.put("service", 1.0);
+        roadIdSet.put("pedestrian", 10.0);
+        roadIdSet.put("path", 10.0);
+    }
+
+    private void initializeCycleTagsHashSet() {
+        this.cycleTags = new HashSet<>(List.of(
+                "primary",
+                "secondary",
+                "tertiary",
+                "unclassified",
+                "residential",
+                "primary_link",
+                "secondary_link",
+                "tertiary_link",
+                "living_street",
+                "track",
+                "cycleway",
+                "yes",
+                "designated",
+                "use_sidepath",
+                "optional_sidepath",
+                "permissive",
+                "destination",
+                "private",
+                "pedestrian",
+                "footway",
+                "driveway"));
+    }
+
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         int NodeCount = 0;
