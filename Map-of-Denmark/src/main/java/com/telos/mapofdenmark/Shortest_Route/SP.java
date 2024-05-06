@@ -79,12 +79,4 @@ public class SP
             path.push(e);
         return path;
     }
-
-    /**
-     *  A Helper function for the A* heuristic. This helper function calculateds the distance from the node that is currently being explored to the end node in a
-     *  birds as distance as crows fly. This helps to get the shortest path quicker.
-     * @param v the current node that is being explored
-     * @param goal The destination for the pathfinding algorith the place we want to end up.
-     * @return this returns the distance that has been calculated.
-     */
 }
