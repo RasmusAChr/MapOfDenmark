@@ -21,7 +21,7 @@ public class RadixTrie implements Serializable {
     }
 
     /**
-     * Inserts a word into the Patricia Trie.
+     * Inserts a word into the Radix Trie.
      * @param inputWord The word to be inserted into the trie.
      */
     public void insert(String inputWord) {
@@ -32,7 +32,7 @@ public class RadixTrie implements Serializable {
     }
 
     /**
-     * Helper method to insert a word into the Patricia Trie recursively.
+     * Helper method to insert a word into the Radix Trie recursively.
      * @param node The current node in the trie.
      * @param word The word to be inserted.
      * @return The updated node after insertion.

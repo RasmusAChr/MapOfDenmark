@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * The class ColorScheme represents a color scheme used for coloring different relations from an OSM map.
- * These relations includes: naturals, landuses, roads etc.
+ * These relations include: naturals, landuses, roads etc.
  */
 public class ColorScheme implements Serializable{
     Map<String, String> placeColors;
@@ -49,42 +49,24 @@ public class ColorScheme implements Serializable{
         String hex = null;
         try{
             if(!dark){
-                switch (type) {
-                    case "place":
-                        hex = placeColors.get(landform);
-                        break;
-                    case "natural":
-                        hex = naturalColors.get(landform);
-                        break;
-                    case "landuse":
-                        hex = landuseColors.get(landform);
-                        break;
-                    case "building":
-                        hex = "#a39d98";
-                        break;
-                    case "road":
-                        hex = roadColors.get(landform);
-                        break;
-                }
+                hex = switch (type) {
+                    case "place" -> placeColors.get(landform);
+                    case "natural" -> naturalColors.get(landform);
+                    case "landuse" -> landuseColors.get(landform);
+                    case "building" -> "#a39d98";
+                    case "road" -> roadColors.get(landform);
+                    default -> hex;
+                };
             }
             else {
-                switch (type) {
-                    case "place":
-                        hex = placeDarkColors.get(landform);
-                        break;
-                    case "natural":
-                        hex = naturalDarkColors.get(landform);
-                        break;
-                    case "landuse":
-                        hex = landuseDarkColors.get(landform);
-                        break;
-                    case "building":
-                        hex = "#706b67";
-                        break;
-                    case "road":
-                        hex = roadDarkColors.get(landform);
-                        break;
-                }
+                hex = switch (type) {
+                    case "place" -> placeDarkColors.get(landform);
+                    case "natural" -> naturalDarkColors.get(landform);
+                    case "landuse" -> landuseDarkColors.get(landform);
+                    case "building" -> "#706b67";
+                    case "road" -> roadDarkColors.get(landform);
+                    default -> hex;
+                };
             }
             return Color.web(hex);
         } catch (NullPointerException e) {
@@ -102,7 +84,7 @@ public class ColorScheme implements Serializable{
      * @return - the default color either in dark mode or in light mode
      */
     public Color getDefaultColor(boolean dark){
-        if(dark) return Color.web("#ff0000");
+        if(dark) return Color.web("#b5b3ae");
         return Color.web("#ff0000");
     }
 

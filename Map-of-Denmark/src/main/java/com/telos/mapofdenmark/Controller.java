@@ -74,7 +74,7 @@ public class Controller {
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
-
+        suggestionsBox.setVisible(true);
         view.canvas.setOnMousePressed(e -> {
             lastX = e.getX();
             lastY = e.getY();
@@ -112,6 +112,8 @@ public class Controller {
         // Add a listener to the slider's value
         zoomSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateImageViewPosition(newVal.doubleValue()
         ));
+
+        // Clickable Suggestions
         suggestionsBox.setOnMouseClicked(event ->{
             if(!suggestionsBox.getSelectionModel().getSelectedItem().isEmpty()){
                 String chosenSelection = suggestionsBox.getSelectionModel().getSelectedItem();
@@ -119,19 +121,18 @@ public class Controller {
                 if(searchBarCounter == 0){
                     searchBar.setText(chosenSelection);
                     checkForIfTextIsStreet(searchBar);
+                    addressParsing(chosenSelection,searchBar);
                     panToAddress(chosenSelection,true);
                 }
                 // Puts it into the second searchbar
                 else{
                     searchBar1.setText(chosenSelection);
                     checkForIfTextIsStreet(searchBar1);
+                    addressParsing(chosenSelection,searchBar1);
                     panToAddress(chosenSelection, false);
                 }
-                suggestionsBox.setVisible(false);
             }
-
         });
-
         searchImage.setOnMouseClicked(event -> {
             panToAddress(searchBar.getText(), true);
         });
@@ -310,13 +311,11 @@ public class Controller {
 
             // Logic for the suggestionsBox in UI
             if (!suggestionsList.isEmpty()) {
-                suggestionsBox.setVisible(true);
+
                 suggestionsBox.setItems(FXCollections.observableArrayList(suggestionsList));
             } else {
-                suggestionsBox.setVisible(false);
+
             }
-        } else {
-            suggestionsBox.setVisible(false);
         }
     }
 
