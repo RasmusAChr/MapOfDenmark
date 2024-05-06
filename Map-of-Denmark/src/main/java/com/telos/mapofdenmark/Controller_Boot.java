@@ -53,7 +53,7 @@ public class Controller_Boot {
     public void init(View_Boot view, Stage primaryStage){
         this.view = view;
         this.primaryStage = primaryStage;
-        this.defaultFileName = "kbh.osm";
+        this.defaultFileName = "bornholm.osm.obj";
         this.path = System.getProperty("user.dir"); // gets which directory the project is placed
         this.userFile = path + "/" + defaultFileName; // To be Looked at
     }
