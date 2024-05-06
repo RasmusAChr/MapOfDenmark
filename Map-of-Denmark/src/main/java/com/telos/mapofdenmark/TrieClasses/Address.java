@@ -103,7 +103,7 @@ public class Address implements Serializable {
     }
 
     /**
-     * Getter method to retrieve the city of the address
+     * Get method to retrieve the city of the address
      * @return - a string that represents the city
      */
     public String getCity() {

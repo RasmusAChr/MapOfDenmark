@@ -117,17 +117,16 @@ public class ColorScheme implements Serializable{
         placeDarkColors.put("isolated_dwelling", "#9aae98");
         placeColors.put("locality", "#c5d9c3");
         placeDarkColors.put("locality", "#9aae98");
-
-        placeColors.put("village", "#c5d9c3");
-        placeDarkColors.put("village", "#9aae98");
-        placeColors.put("sea", "#c5d9c3");
-        placeDarkColors.put("sea", "#9aae98");
-        placeColors.put("farm", "#c5d9c3");
-        placeDarkColors.put("farm", "#9aae98");
-        placeColors.put("region", "#c5d9c3");
-        placeDarkColors.put("region", "#9aae98");
-        placeColors.put("region", "#c5d9c3");
-        placeDarkColors.put("region", "#9aae98");
+        placeColors.put("village", "#f2efe9");
+        placeDarkColors.put("village", "#b5b3ae");
+        placeColors.put("sea", "#aad3df");
+        placeDarkColors.put("sea", "#495f66");
+        placeColors.put("farm", "#8cbf80");
+        placeDarkColors.put("farm", "#5e8e5b");
+        placeColors.put("region", "#f2efe9");
+        placeDarkColors.put("region", "#b5b3ae");
+        placeColors.put("city_block", "#f2efe9");
+        placeDarkColors.put("city_block", "#b5b3ae");
     }
 
     public void naturalScheme(){
@@ -194,6 +193,33 @@ public class ColorScheme implements Serializable{
         naturalDarkColors.put("tree_group", "#5c7a58");
         naturalColors.put("farmland", "#8cbf80");
         naturalDarkColors.put("farmland", "#5e8e5b");
+
+        naturalColors.put("residential", "#dadada");
+        naturalDarkColors.put("residential", "#a0a0a0");
+        naturalColors.put("farmyard", "#efd5b3");
+        naturalDarkColors.put("farmyard", "#d4b295");
+        naturalColors.put("shingle", "#e4dcd4");
+        naturalDarkColors.put("shingle", "#c5bdb5");
+        naturalColors.put("isthmus", "#c3c3c3");
+        naturalDarkColors.put("isthmus", "#a6a6a6");
+        naturalColors.put("meadow", "#8cbf80");
+        naturalDarkColors.put("meadow", "#5e8e5b");
+        naturalColors.put("reef", "#aad3df");
+        naturalDarkColors.put("reef", "#495f66");
+        naturalColors.put("dune", "#fff1bb");
+        naturalDarkColors.put("dune", "#e0c77a");
+        naturalColors.put("fell", "#8cbf80");
+        naturalDarkColors.put("fell", "#5e8e5b");
+        naturalColors.put("yes", "#f2efe9");
+        naturalDarkColors.put("yes", "#b5b3ae");
+        naturalColors.put("trees", "#7aa66f");
+        naturalDarkColors.put("trees", "#5c7a58");
+        naturalColors.put("islet", "#f2efe9");
+        naturalDarkColors.put("islet", "#b5b3ae");
+        naturalColors.put("stones", "#c3c3c3");
+        naturalDarkColors.put("stones", "#a6a6a6");
+        naturalColors.put("gravel", "#d4d4d4");
+        naturalDarkColors.put("gravel", "#b5b5b5");
     }
 
     public void landuseScheme(){
