@@ -28,7 +28,6 @@ public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
 
     List<Line> list = new ArrayList<>();
-    List<Node> nodeList = new ArrayList<>();
     List<Relation> RelationsPlace = new ArrayList<>();
     List<Relation> RelationsNatural = new ArrayList<>();
     List<Relation> RelationsLanduse = new ArrayList<>();
@@ -70,12 +69,11 @@ public class Model implements Serializable {
 
     Address address;
     EdgeWeightedDigraph EWD;
-    TreeMap<String, Integer> id2node;
+    TreeMap<String, Node> id2node;
     HashMap<String, Double> tagToScaleValue;
     List<Member> relationsMembers;
     HashMap<Long, Way> id2way;
     int indexForCenterPoints = 0;
-    long wayid = 0;
     HashMap<String, Double> roadIdSet;
     HashSet<String> cycleTags;
     ColorScheme cs;
@@ -239,6 +237,7 @@ public class Model implements Serializable {
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         int NodeCount = 0;
+        Node node = null;
         while (input.hasNext()) {
             var tagKind = input.next();
             if (tagKind == XMLStreamConstants.START_ELEMENT) {
@@ -254,9 +253,8 @@ public class Model implements Serializable {
                         var id = input.getAttributeValue(null, "id");
                         var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
                         var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
-                        Node node = new Node(NodeCount, lat, lon);
-                        id2node.put(id, NodeCount);
-                        nodeList.add(node);
+                        node = new Node(NodeCount, lat, lon);
+                        id2node.put(id, node);
                         NodeCount++;
                     }
                     case "tag" -> {
@@ -272,7 +270,6 @@ public class Model implements Serializable {
                     }
                     case "way","relation" -> {
                         EWD = new EdgeWeightedDigraph(NodeCount);
-                        wayid = Long.parseLong(input.getAttributeValue(null,"id"));
                         parseWaysAndRelations(input, tagKind); // First way element ???? input.getname = way
                         return;
                     }
@@ -283,7 +280,7 @@ public class Model implements Serializable {
                     if (address != null && !address.getStreet().isBlank()) {
                         addressList.add(address);
                         //System.out.println(addressId);
-                        addressIdMap.put(address.getFullAddress().toLowerCase(), nodeList.get(NodeCount-1));
+                        addressIdMap.put(address.getFullAddress().toLowerCase(), node);
                         address = null; // Reset for the next address
                     }
                 }
@@ -426,7 +423,7 @@ public class Model implements Serializable {
 
                 } else if (name.equals("nd")) {
                     var ref = input1.getAttributeValue(null, "ref");
-                    var node = nodeList.get(id2node.get(ref));
+                    var node = id2node.get(ref);
                     way.add(node);
                 } else if (name.equals("relation")) {
                     relationsMembers = new ArrayList<>();
@@ -568,7 +565,6 @@ public class Model implements Serializable {
                 }
             }
         }
-        nodeList.clear();
         id2node.clear();
     }
 
@@ -578,7 +574,6 @@ public class Model implements Serializable {
         double y = startaddress.getLat();
         Node tmpNode = kdTreeWaysRoad.getNearestNeighbor(x,y,true).getArbitraryNode();
         list.clear();
-      //  this.Dijkstra = new SP(EWD,DigraphNodeToIndex.get(tmpNode),vehicle); // this starts the dijkstra search from the index that refferes to a node
         this.Dijkstra = new SP(EWD,tmpNode.id,vehicle);
     }
 
@@ -607,7 +602,6 @@ public class Model implements Serializable {
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
             for(DirectedEdge i: Dijkstra.pathTo(tmpNode.id)) {
-
                 Node node1 = getNodeFromKDTree(i.to());
                 if (!NodeAdded.contains(node1)) {
                     NodeAdded.add(node1);
@@ -619,18 +613,8 @@ public class Model implements Serializable {
                     NodeAdded.add(node2);
                     path.add(node2);
                 }
-                /*
-
-             if(!NodeAdded.contains(nodeList.get(i.to()))){
-                 NodeAdded.add(nodeList.get(i.to()));
-                 path.add(nodeList.get(i.to()));
-             } else if (!NodeAdded.contains(nodeList.get(i.from()))){
-                 NodeAdded.add(nodeList.get(i.from()));
-                 path.add(nodeList.get(i.from()));
-             }*/
-
-         }
-         return path;
+            }
+        return path;
     }
     private Node getNodeFromKDTree(int id) {
         for (Way way: kdTreeWaysRoad.getAllWays()) {
