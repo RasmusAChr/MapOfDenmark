@@ -530,33 +530,38 @@ public class Model implements Serializable {
                             } else if (relationKey.equals("building")) {
                                 Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
                                 RelationsBuilding.add(tmpRelation);
+                                // temp fix for not adding multiple members of same relations
+                                addToCenterRelations(relationsMembers.get(0).getWay(), tmpRelation, "building");
 
                                 // for loop to find all members in relation and add to collection
-                                for(Member member : relationsMembers){
-                                    if(member.getWay() != null){
-                                        addToCenterRelations(member.getWay(), tmpRelation, "building");
-                                    }
-                                }
+//                                for(Member member : relationsMembers){
+//                                    if(member.getWay() != null){
+//                                        addToCenterRelations(member.getWay(), tmpRelation, "building");
+//                                    }
+//                                }
                             } else if (relationKey.equals("natural")) {
                                 Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
                                 RelationsNatural.add(tmpRelation);
+                                // temp fix for not adding multiple members of same relations
+                                addToCenterRelations(relationsMembers.get(0).getWay(), tmpRelation, "natural");
 
                                 // for loop to find all members in relation and add to collection
-                                for(Member member : relationsMembers){
-                                    if(member.getWay() != null){
-                                        addToCenterRelations(member.getWay(), tmpRelation, "natural");
-                                    }
-                                }
+//                                for(Member member : relationsMembers){
+//                                    if(member.getWay() != null){
+//                                        addToCenterRelations(member.getWay(), tmpRelation, "natural");
+//                                    }
+//                                }
                             } else if (relationKey.equals("landuse")) {
                                 Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
                                 RelationsLanduse.add(tmpRelation);
-
+                                // temp fix for not adding multiple members of same relations
+                                addToCenterRelations(relationsMembers.get(0).getWay(), tmpRelation, "landuse");
                                 // for loop to find all members in relation and add to collection
-                                for(Member member : relationsMembers){
-                                    if(member.getWay() != null){
-                                        addToCenterRelations(member.getWay(), tmpRelation, "landuse");
-                                    }
-                                }
+//                                for(Member member : relationsMembers){
+//                                    if(member.getWay() != null){
+//                                        addToCenterRelations(member.getWay(), tmpRelation, "landuse");
+//                                    }
+//                                }
                             }
                         }
                     }
