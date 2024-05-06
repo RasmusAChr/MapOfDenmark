@@ -6,28 +6,33 @@ import javafx.scene.shape.FillRule;
 import java.io.Serializable;
 import java.util.*;
 
-public class Relation implements Serializable {
-    private String type;
-    private String landform;
 
+/**
+ * Represents a relation composed of nodes and ways.
+ */
+public class Relation implements Serializable {
+    private String landform;
     private List<Member> members;
     private List<Node> orderedNodes;
     private List<List<Node>> listOfOrderedNodes;
     private List<Way> innerWays;
-    private List<Member> nonRelatedMembers;
     private List<Way> singleWays;
     boolean drawable;
     Node lastNode = null;
     ColorScheme cs;
 
-
-    public Relation(String type, List<Member> memberRefs, String landform, ColorScheme cs) {
-        this.type = type;
+    /**
+     * Constructs a Relation object with specified member references, landform, and color scheme.
+     *
+     * @param memberRefs the list of members in the relation
+     * @param landform the landform associated with the relation
+     * @param cs the color scheme for drawing
+     */
+    public Relation(List<Member> memberRefs, String landform, ColorScheme cs) {
         this.landform = landform;
         this.members = memberRefs;
         this.drawable = true;
         this.innerWays = new ArrayList<>();
-        this.nonRelatedMembers = new ArrayList<>();
         this.orderedNodes = new ArrayList<>();
         this.singleWays = new ArrayList<>();
         this.listOfOrderedNodes = new ArrayList<>();
@@ -35,9 +40,10 @@ public class Relation implements Serializable {
         orderNodes();
     }
 
+    /**
+     * Orders the nodes and ways based on relation membership.
+     */
     public void orderNodes(){
-        var hasBeenSorted = false;
-
 
         // If a way doesn't exist, then don't manipulate/draw it.
         for (Member m : members) {
@@ -48,10 +54,13 @@ public class Relation implements Serializable {
         }
 
         while (!addToOrderedNodes().isEmpty()) addToOrderedNodes();
-        //System.out.println("------------------------------");
-
     }
 
+    /**
+     * Adds ordered nodes to the list.
+     *
+     * @return the leftover members after ordering
+     */
     public List<Member> addToOrderedNodes (){
         List<Member> leftOverMembers = new ArrayList<>();
 
@@ -109,6 +118,14 @@ public class Relation implements Serializable {
         return leftOverMembers;
     }
 
+    /**
+     * Draws the relation on the specified GraphicsContext.
+     *
+     * @param gc the GraphicsContext to draw on
+     * @param zoom the zoom level
+     * @param darkMode indicates if dark mode is enabled
+     * @param type the type of relation to draw
+     */
     public void Draw(GraphicsContext gc, double zoom, boolean darkMode, String type) {
         gc.setFill(cs.getColor(landform,darkMode,type));
         gc.setFillRule(FillRule.EVEN_ODD);
@@ -172,6 +189,12 @@ public class Relation implements Serializable {
         }
     }
 
+    /**
+     * Reverses the order of nodes in a member's way.
+     *
+     * @param mem the member containing the way to reverse
+     * @return the list of nodes in reversed order
+     */
     public List<Node> reverseNodes(Member mem){
         ArrayList<Node> listOfNodes = mem.getWay().getNodes();
         ArrayList<Node> reversOfNodes = new ArrayList<>();

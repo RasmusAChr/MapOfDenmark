@@ -17,6 +17,12 @@ import java.util.List;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 
+/**
+ * The controller class is used to manage user interactions but also updates the view accordingly.
+ * The controller class is used to handle events such as mouse clicks, keyboard inputs and slider adjustments.
+ * The controller interacts with the Model class to perform address searches, calculate distances,
+ * manages points of interests, manages suggestions to addresses but also makes them clickable etc.
+ */
 public class Controller {
     //JavaFX requires a non-parameter constructor to load and run the FXML file.
     // So it needs to stay (even though it's empty)
@@ -68,6 +74,11 @@ public class Controller {
 
     public boolean switchToRadix = false;
 
+    /**
+     * Initializes the Controller objects with the given Model and View.
+     * @param inputModel - The Model object
+     * @param inputView - The View object
+     */
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
         this.view = inputView;
@@ -95,6 +106,11 @@ public class Controller {
             lastY = e.getY();
         });
     }
+
+    /**
+     * Initializes the controller's different components. Also used to manage different events
+     * such as managing the different searchbars, the suggestionsbox to add suggestions and make them clickable etc.
+     */
     @FXML
     private void initialize(){
         zoomSlider.setValue(50.0);
@@ -180,6 +196,11 @@ public class Controller {
           });
     }
 
+    /**
+     * Checks if the text in the given searchbar is a street name.
+     * If it is it updates the switchToRadix boolean to indicate a switch to a RadixTrie with full addresses
+     * @param modularSearchBar - The given search bar
+     */
     private void checkForIfTextIsStreet(TextField modularSearchBar){
         if(model.isWordInTrie(modularSearchBar.getText())){
             switchToRadix = true;
@@ -189,12 +210,17 @@ public class Controller {
         }
     }
 
+    /**
+     * Handles the search functionality for Dijkstra by starting and stopping the search
+     */
     @FXML
     private void handleSearch() {
         StartSearch();
     }
 
-
+    /**
+     * Used to initiate the search process for Dijkstra by inputting text from the second search bar
+     */
     @FXML
     private void StartSearch(){
         String input = searchBar1.getText().toLowerCase();
@@ -210,6 +236,10 @@ public class Controller {
         System.gc();
     }
 
+
+    /**
+     * Toggles the vehicle mode to either Bike or Car depending on the input
+     */
     @FXML
     private void toggleMode(){
         if(ToggleMode.isSelected()){
@@ -224,6 +254,9 @@ public class Controller {
         }
     }
 
+    /**
+     * Toggles the theme mode to either dark or light depending on input
+     */
     @FXML
     private void toggleTheme(){
         // if the themebutton has been toggled on. determines wheter do display in dark or light mode.
@@ -241,6 +274,10 @@ public class Controller {
             view.redraw();
         }
     }
+
+    /**
+     * Toggles the Point of Interest (POI) mode to either true or false depending on input
+     */
     @FXML
     private void placeInterest(){
         if(POI_MODE){
@@ -250,14 +287,11 @@ public class Controller {
             POI_MODE = true;
             System.out.println("Started POI MODE");
         }    }
-    @FXML
-    public double getPanWidth(){
-       return backgroundPane.getWidth();
-    }
-    @FXML
-    public double getPanHeight(){
-        return backgroundPane.getHeight();
-    }
+
+    /**
+     * Updates the position of the image view based on the slider value.
+     * @param sliderValue - The current value of the slider
+     */
     @FXML
     private void updateImageViewPosition(double sliderValue){
         // This portion changes image the image itself
@@ -281,6 +315,11 @@ public class Controller {
 
     }
 
+    /**
+     * Parses the address and updates the suggestions box accordingly
+     * @param newValue - Text from the searchbar given
+     * @param modularSearchBar - the searchbar given
+     */
     @FXML
     private void addressParsing(String newValue, TextField modularSearchBar) {
         suggestionsBox.getItems().clear(); // Clear previous suggestions
@@ -310,7 +349,9 @@ public class Controller {
         }
     }
 
-
+    /**
+     * Tests encoding with UY by adding a test string to the suggestions box
+     */
     @FXML
     private void testEncodingWithUI() {
         // Directly set a test string to verify UTF-8 characters are displayed correctly
@@ -322,6 +363,11 @@ public class Controller {
         } catch (NullPointerException E) {}
     }
 
+    /**
+     * Pans over to the given address, and makes sure that it is centered in the canvas and draws a circle on the given address
+     * @param selectedAddress - address given in string that needs to be panned to
+     * @param startPoint - Boolean which decides which tempAddressPoint that should be given the coordinates. True = start address point, false = end address point
+     */
     private void panToAddress(String selectedAddress, boolean startPoint){
         String addressToLowerCase = selectedAddress.toLowerCase();
         if(model.getAddressIdMap().get(addressToLowerCase) != null && lastPannedToAddress != model.getAddressIdMap().get(addressToLowerCase)){
@@ -356,6 +402,11 @@ public class Controller {
         }
     }
 
+    /**
+     * Calculates the distance between to given points in corresponding to real life distance, and updates the distanceLabel accordingly
+     * @param startPoint - start point for the line
+     * @param endPoint - end point for the line
+     */
     //Inspiration for math formula found at https://www.movable-type.co.uk/scripts/latlong.html
     @FXML
     private void CalculateDistance(Point2D startPoint, Point2D endPoint){
