@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.*;
 
 // Inspiration to KDTree from https://www.geeksforgeeks.org/search-and-insertion-in-k-dimensional-tree/
-// We also utilized code from chapter 3 in Algorithms 4 by Wayne and Sedgewick ch 3.2
+// We also utilized code from chapter 3 in Algorithms 4 by Wayne and Sedgewick ch 3.2 about BST (Binary Search Trees)
 /**
  * The KDTree class is a spatial data structure that supports organizing nodes in a 2D dimensional space.
  * The data structure supports the following methods: Insertion method to insert nodes into the KDTree, deleteMin which deletes the smallest key in the KDTree,
@@ -449,56 +449,6 @@ public class KDTreeWay implements Serializable
                 else return best;
             }
         }
-    }
-
-    /**
-     * Performs a range search within the given range, and returns a set of ways found
-     * @param xMin - the minimum X coordinate of the range
-     * @param xMax - the maximum X coordinate of the range
-     * @param yMin - the minimum Y coordinate of the range
-     * @param yMax - the maximum Y coordinate of the range
-     * @return - Set of ways that were found in the range search
-     */
-    public Set<Way> rangeSearchSet(double xMin, double xMax, double yMin, double yMax)
-    {
-//        System.out.println("Range Searching for these param: xMin:"+xMin+" xMax:"+xMax+" yMin:"+yMin+" yMax:"+yMax);
-        Set<Way> waySet = new HashSet<>();
-        rangeSearchSet(root, waySet, xMin, xMax, yMin, yMax, 0);
-        return waySet;
-    }
-
-    /**
-     * Recursive helper method that recursively searches for ways within the given range. The ways found in the range are added to the waySet.
-     * It also considers the depth of the recursion to determine which axis it should do the comparison (0 for x-axis and 1 for y-axis)
-     * @param x - the current node that is being examined
-     * @param waySet - the set that the ways found will be added to
-     * @param xMin - the minimum X coordinate of the range
-     * @param xMax - the maximum X coordinate of the range
-     * @param yMin - the minimum Y coordinate of the range
-     * @param yMax - the maximum Y coordinate of the range
-     * @param depth - current depth of the recursion step
-     */
-    private void rangeSearchSet(KDNode x, Set<Way> waySet, double xMin, double xMax, double yMin, double yMax, int depth)
-    {
-        if (x == null) return;
-
-        int axis = depth % 2;
-        double cmplo; //CompareToLow
-        double cmphi; //CompareToHigh
-        // if the axis is 0, compare the x value long else comp     are lat
-        if(axis == 0){
-            // Sort based on the x-axis
-            cmplo = Double.compare(xMin,x.x);
-            cmphi = Double.compare(xMax,x.x);
-
-        } else {
-            // Sort based on the y-axis
-            cmplo = Double.compare(yMin,x.y);
-            cmphi = Double.compare(yMax,x.y);
-        }
-        if (cmplo < 0) rangeSearchSet(x.left, waySet, xMin, xMax, yMin, yMax, depth+1);
-        if (cmplo <= 0 && cmphi >= 0) waySet.add(x.val);
-        if (cmphi > 0) rangeSearchSet(x.right, waySet, xMin, xMax, yMin, yMax, depth+1);
     }
 
     /**

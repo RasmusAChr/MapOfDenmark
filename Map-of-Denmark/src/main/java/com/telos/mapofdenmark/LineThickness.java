@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 public class LineThickness implements Serializable {
+    // HashMap to store line widths for different feature types
     HashMap<String, Double> linewidth;
 
     public LineThickness() {
@@ -11,9 +12,16 @@ public class LineThickness implements Serializable {
         defaultScheme();
     }
 
+    /**
+     * Retrieves the line width for the specified feature type.
+     * @param key The key representing the feature type
+     * @return The line width for the specified feature type
+     */
     public double getWidth(String key) {
         return linewidth.get(key);
     }
+
+    // Initializes the HashMap with default line width values for various feature types.
     public void defaultScheme() {
         linewidth.clear();
         linewidth.put("default", 0.00001);
@@ -44,6 +52,11 @@ public class LineThickness implements Serializable {
         linewidth.put("path", 0.00003);
     }
 
+    /**
+     * Checks if the specified key exists in the HashMap.
+     * @param a The key to search for
+     * @return true if the key exists, otherwise false
+     */
     public boolean findKey(String a) {
         return linewidth.containsKey(a);
     }

@@ -11,19 +11,18 @@ import java.util.regex.Pattern;
 // used this as ref for insertion method https://leetcode.com/problems/implement-trie-prefix-tree/solutions/467046/Java-Radix-tree-(compact-prefix-tree)-beats-99.7-runtime-and-100-memory/
 // and for collecting suggestions this was used as inspiration https://github.com/wolfgarbe/PruningRadixTrie
 
+/**
+ * A Radix Trie data structure for efficient storing and retrieval of strings.
+ */
 public class RadixTrie implements Serializable {
     RadixNode rootNode;
 
-    /**
-     * Constructor for the Trie class.
-     */
     public RadixTrie() {
-        rootNode = new RadixNode(29); // Create a root node with a specified initial capacity
+        rootNode = new RadixNode(29); // Create a root node with a specified initial capacity based
     }
 
     /**
      * Inserts a word into the Patricia Trie.
-     *
      * @param inputWord The word to be inserted into the trie.
      */
     public void insert(String inputWord) {
@@ -35,7 +34,6 @@ public class RadixTrie implements Serializable {
 
     /**
      * Helper method to insert a word into the Patricia Trie recursively.
-     *
      * @param node The current node in the trie.
      * @param word The word to be inserted.
      * @return The updated node after insertion.
@@ -121,7 +119,7 @@ public class RadixTrie implements Serializable {
                     String matchPart = prefix.substring(prefixPosition);
 //                    System.out.println("Partially matched node: " + child.value + " with prefix part: " + matchPart);
                     currentNode = child;
-                    currentPrefix += child.value; // Ensure the entire node value is added to currentPrefix
+                    currentPrefix += child.value; // Ensure the entire node value is appended to currentPrefix
                     prefixPosition += matchPart.length();
                     matched = true;
                     break;
@@ -238,12 +236,22 @@ public class RadixTrie implements Serializable {
         return result.toString().trim();
     }
 
+    /**
+     * Retrieves a list of all addresses stored in the trie.
+     * @return A list of all addresses.
+     */
     public List<String> getAllAddresses() {
         List<String> allAddresses = new ArrayList<>();
         collectAllAddresses(rootNode, "", allAddresses);
         return formatAddressSuggestions(allAddresses);
     }
 
+    /**
+     * Helper method to collect all addresses stored in the trie.
+     * @param node          Current node in the trie.
+     * @param currentAddress The current address formed by the path to this node.
+     * @param allAddresses  List to store all collected addresses.
+     */
     private void collectAllAddresses(RadixNode node, String currentAddress, List<String> allAddresses) {
         // Base case: If the current node is the end of an address, add it to the list of all addresses
         if (node.endOfWord) {
