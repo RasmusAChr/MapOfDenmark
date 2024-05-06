@@ -173,6 +173,8 @@ public class Model implements Serializable {
 
         // Saves objects to binary file
         save(filename+".obj");
+
+        System.gc();
     }
 
     /**
