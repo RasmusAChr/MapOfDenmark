@@ -19,11 +19,11 @@ public class RadixTrieTest {
 
     @Test
     public void testInsert() {
-        trie.insert("Strandvejen 20 Svaneke Bornholm Denmark");
-        trie.insert("Strandvejen 21 Svaneke Bornholm Denmark");
-        trie.insert("Strandvejen 22 Svaneke Bornholm Denmark");
-        trie.insert("Østergade 10 København København Denmark");
-        trie.insert("Vestergade 5 Aarhus Aarhus Denmark");
+        trie.insert("Strandvejen");
+        trie.insert("Strandvejen");
+        trie.insert("Strandvejen");
+        trie.insert("Østergade");
+        trie.insert("Vestergade");
     }
 
     @Test
