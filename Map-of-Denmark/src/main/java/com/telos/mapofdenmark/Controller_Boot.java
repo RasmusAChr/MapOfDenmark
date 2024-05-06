@@ -12,6 +12,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 /**
  * The Controller_Boot class controls the boot screen of the application, but only the boot screen.
  * It handles user interactions which includes: loading a custom file or choosing the default file.
@@ -83,20 +86,43 @@ public class Controller_Boot {
         if (file != null) {
             System.out.println("File loading: " + file.getName());
             userFilename = file.getName();
-            try (InputStream inputStream = new FileInputStream(file)) {
-                chosen = true;
-                view.setPath(userFilename);
-                view.setChosen(chosen);
-                runMap(primaryStage, inputStream, userFilename);
-            } catch (IOException e) {
-                System.err.println("Error: Failed to read file.");
-                e.printStackTrace();
+            if (file.getName().toLowerCase().endsWith(".zip")) {
+                // If the selected file is a zip file, unzip it
+                try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(file))) {
+                    ZipEntry entry;
+                    while ((entry = zipInputStream.getNextEntry()) != null) {
+                        if (!entry.isDirectory()) {
+                            String entryName = entry.getName();
+                            if (entryName.toLowerCase().endsWith(".osm")) {
+                                // If the entry is an OSM file, process it
+                                chosen = true;
+                                view.setPath(entryName);
+                                view.setChosen(chosen);
+                                runMap(primaryStage, zipInputStream, entryName);
+                                break;
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    System.err.println("Error: Failed to unzip file.");
+                    e.printStackTrace();
+                }
+            } else {
+                // If the selected file is not a zip file, proceed as before
+                try (InputStream inputStream = new FileInputStream(file)) {
+                    chosen = true;
+                    view.setPath(userFilename);
+                    view.setChosen(chosen);
+                    runMap(primaryStage, inputStream, userFilename);
+                } catch (IOException e) {
+                    System.err.println("Error: Failed to read file.");
+                    e.printStackTrace();
+                }
             }
         } else {
             // If no file has been selected, pick the default map
             default_path();
         }
-
     }
     /**
      * Method triggered if the user don't want to pick a custom file.
