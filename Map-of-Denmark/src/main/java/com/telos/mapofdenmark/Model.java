@@ -24,6 +24,12 @@ import com.telos.mapofdenmark.TrieClasses.RadixTrie;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.geometry.Point2D;
 
+/**
+ * The Model class is responsible for parsing and storing the data from OpenStreetMap files.
+ * It provides methods for loading and saving the data, as well as accessing various collections
+ * and data structures used for storing and retrieving information about nodes, ways, addresses,
+ * relations, and more.
+ */
 public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
 
@@ -33,7 +39,6 @@ public class Model implements Serializable {
     List<Relation> RelationsLanduse = new ArrayList<>();
     List<Relation> RelationsBuilding = new ArrayList<>();
 
-
     // Collection used for storing points of interest
     List<Point2D> pointsOfInterest = new ArrayList<>();
 
@@ -41,7 +46,6 @@ public class Model implements Serializable {
     List<Way> centerPointRelationsBuilding = new ArrayList<>();
     List<Way> centerPointRelationsNatural = new ArrayList<>();
     List<Way> centerPointRelationsLanduse = new ArrayList<>();
-
 
     // Collection used for storing center points for ways
     List<Way> centerPointWaysPlace = new ArrayList<>();
@@ -55,19 +59,22 @@ public class Model implements Serializable {
     private RadixTrie radixTrie;
     double minlat, maxlat, minlon, maxlon;
     List<Address> addressList;
+    Address address;
+
     Map<String, Node> addressIdMap;
 
+    // KD-Trees for relations
     KDTreeWay kdTreeBuildings; // KDTree holds relation buildings
     KDTreeWay kdTreeNaturals; // KDTree holds relation naturals
     KDTreeWay kdTreeLanduses; // KDTree holds relation landuses
 
+    // KD-Trees for ways
     KDTreeWay kdTreeWaysPlace; // KDTree holds ways places
     KDTreeWay kdTreeWaysNatural; // KDTree holds ways natural
     KDTreeWay kdTreeWaysLanduse; // KDTree holds ways landuses
     KDTreeWay kdTreeWaysBuilding; // KDTree holds ways buildings
     KDTreeWay kdTreeWaysRoad; // KDTree holds ways roads
 
-    Address address;
     EdgeWeightedDigraph EWD;
     TreeMap<String, Node> id2node;
     List<Member> relationsMembers;
@@ -77,30 +84,27 @@ public class Model implements Serializable {
     HashSet<String> cycleTags;
     ColorScheme cs;
     LineThickness lt;
+
+    // Set with allowed key types when parsing ways and relations.
     Set<String> allowedKeyTypes;
+    // Set with banned landforms (values) when parsing ways and relations.
     Set<String> bannedLandforms;
+
+    // Sets corresponding to road layers with values.
     Set<String> xsmallRoads;
     Set<String> smallRoads;
     Set<String> mediumRoads;
     Set<String> bigRoads;
 
-
-    static Model load(InputStream inputStream, String fileName) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
-        if(fileName.endsWith(".obj")){
-            try (var in = new ObjectInputStream(new BufferedInputStream(inputStream))) {
-                return (Model) in.readObject();
-            } catch (Exception e) {
-                // Close the input stream if an exception occurs
-                inputStream.close();
-                throw e;
-            }
-        }
-        else{
-            return new Model(inputStream, fileName);
-        }
-    }
-
-
+    /**
+     * Constructs a new Model instance by parsing the given input stream.
+     *
+     * @param inputStream The input stream containing the data to be parsed.
+     * @param filename The name of the file being parsed.
+     * @throws XMLStreamException If an error occurs while parsing the XML data.
+     * @throws FactoryConfigurationError If a factory configuration error occurs.
+     * @throws IOException If an I/O error occurs while reading the input stream.
+     */
     public Model(InputStream inputStream, String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
         cs = new ColorScheme();
         lt = new LineThickness();
@@ -130,8 +134,7 @@ public class Model implements Serializable {
         this.radixTrie = new RadixTrie();
         for(Address address : addressList){
             if(address != null){
-//                trie.insert(address.getStreet());
-                // RadixTrie insert put here
+                trie.insert(address.getStreet());
                 radixTrie.insert(address.getFullAddress());
             } else System.out.println("Address is null");
         }
@@ -147,7 +150,6 @@ public class Model implements Serializable {
         this.kdTreeWaysRoad = new KDTreeWay();
 
         // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
-
         // KD-Trees for Relations
         kdTreeBuildings.populate(centerPointRelationsBuilding);
         System.out.println("Size of KD-Tree Relations Building: " + kdTreeBuildings.size());
@@ -172,6 +174,38 @@ public class Model implements Serializable {
         save(filename+".obj");
     }
 
+    /**
+     * Loads a Model instance from a file. If the file extension is ".obj", it attempts to deserialize
+     * a previously saved Model object. Otherwise, it creates a new Model instance by parsing the given file.
+     *
+     * @param inputStream The input stream containing the data to be loaded.
+     * @param fileName The name of the file being loaded.
+     * @return The loaded Model instance.
+     * @throws FileNotFoundException If the file cannot be found.
+     * @throws IOException If an I/O error occurs while reading the file.
+     * @throws ClassNotFoundException If the class of the serialized object cannot be found.
+     * @throws XMLStreamException If an error occurs while parsing the XML data.
+     * @throws FactoryConfigurationError If a factory configuration error occurs.
+     */
+    static Model load(InputStream inputStream, String fileName) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
+        if(fileName.endsWith(".obj")){
+            try (var in = new ObjectInputStream(new BufferedInputStream(inputStream))) {
+                return (Model) in.readObject();
+            } catch (Exception e) {
+                // Close the input stream if an exception occurs
+                inputStream.close();
+                throw e;
+            }
+        }
+        else{
+            return new Model(inputStream, fileName);
+        }
+    }
+
+    /**
+     * Initializes the roadIdSet map with predefined road types and their corresponding speeds.
+     * The roadIdSet map is used to store the weight for the different roads.
+     */
     private void initializeRoadIdSetMap() {
         this.roadIdSet = new HashMap<String, Double>(Map.of(
                 "motorway",0.4545,
@@ -193,6 +227,10 @@ public class Model implements Serializable {
         roadIdSet.put("path", 10.0);
     }
 
+    /**
+     * Initializes the HashSet of cycle tags.
+     * Cycle tags are used to classify various types of cycling paths and routes.
+     */
     private void initializeCycleTagsHashSet() {
         this.cycleTags = new HashSet<>(List.of(
                 "primary",
@@ -218,6 +256,14 @@ public class Model implements Serializable {
                 "driveway"));
     }
 
+    /**
+     * Starts the parsing with nodes. Later on calls function to parse ways and relations.
+     *
+     * @param inputStream the input stream containing the network data
+     * @throws IOException                if an I/O error occurs while reading the stream
+     * @throws FactoryConfigurationError if a configuration error occurs while creating XML input factory
+     * @throws XMLStreamException         if an error occurs while processing XML
+     */
     private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         int NodeCount = 0;
@@ -273,23 +319,65 @@ public class Model implements Serializable {
         input.close();
         System.gc();
     }
-
+    /**
+     * Parses the route network from the given input stream.
+     *
+     * This method reads XML data from the provided input stream and processes it to extract
+     * information about the route network. It internally calls the {@link #parseNodeNet(InputStream)}
+     * method to parse the node network.
+     *
+     * @param inputStream The input stream containing the XML data of the route network.
+     * @throws IOException Signals that an I/O exception of some sort has occurred.
+     * @throws FileNotFoundException Signals that an attempt to open the file denoted by a specified pathname has failed.
+     * @throws XMLStreamException Indicates an error in the XML stream being processed.
+     * @throws FactoryConfigurationError Signals an error in the configuration of the XML parser factory.
+     *
+     * @see #parseNodeNet(InputStream)
+     */
     private void parseRouteNet(InputStream inputStream) throws IOException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         parseNodeNet(inputStream);
     }
 
+    /**
+     * Saves the current object to a binary file using serialization.
+     *
+     * @param filename the name of the file to which the object will be saved
+     * @throws FileNotFoundException if the specified file is not found or cannot be opened for writing
+     * @throws IOException if an I/O error occurs while writing to the file
+     */
     void save(String filename) throws FileNotFoundException, IOException {
         try (var out = new ObjectOutputStream(new FileOutputStream(filename))) {
             out.writeObject(this);
         }
     }
 
+    /**
+     * Parses the contents of a ZIP file containing XML data.
+     *
+     * This method extracts the contents of the ZIP file from the provided input stream,
+     * reads the XML data, and parses it using the parseNodeNet method.
+     *
+     * @param inputStream the input stream containing the ZIP file data to parse
+     * @throws IOException if an I/O error occurs while reading the ZIP file
+     * @throws XMLStreamException if an error occurs while parsing the XML data
+     * @throws FactoryConfigurationError if a configuration error is encountered while
+     * creating the XML input factory
+     */
     private void parseZIP(InputStream inputStream) throws IOException, XMLStreamException, FactoryConfigurationError {
         var input = new ZipInputStream(inputStream);
         input.getNextEntry();
         parseNodeNet(input);
     }
 
+    /**
+     * Parses ways and relations from XML input stream.
+     *
+     * @param input1    XMLStreamReader representing the input stream
+     * @param tagKind   Current XML tag kind
+     * @throws FileNotFoundException    If the file specified by input1 is not found
+     * @throws XMLStreamException        If an error occurs while processing the XML stream
+     * @throws FactoryConfigurationError If a configuration error occurs while creating XML input factories
+     */
     private void parseWaysAndRelations(XMLStreamReader input1, int tagKind) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         var way = new ArrayList<Node>();
         var building = false;
@@ -666,6 +754,14 @@ public class Model implements Serializable {
     public List<String> getSuggestionList(String input){
 //        return trie.getAddressSuggestions(input.toLowerCase(), 4);
         return radixTrie.getAddressSuggestions(input.toLowerCase(), 5);
+    }
+    public List<String> getStreetNamesList(String input){
+//        return trie.getAddressSuggestions(input.toLowerCase(), 4);
+        return trie.getAddressSuggestions(input.toLowerCase(), 4, true);
+    }
+
+    public boolean isWordInTrie(String inputWord){
+        return trie.contains(inputWord);
     }
 
     public void addPOI(Point2D POI) {

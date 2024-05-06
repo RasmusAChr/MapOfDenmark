@@ -66,7 +66,7 @@ public class Controller {
 
     private Node lastPannedToAddress;
 
-    private boolean allowedToPan = true;
+    public boolean switchToRadix = false;
 
     public void init(Model inputModel, View inputView) {
         this.model = inputModel;
@@ -113,13 +113,16 @@ public class Controller {
                 // Puts the text into the first searchbar
                 if(searchBarCounter == 0){
                     searchBar.setText(chosenSelection);
-                    panToAddress(chosenSelection);
+                    checkForIfTextIsStreet(searchBar);
+                    panToAddress(chosenSelection,true);
 
 
                 }
                 // Puts it into the second searchbar
                 else{
                     searchBar1.setText(chosenSelection);
+                    checkForIfTextIsStreet(searchBar1);
+                    panToAddress(chosenSelection, false);
                 }
                 suggestionsBox.setVisible(false);
             }
@@ -127,26 +130,31 @@ public class Controller {
         });
 
         searchImage.setOnMouseClicked(event -> {
-            panToAddress(searchBar.getText());
+            panToAddress(searchBar.getText(), true);
         });
 
         searchBar.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar.getText().isEmpty())) {
-                System.out.println(searchBar.getText());
-                addressParsing(searchBar.getText());
+                checkForIfTextIsStreet(searchBar);
+                addressParsing(searchBar.getText(), searchBar);
                 searchBarCounter = 0;
             }
             if(event.getCode() == KeyCode.BACK_SPACE && searchBar.getText().isEmpty()) {
                 // Backspace key was pressed and search bar is empty
-                view.setTempAddressPoint(null, null);
+                view.setTempAddressStartPoint(null, null);
                 view.redraw();
             }
         });
         searchBar1.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar1.getText().isEmpty())) {
-                System.out.println(searchBar1.getText());
-                addressParsing(searchBar1.getText());
+                checkForIfTextIsStreet(searchBar);
+                addressParsing(searchBar1.getText(), searchBar1);
                 searchBarCounter = 1;
+            }
+            if(event.getCode() == KeyCode.BACK_SPACE && searchBar.getText().isEmpty()) {
+                // Backspace key was pressed and search bar is empty
+                view.setTempAddressEndPoint(null, null);
+                view.redraw();
             }
         });
 
@@ -172,9 +180,12 @@ public class Controller {
           });
     }
 
-    private void checkForIfTextIsStreet(TextField searchBar, int searchBarCounter, Trie trie){
-        if(trie.contains(searchBar.getText())){
-            
+    private void checkForIfTextIsStreet(TextField modularSearchBar){
+        if(model.isWordInTrie(modularSearchBar.getText())){
+            switchToRadix = true;
+        }
+        else{
+            switchToRadix = false;
         }
     }
 
@@ -273,23 +284,32 @@ public class Controller {
     }
 
     @FXML
-    private void addressParsing(String newValue) {
+    private void addressParsing(String newValue, TextField modularSearchBar) {
         suggestionsBox.getItems().clear(); // Clear previous suggestions
-            // Only proceed if the new value is not empty
-            if (!newValue.isEmpty()) {
+        checkForIfTextIsStreet(modularSearchBar);
+        // Only proceed if the new value is not empty
+        if (!newValue.isEmpty()) {
+            List<String> suggestionsList;
+            if(!switchToRadix){
                 // Get new suggestions based on the current text in the search bar
-                List<String> suggestionsList = model.getSuggestionList(newValue);
+                suggestionsList = model.getStreetNamesList(newValue);
+            }
+            else{
+                suggestionsList = model.getSuggestionList(newValue);
+            }
 
-                // Logic for the suggestionsBox in UI
-                if (!suggestionsList.isEmpty()) {
-                    suggestionsBox.setVisible(true);
-                    suggestionsBox.setItems(FXCollections.observableArrayList(suggestionsList));
-                } else {
-                    suggestionsBox.setVisible(false);
-                }
+
+
+            // Logic for the suggestionsBox in UI
+            if (!suggestionsList.isEmpty()) {
+                suggestionsBox.setVisible(true);
+                suggestionsBox.setItems(FXCollections.observableArrayList(suggestionsList));
             } else {
                 suggestionsBox.setVisible(false);
             }
+        } else {
+            suggestionsBox.setVisible(false);
+        }
     }
 
 
@@ -304,10 +324,9 @@ public class Controller {
         } catch (NullPointerException E) {}
     }
 
-    private void panToAddress(String selectedAddress){
+    private void panToAddress(String selectedAddress, boolean startPoint){
         String addressToLowerCase = selectedAddress.toLowerCase();
-        if(model.getAddressIdMap().get(addressToLowerCase) != null && lastPannedToAddress != model.getAddressIdMap().get(addressToLowerCase)
-        && allowedToPan){
+        if(model.getAddressIdMap().get(addressToLowerCase) != null && lastPannedToAddress != model.getAddressIdMap().get(addressToLowerCase)){
             Node addressNode = model.getAddressIdMap().get(addressToLowerCase);
             lastPannedToAddress = addressNode;
             double addressX = addressNode.getLon() * 0.56;
@@ -323,8 +342,12 @@ public class Controller {
 
 
             view.drawCircle(addressX,addressY);
-
-            view.setTempAddressPoint(addressX,addressY);
+            if(startPoint){
+                view.setTempAddressStartPoint(addressX,addressY);
+            }
+            else{
+                view.setTempAddressEndPoint(addressX,addressY);
+            }
             view.pan(dx, dy);
         }
         else if (model.getAddressIdMap().get(selectedAddress) == null){
@@ -357,7 +380,5 @@ public class Controller {
         distanceLabel.setText(String.format("Scale of line : %.0f m", distance));  // Setting the distance text directly formatted
     }
 
-    public void setAllowedToPan(Boolean allowedToPan){
-        this.allowedToPan = allowedToPan;
-    }
+
 }

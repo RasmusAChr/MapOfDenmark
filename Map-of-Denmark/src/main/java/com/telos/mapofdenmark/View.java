@@ -18,6 +18,10 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Queue;
 
+/**
+ * The View class represents the graphical view of the Map of Denmark application.
+ * It handles the visualization of map data and user interactions.
+ */
 public class View {
     Canvas canvas = new Canvas(1120.0, 638.0);
     GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -39,8 +43,15 @@ public class View {
     @FXML
     private Pane backgroundPane;
 
-    Point2D tempAddressPoint;
+    Point2D tempAddressStartPoint;
+    Point2D tempAddressEndPoint;
 
+    /**
+     * Constructs a View object.
+     * @param model - The model of the application
+     * @param primaryStage - The primary stage of the application
+     * @throws IOException - If an Input/Output error occurs
+     */
     public View(Model model, Stage primaryStage) throws IOException {
         this.model = model;
 
@@ -79,6 +90,9 @@ public class View {
 
     }
 
+    /**
+     * Redraws the entire map when called with relevant data such as ways and relations.
+     */
     void redraw() {
         gc.setTransform(new Affine());
         gc.setFill(model.cs.getColor("water", dark, "natural"));
@@ -88,8 +102,6 @@ public class View {
         // Logic for drawing ways from KDTree instead of all ways
         Point2D canvasTopLeft =  mousetoModel(-200,-200);
         Point2D canvasBottomRight = mousetoModel(canvas.getWidth() + 200,canvas.getHeight() + 200);
-        //Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-
 
         // Drawing place
         drawPlace(canvasTopLeft, canvasBottomRight);
@@ -119,11 +131,19 @@ public class View {
         }
         drawPOI();
 
-        if(tempAddressPoint != null){
-            drawCircle(tempAddressPoint.getX(), tempAddressPoint.getY());
+        if(tempAddressStartPoint != null){
+            drawCircle(tempAddressStartPoint.getX(), tempAddressStartPoint.getY());
+        }
+        if(tempAddressEndPoint != null){
+            drawCircle(tempAddressEndPoint.getX(), tempAddressEndPoint.getY());
         }
 
     }
+
+    /**
+     * Draws points of interests using the {@link #drawCircle(double, double)} method.
+     * It collects the points stored inside the Model class using a getter method and draws circles from them when called
+     */
     private void drawPOI() {
         if (!model.getPointsOfInterest().isEmpty()) {
             for (Point2D pointOfInterest : model.getPointsOfInterest()) {
@@ -139,6 +159,11 @@ public class View {
         }
     }
 
+    /**
+     * Draws a circle on the canvas on the given coordinates when called
+     * @param x - The x-coordinate of the center of the circle
+     * @param y - The y-coordinate of the center of the circle
+     */
     void drawCircle(double x, double y){
         double radius = 0.0001; // Radius of the circle in pixels
         gc.setFill(Color.BLACK);  // Set the fill color for the circle
@@ -147,6 +172,13 @@ public class View {
         gc.fillOval(x - radius+0.000025, y - radius+0.000025, 1.5 * radius, 1.5 * radius);
     }
 
+    /**
+     * Pans the view to a specified part of the map defined by the given coordinates
+     * @param minlat - The minimum latitude of the map area
+     * @param minlon - The minimum longitude of the map area
+     * @param maxlat - The maximum latitude of the map area
+     * @param maxlon - The maximum longitude of the map area
+     */
     void panToMap(double minlat, double minlon, double maxlat, double maxlon) {
         double midpointLat = (minlat + maxlat) / 2.0;
         double midpointLon = (minlon + maxlon) / 2.0;
@@ -154,21 +186,41 @@ public class View {
         redraw();
     }
 
+    /**
+     * Pans the view by a given amount given in horizontal & vertical distance
+     * @param dx - The horizontal distance to pan
+     * @param dy - The vertical distance to pan
+     */
     void pan(double dx, double dy) {
         trans.prependTranslation(dx, dy);
         redraw();
     }
 
+    /**
+     * Resizes the panes used in the application when called.
+     * @param resizedWidth - The new width of the panes
+     * @param resizedHeight - The height of the panes
+     */
     private void resizePanes(double resizedWidth, double resizedHeight){
         canvas.setWidth(resizedWidth);
         canvas.setHeight(resizedHeight);
         redraw();
     }
 
+    /**
+     * Toggles the color scheme of the map.
+     * @param a - Boolean value: true = dark mode color scheme, false = light mode color scheme
+     */
     void togglecolor(boolean a){
         dark = a;
     }
 
+    /**
+     * Zoom method that zooms the view by given factors.
+     * @param dx - The horizontal distance for zooming
+     * @param dy - The vertical distance for zooming
+     * @param factor - The zoom factor
+     */
     void zoom(double dx, double dy, double factor) {
         pan(-dx, -dy);
         trans.prependScale(factor, factor);
@@ -176,6 +228,12 @@ public class View {
         redraw();
     }
 
+    /**
+     * Converts pixel coordinates to geographical coordinates
+     * @param lastX - The x-coordinate in pixel coordinates
+     * @param lastY - The y-coordinate in pixel coordinates
+     * @return - The corresponding coordinates in geographical coordinates
+     */
     public Point2D mousetoModel(double lastX, double lastY) {
         try {
             return trans.inverseTransform(lastX, lastY);
@@ -185,33 +243,57 @@ public class View {
         }
     }
 
+    /**
+     * Converts geographical coordinates to pixels on the canvas.
+     * @param lon - The longitude(x) coordinate
+     * @param lat - The latitude(y) coordinate
+     * @return - Corresponding geographical coordinates in pixels
+     */
     public Point2D convertGeoCoordsToPixels(double lon, double lat){
         Point2D transformedGeoPoint = trans.transform(lon, lat);
 
         return transformedGeoPoint;
     }
 
+    /**
+     * Sets the current value of the slider.
+     * @param value - The value of the slider
+     */
     public void Current_Slider_value(double value){
         slider_value = value;
     }
 
+    /**
+     * Gets the center point of the canvas in pixel coordinates
+     * @return - The center point of the canvas in pixel coordinates
+     */
     public Point2D getCanvasCenterPoint(){
         double centerX = canvas.getWidth() / 2;
         double centerY = canvas.getHeight() / 2;
 
-        Point2D canvasCoordsTransformed = mousetoModel(centerX, centerY);
-
         return new Point2D(centerX,centerY);
     }
 
-    public void setTempAddressPoint(Double x, Double y) {
+    public void setTempAddressStartPoint(Double x, Double y) {
         if (x == null || y == null) {
-            tempAddressPoint = null;
+            tempAddressStartPoint = null;
         } else {
-            tempAddressPoint = new Point2D(x, y);
+            tempAddressStartPoint = new Point2D(x, y);
+        }
+    }
+    public void setTempAddressEndPoint(Double x, Double y) {
+        if (x == null || y == null) {
+            tempAddressEndPoint = null;
+        } else {
+            tempAddressEndPoint = new Point2D(x, y);
         }
     }
 
+    /**
+     * Used to draw place relations on the canvas.
+     * @param canvasTopLeft - The top-left corner of the canvas
+     * @param canvasBottomRight - The bottom-right corner of the canvas
+     */
     private void drawPlace(Point2D canvasTopLeft, Point2D canvasBottomRight){
         Queue<Way> waysPlaceNodesFromKD = model.kdTreeWaysPlace.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
 
@@ -220,7 +302,7 @@ public class View {
         }
 
         for (Way placeWay : waysPlaceNodesFromKD) {
-            if (placeWay != null && placeWay.getZoom_scale() < slider_value) {
+            if (placeWay != null) {
                 gc.setStroke(Color.BLACK);
                 placeWay.draw(gc, slider_value, dark, model.getColorScheme());
                 placeWay.fill(gc, dark, model.getColorScheme(), "place");
@@ -228,6 +310,11 @@ public class View {
         }
     }
 
+    /**
+     * Draws natural relations onto the canvas
+     * @param canvasTopLeft - The top-left corner of the canvas
+     * @param canvasBottomRight - The bottom-right corner of the canvas
+     */
     private void drawNatural(Point2D canvasTopLeft, Point2D canvasBottomRight){
         Queue<Way> naturalsNodesFromKD = model.kdTreeNaturals.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         Queue<Way> waysNaturalNodesFromKD = model.kdTreeWaysNatural.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
@@ -239,7 +326,7 @@ public class View {
 
         // Drawing natural ways
         for (Way naturalsWay : waysNaturalNodesFromKD) {
-            if (naturalsWay != null && naturalsWay.getZoom_scale() < slider_value) {
+            if (naturalsWay != null) {
                 gc.setStroke(Color.BLACK);
                 naturalsWay.draw(gc, slider_value, dark, model.getColorScheme());
                 naturalsWay.fill(gc, dark, model.getColorScheme(), "natural");
@@ -247,6 +334,11 @@ public class View {
         }
     }
 
+    /**
+     * Draws Landuse relations onto the canvas
+     * @param canvasTopLeft - The top-left corner of the canvas
+     * @param canvasBottomRight - The bottom-right corner of the canvas
+     */
     private void drawLanduse(Point2D canvasTopLeft, Point2D canvasBottomRight){
         Queue<Way> landuseNodesFromKD = model.kdTreeLanduses.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         Queue<Way> waysLanduseNodesFromKD = model.kdTreeWaysLanduse.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
@@ -258,7 +350,7 @@ public class View {
 
         // Drawing landuse ways
         for (Way landuseWay : waysLanduseNodesFromKD) {
-            if (landuseWay != null && landuseWay.getZoom_scale() < slider_value) {
+            if (landuseWay != null) {
                 gc.setStroke(Color.BLACK);
                 landuseWay.draw(gc, slider_value, dark, model.getColorScheme());
                 landuseWay.fill(gc, dark, model.getColorScheme(), "landuse");
@@ -267,6 +359,11 @@ public class View {
 
     }
 
+    /**
+     * Draws Building relations onto the canvas
+     * @param canvasTopLeft - The top-left corner of the canvas
+     * @param canvasBottomRight - The bottom-right corner of the canvas
+     */
     private void drawBuilding(Point2D canvasTopLeft, Point2D canvasBottomRight){
         Queue<Way> buildingNodesFromKD = model.kdTreeBuildings.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
         Queue<Way> waysBuildingNodesFromKD = model.kdTreeWaysBuilding.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
@@ -278,7 +375,7 @@ public class View {
 
         // Drawing building ways
         for (Way buildingWay : waysBuildingNodesFromKD) {
-            if (buildingWay != null && buildingWay.getZoom_scale() < slider_value) {
+            if (buildingWay != null) {
                 gc.setStroke(Color.BLACK);
                 buildingWay.draw(gc, slider_value, dark, model.getColorScheme());
                 buildingWay.fill(gc, dark, model.getColorScheme(), "building");
@@ -286,11 +383,16 @@ public class View {
         }
     }
 
+    /**
+     * Draws road relations onto the canvas
+     * @param canvasTopLeft - The top-left corner of the canvas
+     * @param canvasBottomRight - The bottom-right corner of the canvas
+     */
     private void drawRoad(Point2D canvasTopLeft, Point2D canvasBottomRight){
         Queue<Way> waysRoadNodesFromKD = model.kdTreeWaysRoad.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
 
         for (Way roadWay : waysRoadNodesFromKD) {
-            if (roadWay != null && roadWay.getZoom_scale() < slider_value) {
+            if (roadWay != null) {
                 gc.setStroke(Color.BLACK);
 
                 if (model.xsmallRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 80) {

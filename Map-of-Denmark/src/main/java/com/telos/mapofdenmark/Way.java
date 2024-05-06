@@ -8,12 +8,17 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Way implements Serializable {
+    // Array of coordinates representing the way
     double[] coords;
+    // Latitude of the center point of the way
     double centerLat;
+    // Longitude of the center point of the way
     double centerLon;
+    // Reference to the parent relation of the way
     private Relation refRelation;
-
+    // Reference to one of the nodes in the way
     Node refNode;
+    // List of nodes forming the way
     private ArrayList<Node> nodesInWay;
     String landform;
     String type;
@@ -70,12 +75,10 @@ public class Way implements Serializable {
     public double getCenterLat() { return centerLat; }
     public double getCenterLon() { return centerLon; }
     public boolean isRoad(){ return false; }
-
     // Getter and setter for refRelation
     public Relation getRefRelation() {
         return refRelation;
     }
-
     public void setRefRelation(Relation refRelation) {
         this.refRelation = refRelation;
     }
