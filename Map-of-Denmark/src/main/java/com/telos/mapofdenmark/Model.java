@@ -118,7 +118,8 @@ public class Model implements Serializable {
         this.address = new Address();
         this.addressIdMap = new TreeMap<>(); // Used for ref a node id to an address
         this.allowedKeyTypes = new HashSet<>(Arrays.asList("place", "natural", "landuse", "building")); // Allowed types for relations and ways
-        this.bannedLandforms = new HashSet<>(Arrays.asList("coastline", "military", "port", "industrial", "harbour", "strait", "recreation_ground", "Tønballe Tårnet", "spring", "hedge", "Hviids Caravanservice", "sinkhole", "ground", "stone")); // Banned types for relations and ways
+        this.bannedLandforms = new HashSet<>(Arrays.asList("coastline", "military", "port", "industrial", "harbour", "strait", "recreation_ground",
+                                                            "Tønballe Tårnet", "spring", "hedge", "Hviids Caravanservice", "sinkhole", "ground", "shoal")); // Banned types for relations and ways
 
         this.xsmallRoads = new HashSet<>(Arrays.asList("path", "footway", "cycleway", "designated", "yes", "permissive", "optional_sidepath", "use_sidepath", "desination", "pedestrian"));
         this.smallRoads = new HashSet<>(Arrays.asList("service", "default", "track", "living_street", "residential", "unclassified"));
