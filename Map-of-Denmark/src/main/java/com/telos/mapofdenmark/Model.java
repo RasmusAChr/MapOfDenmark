@@ -598,7 +598,7 @@ public class Model implements Serializable {
                     if (RelationsType.equals("multipolygon")) {
                         if (validRelation && !bannedLandforms.contains(relationLandform)) {
                              if (relationKey.equals("building")) {
-                                Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
+                                Relation tmpRelation = new Relation(new ArrayList<>(relationsMembers), relationLandform,cs);
                                 RelationsBuilding.add(tmpRelation);
                                 // Temp fix for ensuring that the same relation ref is not added twice
                                 if(relationsMembers.get(0).getWay() != null) {
@@ -612,14 +612,14 @@ public class Model implements Serializable {
 //                                    }
 //                                }
                             } else if (relationKey.equals("natural") && !relationLandform.equals("peninsula")) {
-                                Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
+                                Relation tmpRelation = new Relation(new ArrayList<>(relationsMembers), relationLandform,cs);
                                 RelationsNatural.add(tmpRelation);
                                 // Temp fix for ensuring that the same relation ref is not added twice
                                 if(relationsMembers.get(0).getWay() != null) {
                                     addToCenterRelations(relationsMembers.get(0).getWay(), tmpRelation, "natural");
                                 }
                             } else if (relationKey.equals("landuse")) {
-                                Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
+                                Relation tmpRelation = new Relation(new ArrayList<>(relationsMembers), relationLandform,cs);
                                 RelationsLanduse.add(tmpRelation);
                                 // Temp fix for ensuring that the same relation ref is not added twice
                                 if(relationsMembers.get(0).getWay() != null) {
@@ -627,7 +627,7 @@ public class Model implements Serializable {
                                 }
                             }
                              else if (relationKey.equals("place") || relationLandform.equals("peninsula")) {
-                                 RelationsPlace.add(new Relation(RelationsType,relationsMembers,relationLandform, cs));
+                                 RelationsPlace.add(new Relation(relationsMembers, relationLandform, cs));
                              }
                         }
                     }
