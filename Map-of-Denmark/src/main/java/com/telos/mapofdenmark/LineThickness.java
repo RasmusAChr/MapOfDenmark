@@ -30,7 +30,7 @@ public class LineThickness implements Serializable {
     public void defaultScheme() {
         linewidth.clear();
         linewidth.put("default", 0.00001);
-        linewidth.put("highway", 0.0005);
+        linewidth.put("motorway", 0.0005);
         linewidth.put("trunk", 0.0004);
         linewidth.put("primary", 0.0003);
         linewidth.put("secondary", 0.0002);
