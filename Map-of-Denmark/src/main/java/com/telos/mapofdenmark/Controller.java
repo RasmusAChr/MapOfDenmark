@@ -115,20 +115,20 @@ public class Controller {
 
         // Clickable Suggestions
         suggestionsBox.setOnMouseClicked(event ->{
-            if(!suggestionsBox.getSelectionModel().getSelectedItem().isEmpty()){
-                String chosenSelection = suggestionsBox.getSelectionModel().getSelectedItem();
+            String chosenSelection = suggestionsBox.getSelectionModel().getSelectedItem();
+            if (chosenSelection != null && !chosenSelection.isEmpty()) {
                 // Puts the text into the first searchbar
-                if(searchBarCounter == 0){
+                if (searchBarCounter == 0) {
                     searchBar.setText(chosenSelection);
                     checkForIfTextIsStreet(searchBar);
-                    addressParsing(chosenSelection,searchBar);
-                    panToAddress(chosenSelection,true);
+                    addressParsing(chosenSelection, searchBar);
+                    panToAddress(chosenSelection, true);
                 }
                 // Puts it into the second searchbar
-                else{
+                else {
                     searchBar1.setText(chosenSelection);
                     checkForIfTextIsStreet(searchBar1);
-                    addressParsing(chosenSelection,searchBar1);
+                    addressParsing(chosenSelection, searchBar1);
                     panToAddress(chosenSelection, false);
                 }
             }
