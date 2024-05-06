@@ -506,9 +506,7 @@ public class Model implements Serializable {
                     insideRelation = false;
                     if (RelationsType.equals("multipolygon")) {
                         if (validRelation && !bannedLandforms.contains(relationLandform)) {
-                            if (relationKey.equals("place")) {
-                                RelationsPlace.add(new Relation(RelationsType,relationsMembers,relationLandform, cs));
-                            } else if (relationKey.equals("building")) {
+                             if (relationKey.equals("building")) {
                                 Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
                                 RelationsBuilding.add(tmpRelation);
                                 // Temp fix for ensuring that the same relation ref is not added twice
@@ -522,7 +520,7 @@ public class Model implements Serializable {
 //                                        addToCenterRelations(member.getWay(), tmpRelation, "building");
 //                                    }
 //                                }
-                            } else if (relationKey.equals("natural")) {
+                            } else if (relationKey.equals("natural") && !relationLandform.equals("peninsula")) {
                                 Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
                                 RelationsNatural.add(tmpRelation);
                                 // Temp fix for ensuring that the same relation ref is not added twice
@@ -551,6 +549,9 @@ public class Model implements Serializable {
 //                                    }
 //                                }
                             }
+                             else if (relationKey.equals("place") || relationLandform.equals("peninsula")) {
+                                 RelationsPlace.add(new Relation(RelationsType,relationsMembers,relationLandform, cs));
+                             }
                         }
                     }
                 }

@@ -9,7 +9,6 @@ import javafx.scene.paint.Color;
 
 public class Way implements Serializable {
     double[] coords;
-    double zoom_scale;
     double centerLat;
     double centerLon;
     private Relation refRelation;
@@ -39,7 +38,6 @@ public class Way implements Serializable {
         this.centerLon = sumLon / way.size();
 
         this.refNode = way.get(0);
-        this.zoom_scale = zoom_scale;
         this.landform = landform;
         this.type = type;
     }
@@ -68,9 +66,6 @@ public class Way implements Serializable {
 
     public Node getArbitraryNode(){
         return refNode;
-    }
-    public double getZoom_scale() {
-        return zoom_scale;
     }
     public double getCenterLat() { return centerLat; }
     public double getCenterLon() { return centerLon; }
