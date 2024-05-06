@@ -113,13 +113,14 @@ public class Controller {
                 // Puts the text into the first searchbar
                 if(searchBarCounter == 0){
                     searchBar.setText(chosenSelection);
-                    panToAddress(chosenSelection);
+                    panToAddress(chosenSelection,true);
 
 
                 }
                 // Puts it into the second searchbar
                 else{
                     searchBar1.setText(chosenSelection);
+                    panToAddress(chosenSelection, false);
                 }
                 suggestionsBox.setVisible(false);
             }
@@ -127,7 +128,7 @@ public class Controller {
         });
 
         searchImage.setOnMouseClicked(event -> {
-            panToAddress(searchBar.getText());
+            panToAddress(searchBar.getText(), true);
         });
 
         searchBar.setOnKeyPressed(event -> {
@@ -138,7 +139,7 @@ public class Controller {
             }
             if(event.getCode() == KeyCode.BACK_SPACE && searchBar.getText().isEmpty()) {
                 // Backspace key was pressed and search bar is empty
-                view.setTempAddressPoint(null, null);
+                view.setTempAddressStartPoint(null, null);
                 view.redraw();
             }
         });
@@ -147,6 +148,11 @@ public class Controller {
                 System.out.println(searchBar1.getText());
                 addressParsing(searchBar1.getText());
                 searchBarCounter = 1;
+            }
+            if(event.getCode() == KeyCode.BACK_SPACE && searchBar.getText().isEmpty()) {
+                // Backspace key was pressed and search bar is empty
+                view.setTempAddressEndPoint(null, null);
+                view.redraw();
             }
         });
 
@@ -304,7 +310,7 @@ public class Controller {
         } catch (NullPointerException E) {}
     }
 
-    private void panToAddress(String selectedAddress){
+    private void panToAddress(String selectedAddress, boolean startPoint){
         String addressToLowerCase = selectedAddress.toLowerCase();
         if(model.getAddressIdMap().get(addressToLowerCase) != null && lastPannedToAddress != model.getAddressIdMap().get(addressToLowerCase)
         && allowedToPan){
@@ -323,8 +329,12 @@ public class Controller {
 
 
             view.drawCircle(addressX,addressY);
-
-            view.setTempAddressPoint(addressX,addressY);
+            if(startPoint){
+                view.setTempAddressStartPoint(addressX,addressY);
+            }
+            else{
+                view.setTempAddressEndPoint(addressX,addressY);
+            }
             view.pan(dx, dy);
         }
         else if (model.getAddressIdMap().get(selectedAddress) == null){

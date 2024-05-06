@@ -39,7 +39,8 @@ public class View {
     @FXML
     private Pane backgroundPane;
 
-    Point2D tempAddressPoint;
+    Point2D tempAddressStartPoint;
+    Point2D tempAddressEndPoint;
 
     public View(Model model, Stage primaryStage) throws IOException {
         this.model = model;
@@ -119,8 +120,11 @@ public class View {
         }
         drawPOI();
 
-        if(tempAddressPoint != null){
-            drawCircle(tempAddressPoint.getX(), tempAddressPoint.getY());
+        if(tempAddressStartPoint != null){
+            drawCircle(tempAddressStartPoint.getX(), tempAddressStartPoint.getY());
+        }
+        if(tempAddressEndPoint != null){
+            drawCircle(tempAddressEndPoint.getX(), tempAddressEndPoint.getY());
         }
 
     }
@@ -204,11 +208,18 @@ public class View {
         return new Point2D(centerX,centerY);
     }
 
-    public void setTempAddressPoint(Double x, Double y) {
+    public void setTempAddressStartPoint(Double x, Double y) {
         if (x == null || y == null) {
-            tempAddressPoint = null;
+            tempAddressStartPoint = null;
         } else {
-            tempAddressPoint = new Point2D(x, y);
+            tempAddressStartPoint = new Point2D(x, y);
+        }
+    }
+    public void setTempAddressEndPoint(Double x, Double y) {
+        if (x == null || y == null) {
+            tempAddressEndPoint = null;
+        } else {
+            tempAddressEndPoint = new Point2D(x, y);
         }
     }
 
