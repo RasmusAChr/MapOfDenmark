@@ -24,6 +24,12 @@ import com.telos.mapofdenmark.TrieClasses.RadixTrie;
 import com.telos.mapofdenmark.TrieClasses.Trie;
 import javafx.geometry.Point2D;
 
+/**
+ * The Model class is responsible for parsing and storing the data from OpenStreetMap files.
+ * It provides methods for loading and saving the data, as well as accessing various collections
+ * and data structures used for storing and retrieving information about nodes, ways, addresses,
+ * relations, and more.
+ */
 public class Model implements Serializable {
     private static final long serialVersionUID = 9300313068198046L;
 
@@ -33,7 +39,6 @@ public class Model implements Serializable {
     List<Relation> RelationsLanduse = new ArrayList<>();
     List<Relation> RelationsBuilding = new ArrayList<>();
 
-
     // Collection used for storing points of interest
     List<Point2D> pointsOfInterest = new ArrayList<>();
 
@@ -41,7 +46,6 @@ public class Model implements Serializable {
     List<Way> centerPointRelationsBuilding = new ArrayList<>();
     List<Way> centerPointRelationsNatural = new ArrayList<>();
     List<Way> centerPointRelationsLanduse = new ArrayList<>();
-
 
     // Collection used for storing center points for ways
     List<Way> centerPointWaysPlace = new ArrayList<>();
@@ -55,53 +59,53 @@ public class Model implements Serializable {
     private RadixTrie radixTrie;
     double minlat, maxlat, minlon, maxlon;
     List<Address> addressList;
-    Map<String, Node> addressIdMap;
+    Address address;
 
+    Map<String, Node> addressIdMap;
+    HashMap<Long, Way> id2way;
+    HashMap<String, Double> roadIdSet;
+    TreeMap<String, Node> id2node;
+    HashMap<String, Double> tagToScaleValue;
+
+    // KD-Trees for relations
     KDTreeWay kdTreeBuildings; // KDTree holds relation buildings
     KDTreeWay kdTreeNaturals; // KDTree holds relation naturals
     KDTreeWay kdTreeLanduses; // KDTree holds relation landuses
 
+    // KD-Trees for ways
     KDTreeWay kdTreeWaysPlace; // KDTree holds ways places
     KDTreeWay kdTreeWaysNatural; // KDTree holds ways natural
     KDTreeWay kdTreeWaysLanduse; // KDTree holds ways landuses
     KDTreeWay kdTreeWaysBuilding; // KDTree holds ways buildings
     KDTreeWay kdTreeWaysRoad; // KDTree holds ways roads
 
-    Address address;
     EdgeWeightedDigraph EWD;
-    TreeMap<String, Node> id2node;
-    HashMap<String, Double> tagToScaleValue;
     List<Member> relationsMembers;
-    HashMap<Long, Way> id2way;
     int indexForCenterPoints = 0;
-    HashMap<String, Double> roadIdSet;
     HashSet<String> cycleTags;
     ColorScheme cs;
     LineThickness lt;
+
+    // Set with allowed key types when parsing ways and relations.
     Set<String> allowedKeyTypes;
+    // Set with banned landforms (values) when parsing ways and relations.
     Set<String> bannedLandforms;
+
+    // Sets corresponding to road layers with values.
     Set<String> xsmallRoads;
     Set<String> smallRoads;
     Set<String> mediumRoads;
     Set<String> bigRoads;
 
-
-    static Model load(InputStream inputStream, String fileName) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
-        if(fileName.endsWith(".obj")){
-            try (var in = new ObjectInputStream(new BufferedInputStream(inputStream))) {
-                return (Model) in.readObject();
-            } catch (Exception e) {
-                // Close the input stream if an exception occurs
-                inputStream.close();
-                throw e;
-            }
-        }
-        else{
-            return new Model(inputStream, fileName);
-        }
-    }
-
-
+    /**
+     * Constructs a new Model instance by parsing the given input stream.
+     *
+     * @param inputStream The input stream containing the data to be parsed.
+     * @param filename The name of the file being parsed.
+     * @throws XMLStreamException If an error occurs while parsing the XML data.
+     * @throws FactoryConfigurationError If a factory configuration error occurs.
+     * @throws IOException If an I/O error occurs while reading the input stream.
+     */
     public Model(InputStream inputStream, String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
         cs = new ColorScheme();
         lt = new LineThickness();
@@ -172,6 +176,34 @@ public class Model implements Serializable {
 
         // Saves objects to binary file
         save(filename+".obj");
+    }
+
+    /**
+     * Loads a Model instance from a file. If the file extension is ".obj", it attempts to deserialize
+     * a previously saved Model object. Otherwise, it creates a new Model instance by parsing the given file.
+     *
+     * @param inputStream The input stream containing the data to be loaded.
+     * @param fileName The name of the file being loaded.
+     * @return The loaded Model instance.
+     * @throws FileNotFoundException If the file cannot be found.
+     * @throws IOException If an I/O error occurs while reading the file.
+     * @throws ClassNotFoundException If the class of the serialized object cannot be found.
+     * @throws XMLStreamException If an error occurs while parsing the XML data.
+     * @throws FactoryConfigurationError If a factory configuration error occurs.
+     */
+    static Model load(InputStream inputStream, String fileName) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
+        if(fileName.endsWith(".obj")){
+            try (var in = new ObjectInputStream(new BufferedInputStream(inputStream))) {
+                return (Model) in.readObject();
+            } catch (Exception e) {
+                // Close the input stream if an exception occurs
+                inputStream.close();
+                throw e;
+            }
+        }
+        else{
+            return new Model(inputStream, fileName);
+        }
     }
 
     private void initializeRoadIdSetMap() {
@@ -401,9 +433,9 @@ public class Model implements Serializable {
                             break;
                         case "service":
                             if (cycleTags.contains(v)) {
-                            shouldAdd = true;
-                            cycleable = true;
-                            drivable = true;
+                                shouldAdd = true;
+                                cycleable = true;
+                                drivable = true;
                             }
                     }
 
@@ -459,7 +491,7 @@ public class Model implements Serializable {
                             // This makes sure we don't get any lines that isn't roads.
                             // We want to have closed ways, so we can fill them with color.
                             if (way.get(0) == way.get(way.size()-1)){
-                            addToCenterWays(tmpWay, wayKey);
+                                addToCenterWays(tmpWay, wayKey);
                             }
 
                         }
@@ -474,7 +506,7 @@ public class Model implements Serializable {
                             double weight_cycle = dist;
                             // calculate the weight depending on tags
                             if(!cycleable){
-                                 weight_cycle = 500000.0;
+                                weight_cycle = 500000.0;
                             }
                             if (!drivable) {
                                 weight_car = 500000.0;
@@ -597,21 +629,21 @@ public class Model implements Serializable {
         // returns an arraylist of all ways in the KDTree
         kdTreeWaysRoad.getAllWays();
 
-         List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
-         HashSet<Node> NodeAdded = new HashSet<Node>();
-            for(DirectedEdge i: Dijkstra.pathTo(tmpNode.id)) {
-                Node node1 = getNodeFromKDTree(i.to());
-                if (!NodeAdded.contains(node1)) {
-                    NodeAdded.add(node1);
-                    path.add(node1);
-                    continue;
-                }
-                Node node2 = getNodeFromKDTree(i.from());
-                if (!NodeAdded.contains(node2)) {
-                    NodeAdded.add(node2);
-                    path.add(node2);
-                }
+        List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
+        HashSet<Node> NodeAdded = new HashSet<Node>();
+        for(DirectedEdge i: Dijkstra.pathTo(tmpNode.id)) {
+            Node node1 = getNodeFromKDTree(i.to());
+            if (!NodeAdded.contains(node1)) {
+                NodeAdded.add(node1);
+                path.add(node1);
+                continue;
             }
+            Node node2 = getNodeFromKDTree(i.from());
+            if (!NodeAdded.contains(node2)) {
+                NodeAdded.add(node2);
+                path.add(node2);
+            }
+        }
         return path;
     }
     private Node getNodeFromKDTree(int id) {
@@ -643,7 +675,7 @@ public class Model implements Serializable {
     }
     // credit James K polk from StackOwerflow
     private static double distance(double lat1, double lat2, double lon1,
-                                  double lon2) {
+                                   double lon2) {
 
         final int R = 6371; // Radius of the earth
 
