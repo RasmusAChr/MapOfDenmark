@@ -178,10 +178,10 @@ public class Model implements Serializable {
         this.allowedKeyTypes = new HashSet<>(Arrays.asList("place", "natural", "landuse", "building")); // Allowed types for relations and ways
         this.bannedLandforms = new HashSet<>(Arrays.asList("coastline", "military", "port", "industrial", "harbour", "strait", "recreation_ground"));
 
-        this.xsmallRoads = new HashSet<>(Arrays.asList("path", "footway"));
-        this.smallRoads = new HashSet<>(Arrays.asList("pedestrian", "service", "desination", "permissive", "optional_sidepath", "use_sidepath", "designated", "yes", "default", "cycleway", "track", "living_street", "residential", "unclassified"));
-        this.mediumRoads = new HashSet<>(Arrays.asList("tertiary_link", "secondary_link", "primary_link", "trunk_link", "motorway_link", "tertiary", "secondary"));
-        this.bigRoads = new HashSet<>(Arrays.asList("primary", "trunk", "highway"));
+        this.xsmallRoads = new HashSet<>(Arrays.asList("path", "footway", "cycleway", "designated", "yes", "permissive", "optional_sidepath", "use_sidepath", "desination", "pedestrian"));
+        this.smallRoads = new HashSet<>(Arrays.asList("service", "default", "track", "living_street", "residential", "unclassified"));
+        this.mediumRoads = new HashSet<>(Arrays.asList("primary", "tertiary_link", "secondary_link", "primary_link", "trunk_link", "motorway_link", "tertiary", "secondary"));
+        this.bigRoads = new HashSet<>(Arrays.asList("trunk", "highway"));
 
         if (filename.endsWith(".osm.zip")) {
             parseZIP(inputStream);

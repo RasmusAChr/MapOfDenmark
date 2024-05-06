@@ -102,17 +102,17 @@ public class View {
         drawPlace(canvasTopLeft, canvasBottomRight);
 
         // Drawing landuse
-        if (slider_value >= 20){
+        if (slider_value >= 60){
             drawLanduse(canvasTopLeft, canvasBottomRight);
         }
 
         // Drawing natural
-        if (slider_value >= 20){
+        if (slider_value >= 50){
             drawNatural(canvasTopLeft, canvasBottomRight);
         }
 
         // Drawing building
-        if (slider_value >= 50){
+        if (slider_value >= 70){
             drawBuilding(canvasTopLeft, canvasBottomRight);
         }
 
@@ -300,16 +300,16 @@ public class View {
             if (roadWay != null && roadWay.getZoom_scale() < slider_value) {
                 gc.setStroke(Color.BLACK);
 
-                if (model.xsmallRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 60) {
+                if (model.xsmallRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 80) {
                     roadWay.draw(gc, slider_value, dark, model.getColorScheme());
                 }
-                else if (model.smallRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 50){
+                else if (model.smallRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 70){
                     roadWay.draw(gc, slider_value, dark, model.getColorScheme());
                 }
                 else if (model.mediumRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 40){
                     roadWay.draw(gc, slider_value, dark, model.getColorScheme());
                 }
-                else if (model.bigRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 30){
+                else if (model.bigRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 10){
                     roadWay.draw(gc, slider_value, dark, model.getColorScheme());
                 }
 
