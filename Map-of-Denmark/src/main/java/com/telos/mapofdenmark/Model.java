@@ -66,10 +66,10 @@ public class Model implements Serializable {
     KDTreeWay kdTreeWaysLanduse; // KDTree holds ways landuses
     KDTreeWay kdTreeWaysBuilding; // KDTree holds ways buildings
     KDTreeWay kdTreeWaysRoad; // KDTree holds ways roads
-
+    public ArrayList<Node> Nodes = new ArrayList<>();
     Address address;
     EdgeWeightedDigraph EWD;
-    TreeMap<String, Node> id2node;
+    TreeMap<String, Integer> id2int;
     List<Member> relationsMembers;
     HashMap<Long, Way> id2way;
     int indexForCenterPoints = 0;
@@ -107,7 +107,7 @@ public class Model implements Serializable {
         initializeRoadIdSetMap();
         initializeCycleTagsHashSet();
         this.id2way = new HashMap<>();
-        this.id2node = new TreeMap<>();
+        this.id2int = new TreeMap<>();
         this.relationsMembers = new ArrayList<>();
         this.addressList = new ArrayList<>();
         this.address = new Address();
@@ -237,7 +237,8 @@ public class Model implements Serializable {
                         var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
                         var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
                         node = new Node(NodeCount, lat, lon);
-                        id2node.put(id, node);
+                        Nodes.add(node);
+                        id2int.put(id, NodeCount);
                         NodeCount++;
                     }
                     case "tag" -> {
@@ -402,9 +403,14 @@ public class Model implements Serializable {
 
                 } else if (name.equals("nd")) {
                     var ref = input1.getAttributeValue(null, "ref");
-                    var node = id2node.get(ref);
+                    var node = Nodes.get(id2int.get(ref));
                     way.add(node);
                 } else if (name.equals("relation")) {
+                    if(!id2int.isEmpty()) {
+                        id2int.clear();
+                        System.gc();
+                    }
+
                     relationsMembers = new ArrayList<>();
                     insideRelation = true;
                     RelationsType = "";
@@ -514,13 +520,6 @@ public class Model implements Serializable {
                                 if(relationsMembers.get(0).getWay() != null) {
                                     addToCenterRelations(relationsMembers.get(0).getWay(), tmpRelation, "building");
                                 }
-
-                                // for loop to find all members in relation and add to collection
-//                                for(Member member : relationsMembers){
-//                                    if(member.getWay() != null){
-//                                        addToCenterRelations(member.getWay(), tmpRelation, "building");
-//                                    }
-//                                }
                             } else if (relationKey.equals("natural")) {
                                 Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
                                 RelationsNatural.add(tmpRelation);
@@ -528,13 +527,6 @@ public class Model implements Serializable {
                                 if(relationsMembers.get(0).getWay() != null) {
                                     addToCenterRelations(relationsMembers.get(0).getWay(), tmpRelation, "natural");
                                 }
-
-                                // for loop to find all members in relation and add to collection
-//                                for(Member member : relationsMembers){
-//                                    if(member.getWay() != null){
-//                                        addToCenterRelations(member.getWay(), tmpRelation, "natural");
-//                                    }
-//                                }
                             } else if (relationKey.equals("landuse")) {
                                 Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
                                 RelationsLanduse.add(tmpRelation);
@@ -542,29 +534,24 @@ public class Model implements Serializable {
                                 if(relationsMembers.get(0).getWay() != null) {
                                     addToCenterRelations(relationsMembers.get(0).getWay(), tmpRelation, "landuse");
                                 }
-
-                                // for loop to find all members in relation and add to collection
-//                                for(Member member : relationsMembers){
-//                                    if(member.getWay() != null){
-//                                        addToCenterRelations(member.getWay(), tmpRelation, "landuse");
-//                                    }
-//                                }
                             }
                         }
                     }
                 }
             }
         }
-        id2node.clear();
     }
 
     //Dijkstra implementation
-    public void StartDijkstra(Node startaddress,boolean vehicle){
+    public void StartDijkstra(Node startaddress, Node Endadress, boolean vehicle){
         double x = startaddress.getLon();
         double y = startaddress.getLat();
         Node tmpNode = kdTreeWaysRoad.getNearestNeighbor(x,y,true).getArbitraryNode();
+        double x_end = tmpNode.getLon();
+        double y_end = tmpNode.getLat();
+        Node tmpgoal = kdTreeWaysRoad.getNearestNeighbor(x_end,y_end,true).getArbitraryNode();
         list.clear();
-        this.Dijkstra = new SP(EWD,tmpNode.id,vehicle);
+        this.Dijkstra = new SP(EWD,tmpNode.id,tmpgoal.id,vehicle,Nodes);
     }
 
 
@@ -581,42 +568,28 @@ public class Model implements Serializable {
      * @return Returns a list of nodes in order from start to finish
      *
      * */
-    public List<Node> getDijkstraPath(Node Endaddress) {
+    public List<Node> getDijkstraPath(Node Endaddress) { // HASH MAP
         double x = Endaddress.getLon();
         double y = Endaddress.getLat();
         Node tmpNode = kdTreeWaysRoad.getNearestNeighbor(x,y,true).getArbitraryNode();
-
-        // returns an arraylist of all ways in the KDTree
-        kdTreeWaysRoad.getAllWays();
-
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();
+
+
             for(DirectedEdge i: Dijkstra.pathTo(tmpNode.id)) {
-                Node node1 = getNodeFromKDTree(i.to());
-                if (!NodeAdded.contains(node1)) {
-                    NodeAdded.add(node1);
-                    path.add(node1);
-                    continue;
+                Node node_TO = Nodes.get(i.to());
+                Node node_FROM = Nodes.get(i.from());
+                if (!NodeAdded.contains(node_TO)) {
+                    NodeAdded.add(node_TO);
+                    path.add(node_TO);
                 }
-                Node node2 = getNodeFromKDTree(i.from());
-                if (!NodeAdded.contains(node2)) {
-                    NodeAdded.add(node2);
-                    path.add(node2);
+                if (!NodeAdded.contains(node_FROM)) {
+                    NodeAdded.add(node_FROM);
+                    path.add(node_FROM);
                 }
             }
         return path;
     }
-    private Node getNodeFromKDTree(int id) {
-        for (Way way: kdTreeWaysRoad.getAllWays()) {
-            for (Node node: way.getNodes()) {
-                if (node.id == id) {
-                    return node;
-                }
-            }
-        }
-        return null;
-    }
-
     public void parseAddressFromOSM(String v, String k){
         if(address.getStreet().equals(null) || address.getStreet().isEmpty()) {
             if (k.contains("street")) {
@@ -634,7 +607,7 @@ public class Model implements Serializable {
         }
     }
     // credit James K polk from StackOwerflow
-    private static double distance(double lat1, double lat2, double lon1,
+    public double distance(double lat1, double lat2, double lon1,
                                   double lon2) {
 
         final int R = 6371; // Radius of the earth

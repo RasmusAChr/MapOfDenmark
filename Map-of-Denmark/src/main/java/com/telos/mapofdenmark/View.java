@@ -87,10 +87,8 @@ public class View {
         gc.setTransform(trans);
         gc.setLineWidth(0.000005);
         // Logic for drawing ways from KDTree instead of all ways
-        Point2D canvasTopLeft =  mousetoModel(-200,-200);
-        Point2D canvasBottomRight = mousetoModel(canvas.getWidth() + 200,canvas.getHeight() + 200);
-        //Queue<Node> nodesFromKD = model.kdTree.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
-
+        Point2D canvasTopLeft =  mousetoModel(-400,-400);
+        Point2D canvasBottomRight = mousetoModel(canvas.getWidth() + 400,canvas.getHeight() + 400);
 
         // Drawing place
         drawPlace(canvasTopLeft, canvasBottomRight);

@@ -1,5 +1,7 @@
 package com.telos.mapofdenmark.Shortest_Route;
 
+import com.telos.mapofdenmark.Model;
+
 public class SP_Tests {
 
     public static void main(String[] args) {
@@ -10,9 +12,9 @@ public class SP_Tests {
         Digraph.addEdge(new DirectedEdge(3, 4, 0.5,0.7));
         Digraph.addEdge(new DirectedEdge(4, 5, 0.5,0.7));
         Digraph.addEdge(new DirectedEdge(0, 5, 0.5,0.7));
-        SP Dijkstra = new SP(Digraph,0,false);
+        //SP Dijkstra = new SP(Digraph,0,3,false,new Model());
 
-        System.out.println(Dijkstra.pathTo(3));
+       // System.out.println(Dijkstra.pathTo(3));
 
     }
 }

@@ -192,26 +192,24 @@ public class Controller {
     @FXML
     private void handleSearch() {
         StartSearch();
-        StopSearch();
     }
 
 
     @FXML
     private void StartSearch(){
         String input = searchBar1.getText().toLowerCase();
-        Node node = model.getAddressIdMap().get(input);
-        model.StartDijkstra(node,vehicle);
-    }
+        Node node1 = model.getAddressIdMap().get(input);
 
-    @FXML
-    private void StopSearch(){
-        String input = searchBar.getText().toLowerCase();
-        Node node = model.getAddressIdMap().get(input);
-        model.list.add(new Line(model.getDijkstraPath(node)));
+        String input1 = searchBar.getText().toLowerCase();
+        Node node2 = model.getAddressIdMap().get(input1);
+
+        model.StartDijkstra(node1,node2,vehicle);
+
+        model.list.add(new Line(model.getDijkstraPath(node2)));
         view.redraw();
         System.gc();
-
     }
+
     @FXML
     private void toggleMode(){
         if(ToggleMode.isSelected()){
