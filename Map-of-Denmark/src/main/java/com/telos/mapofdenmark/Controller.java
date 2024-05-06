@@ -187,14 +187,14 @@ public class Controller {
 
     @FXML
     private void StartSearch(){
-        String input = searchBar.getText().toLowerCase();
+        String input = searchBar1.getText().toLowerCase();
         Node node = model.getAddressIdMap().get(input);
         model.StartDijkstra(node,vehicle);
     }
 
     @FXML
     private void StopSearch(){
-        String input = searchBar1.getText().toLowerCase();
+        String input = searchBar.getText().toLowerCase();
         Node node = model.getAddressIdMap().get(input);
         model.list.add(new Line(model.getDijkstraPath(node)));
         view.redraw();
