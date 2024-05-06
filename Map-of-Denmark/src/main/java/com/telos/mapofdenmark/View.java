@@ -302,7 +302,7 @@ public class View {
         }
 
         for (Way placeWay : waysPlaceNodesFromKD) {
-            if (placeWay != null && placeWay.getZoom_scale() < slider_value) {
+            if (placeWay != null) {
                 gc.setStroke(Color.BLACK);
                 placeWay.draw(gc, slider_value, dark, model.getColorScheme());
                 placeWay.fill(gc, dark, model.getColorScheme(), "place");
@@ -326,7 +326,7 @@ public class View {
 
         // Drawing natural ways
         for (Way naturalsWay : waysNaturalNodesFromKD) {
-            if (naturalsWay != null && naturalsWay.getZoom_scale() < slider_value) {
+            if (naturalsWay != null) {
                 gc.setStroke(Color.BLACK);
                 naturalsWay.draw(gc, slider_value, dark, model.getColorScheme());
                 naturalsWay.fill(gc, dark, model.getColorScheme(), "natural");
@@ -350,7 +350,7 @@ public class View {
 
         // Drawing landuse ways
         for (Way landuseWay : waysLanduseNodesFromKD) {
-            if (landuseWay != null && landuseWay.getZoom_scale() < slider_value) {
+            if (landuseWay != null) {
                 gc.setStroke(Color.BLACK);
                 landuseWay.draw(gc, slider_value, dark, model.getColorScheme());
                 landuseWay.fill(gc, dark, model.getColorScheme(), "landuse");
@@ -375,7 +375,7 @@ public class View {
 
         // Drawing building ways
         for (Way buildingWay : waysBuildingNodesFromKD) {
-            if (buildingWay != null && buildingWay.getZoom_scale() < slider_value) {
+            if (buildingWay != null) {
                 gc.setStroke(Color.BLACK);
                 buildingWay.draw(gc, slider_value, dark, model.getColorScheme());
                 buildingWay.fill(gc, dark, model.getColorScheme(), "building");
@@ -392,7 +392,7 @@ public class View {
         Queue<Way> waysRoadNodesFromKD = model.kdTreeWaysRoad.rangeSearch(canvasTopLeft.getX(), canvasBottomRight.getX(), canvasTopLeft.getY(), canvasBottomRight.getY());
 
         for (Way roadWay : waysRoadNodesFromKD) {
-            if (roadWay != null && roadWay.getZoom_scale() < slider_value) {
+            if (roadWay != null) {
                 gc.setStroke(Color.BLACK);
 
                 if (model.xsmallRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 80) {
