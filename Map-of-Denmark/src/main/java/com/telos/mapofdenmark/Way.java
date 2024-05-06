@@ -19,7 +19,7 @@ public class Way implements Serializable {
     String landform;
     String type;
 
-    public Way(ArrayList<Node> way, double zoom_scale, String landform, String type) {
+    public Way(ArrayList<Node> way, String landform, String type) {
         this.nodesInWay = new ArrayList<>();
         nodesInWay.addAll(way);
         double sumLat = 0;
@@ -28,7 +28,6 @@ public class Way implements Serializable {
         coords = new double[way.size() * 2];
         for (int i = 0 ; i < way.size() ; ++i) {
             var node = way.get(i);
-            //node.setWay(this);
             coords[2 * i] = 0.56 * node.lon;
             coords[2 * i + 1] = -node.lat;
 

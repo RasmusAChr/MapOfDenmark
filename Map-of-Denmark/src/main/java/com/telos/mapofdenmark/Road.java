@@ -10,8 +10,8 @@ public class Road extends Way implements Serializable {
     String roadType;
     LineThickness lt;
     boolean sliderDraged = false;
-    public Road(ArrayList<Node> way, String roadType, double zoom_scale, LineThickness lt) {
-        super(way, zoom_scale, "", "road");
+    public Road(ArrayList<Node> way, String roadType, LineThickness lt) {
+        super(way, "", "road");
         this.roadType = roadType;
         this.lt = lt;
 

@@ -81,13 +81,6 @@ public class View {
 
     void redraw() {
         gc.setTransform(new Affine());
-//        if(dark) {
-//            gc.setStroke(Color.WHITE);
-//            gc.setFill(Color.web("#212F3D"));
-//        } else{
-//            gc.setFill(Color.WHITE);
-//            gc.setStroke(Color.BLACK);
-//        }
         gc.setFill(model.cs.getColor("water", dark, "natural"));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);

@@ -70,7 +70,6 @@ public class Model implements Serializable {
     Address address;
     EdgeWeightedDigraph EWD;
     TreeMap<String, Node> id2node;
-    HashMap<String, Double> tagToScaleValue;
     List<Member> relationsMembers;
     HashMap<Long, Way> id2way;
     int indexForCenterPoints = 0;
@@ -107,7 +106,6 @@ public class Model implements Serializable {
         lt = new LineThickness();
         initializeRoadIdSetMap();
         initializeCycleTagsHashSet();
-        this.tagToScaleValue = new HashMap<>();
         this.id2way = new HashMap<>();
         this.id2node = new TreeMap<>();
         this.relationsMembers = new ArrayList<>();
@@ -309,7 +307,6 @@ public class Model implements Serializable {
         boolean access = false;
         boolean acccesPostBollean = false;
         long wayid = 0;
-        double zoom_scale = -1.0;
         String relationKey = "";
         Node startNode = null;
         String wayKey = "";
@@ -347,16 +344,13 @@ public class Model implements Serializable {
                 } else if (!insideRelation && name.equals("tag")) {
                     var v = input1.getAttributeValue(null, "v");
                     var k = input1.getAttributeValue(null, "k");
-                    if (tagToScaleValue.containsKey(k)) zoom_scale = tagToScaleValue.get(k);
                     switch (k) {
                         case "place", "natural", "landuse", "building":
                             wayKey = k;
                             wayLandform = v;
                             break;
                         case "highway":
-                            if (tagToScaleValue.containsKey(v)) zoom_scale = tagToScaleValue.get(v);
                             roadtype = v;
-                            //zoom_scale = 0.0;
                             if (roadIdSet.containsKey(v)) {
                                 drivable = true;
                                 shouldAdd = true;
@@ -447,13 +441,13 @@ public class Model implements Serializable {
                 // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name.equals("way")) {
                     if (!roadtype.isEmpty()) { // Is a road
-                        Road tmpRoad = new Road(way, roadtype, zoom_scale, lt);
+                        Road tmpRoad = new Road(way, roadtype, lt);
                         addToCenterWays(tmpRoad, "road");
                         id2way.put(wayid,tmpRoad);
                     } else { // Is not a road
                         //System.out.println("wayKey: " + wayKey);
                         //System.out.println("wayLandform: " + wayLandform);
-                        Way tmpWay = new Way(way, zoom_scale, wayLandform, wayKey);
+                        Way tmpWay = new Way(way, wayLandform, wayKey);
                         if (!bannedLandforms.contains(wayLandform)) {
                             // If the last node isn't the same as the first then don't draw it.
                             // This makes sure we don't get any lines that isn't roads.
@@ -507,7 +501,6 @@ public class Model implements Serializable {
                     acccesPostBollean = false;
                     insideRelation = false;
                     RelationsType = "";
-                    zoom_scale = -1.0;
                     startNode = null;
                 } else if (name.equals("relation") && insideRelation) {
                     insideRelation = false;
