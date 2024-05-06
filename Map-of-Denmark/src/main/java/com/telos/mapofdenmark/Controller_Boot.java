@@ -72,7 +72,7 @@ public class Controller_Boot {
         // Set extension filters such that the user cannot choose undesird file types/extensions
         FileChooser.ExtensionFilter osmFilter = new FileChooser.ExtensionFilter("OSM files (*.osm)", "*.osm");
         FileChooser.ExtensionFilter objFilter = new FileChooser.ExtensionFilter("OBJ files (*.obj)", "*.obj");
-        FileChooser.ExtensionFilter zippedFilter = new FileChooser.ExtensionFilter("Zipped OSM files (*.osm.zip)", "*.osm.zip");
+        FileChooser.ExtensionFilter zippedFilter = new FileChooser.ExtensionFilter("Zipped OSM files (*.zip)", "*.zip");
         fileChooser.getExtensionFilters().addAll(osmFilter, objFilter,zippedFilter);
 
         Loading.setVisible(true);
