@@ -595,9 +595,9 @@ public class Model implements Serializable {
                     if (RelationsType.equals("multipolygon")) {
                         if (validRelation && !bannedLandforms.contains(relationLandform)) {
                             if (relationKey.equals("place")) {
-                                RelationsPlace.add(new Relation(RelationsType,relationsMembers,relationLandform, cs));
+                                RelationsPlace.add(new Relation(relationsMembers,relationLandform, cs));
                             } else if (relationKey.equals("building")) {
-                                Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
+                                Relation tmpRelation = new Relation(new ArrayList<>(relationsMembers) ,relationLandform,cs);
                                 RelationsBuilding.add(tmpRelation);
                                 // Temp fix for ensuring that the same relation ref is not added twice
                                 if(relationsMembers.get(0).getWay() != null) {
@@ -611,7 +611,7 @@ public class Model implements Serializable {
 //                                    }
 //                                }
                             } else if (relationKey.equals("natural")) {
-                                Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
+                                Relation tmpRelation = new Relation(new ArrayList<>(relationsMembers) ,relationLandform,cs);
                                 RelationsNatural.add(tmpRelation);
                                 // Temp fix for ensuring that the same relation ref is not added twice
                                 if(relationsMembers.get(0).getWay() != null) {
@@ -625,7 +625,7 @@ public class Model implements Serializable {
 //                                    }
 //                                }
                             } else if (relationKey.equals("landuse")) {
-                                Relation tmpRelation = new Relation(RelationsType, new ArrayList<>(relationsMembers) ,relationLandform,cs);
+                                Relation tmpRelation = new Relation(new ArrayList<>(relationsMembers) ,relationLandform,cs);
                                 RelationsLanduse.add(tmpRelation);
                                 // Temp fix for ensuring that the same relation ref is not added twice
                                 if(relationsMembers.get(0).getWay() != null) {
@@ -647,7 +647,13 @@ public class Model implements Serializable {
         id2node.clear();
     }
 
-    //Dijkstra implementation
+    /**
+     * Initializes the Dijkstra's shortest path algorithm from the specified start node.
+     *
+     * @param startaddress The starting node for the Dijkstra's algorithm.
+     * @param vehicle A boolean value indicating whether the path calculation is for a cycle (true) or car (false).
+     * @throws NullPointerException if startaddress is null.
+     */
     public void StartDijkstra(Node startaddress,boolean vehicle){
         double x = startaddress.getLon();
         double y = startaddress.getLat();
@@ -695,6 +701,15 @@ public class Model implements Serializable {
             }
         return path;
     }
+
+    /**
+     * Retrieves a Node from the KD-Tree based on its ID.
+     *
+     * This method iterates through all ways stored in the KD-Tree of roads and searches for the Node with the specified ID.
+     *
+     * @param id The ID of the Node to retrieve.
+     * @return The Node with the specified ID if found, otherwise null.
+     */
     private Node getNodeFromKDTree(int id) {
         for (Way way: kdTreeWaysRoad.getAllWays()) {
             for (Node node: way.getNodes()) {
@@ -706,6 +721,13 @@ public class Model implements Serializable {
         return null;
     }
 
+    /**
+     * Parses address components from OpenStreetMap data and sets them in the Address object if they are not already set.
+     * This method is used to extract address information from key-value pairs retrieved from OSM data and populate the Address object accordingly.
+     *
+     * @param v The value corresponding to the key in the OSM data.
+     * @param k The key indicating the type of address component in the OSM data.
+     */
     public void parseAddressFromOSM(String v, String k){
         if(address.getStreet().equals(null) || address.getStreet().isEmpty()) {
             if (k.contains("street")) {
@@ -722,7 +744,19 @@ public class Model implements Serializable {
             }
         }
     }
-    // credit James K polk from StackOwerflow
+
+
+    /**
+     * Calculates the distance between two points on the Earth's surface using the Haversine formula.
+     * The Haversine formula calculates the shortest distance between two points on a sphere given their longitudes and latitudes.
+     * Credit James K Polk from StackOverflow
+     *
+     * @param lat1 Latitude of the first point in degrees.
+     * @param lat2 Latitude of the second point in degrees.
+     * @param lon1 Longitude of the first point in degrees.
+     * @param lon2 Longitude of the second point in degrees.
+     * @return The distance between the two points in meters.
+     */
     private static double distance(double lat1, double lat2, double lon1,
                                   double lon2) {
 
@@ -742,41 +776,76 @@ public class Model implements Serializable {
         return Math.sqrt(distance);
     }
 
+    /**
+     * Retrieves the list of addresses.
+     *
+     * @return The list of addresses.
+     */
     public List<Address> getAddressList() {
         return addressList;
     }
 
+    /**
+     * Returns a reference to the map containing address IDs mapped to corresponding nodes.
+     *
+     * @return The map containing address IDs mapped to corresponding nodes.
+     */
     public Map<String, Node> getAddressIdMap() {
         return addressIdMap;
     }
 
+    /**
+     * Returns a reference to the map containing address IDs mapped to corresponding nodes.
+     *
+     * @return The map containing address IDs mapped to corresponding nodes.
+     */
     public List<String> getSuggestionList(String input){
-//        return trie.getAddressSuggestions(input.toLowerCase(), 4);
         return radixTrie.getAddressSuggestions(input.toLowerCase(), 5);
     }
+
+    /**
+     * Retrieves a list of street names based on the input string.
+     *
+     * @param input the input string to search for street names
+     * @return a List containing street names suggested by the Trie data structure
+     */
     public List<String> getStreetNamesList(String input){
-//        return trie.getAddressSuggestions(input.toLowerCase(), 4);
         return trie.getAddressSuggestions(input.toLowerCase(), 4, true);
     }
 
+    /**
+     * Checks if a given word is present in the Trie.
+     *
+     * @param inputWord The word to search for in the Trie.
+     * @return {@code true} if the word is found in the Trie, {@code false} otherwise.
+     */
     public boolean isWordInTrie(String inputWord){
         return trie.contains(inputWord);
     }
 
+    /**
+     * Adds a point of interest (POI) to the collection.
+     *
+     * @param POI The Point2D object representing the point of interest to be added.
+     */
     public void addPOI(Point2D POI) {
         pointsOfInterest.add(POI);
-//        System.out.println("lon: " + lon + ", lat: " + lat);
-//        Node nearestNode = kdTree.getNearestNeighbor(lon, lat, false);
-//        if (nearestNode != null) {
-////            pointOfInterestList.add(nearestNode);
-//            nearestNode.setPointOfInterest(true);
-//            kdTree.put(lon, lat, nearestNode);
-//        }
     }
 
+    /**
+     * Retrieves the list of points of interest.
+     *
+     * @return A List containing Point2D objects representing points of interest.
+     */
     public List<Point2D> getPointsOfInterest() {
         return pointsOfInterest;
     }
+
+    /**
+     * Retrieves the color scheme associated with this object.
+     *
+     * @return The ColorScheme object representing the color scheme.
+     */
     public ColorScheme getColorScheme() {
         return cs;
     }
@@ -800,6 +869,12 @@ public class Model implements Serializable {
         indexForCenterPoints++;
     }
 
+    /**
+     * Adds a Way object to the appropriate center point relations collection based on the given type.
+     *
+     * @param way         The Way object to be added to the center point relations.
+     * @param type        The type of the Way, which determines the collection it will be added to.
+     */
     public void addToCenterWays(Way way, String type){
         switch (type) {
             case "place":
