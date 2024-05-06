@@ -53,6 +53,8 @@ public class Trie implements Serializable {
         // Start traversal at root node
         TrieNode currentNode = rootNode;
         // Iterate through each character of the input word
+        boolean prefixFound = false;
+
         for(int i = 0; i < inputWord.length(); i++){
             // Gets current character of the input word
             char character = inputWord.charAt(i);
@@ -60,13 +62,19 @@ public class Trie implements Serializable {
             TrieNode node = currentNode.children.get(character);
             // Checks whether the child node does exist
             if(node == null){
-                // If it isn't in the Trie, return false
-                return false;
+                // If it is null and we have found a prefix
+                // it must mean that a node contains some of the prefix
+                if(prefixFound){
+                    return true;
+                }
+                // Otherwise break out of the loop
+                break;
             }
             currentNode = node;
+            prefixFound = true;
         }
         // Returns true if the node was reached during traversal
-        return currentNode.endOfWord;
+        return prefixFound && currentNode.endOfWord;
     }
 
 
