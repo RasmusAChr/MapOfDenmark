@@ -29,6 +29,7 @@ public class Controller_Boot {
     public String userFilename;
 
     public String userFile;
+    public String defaultFileName;
     public String path;
     private Stage primaryStage;
 
@@ -52,8 +53,9 @@ public class Controller_Boot {
     public void init(View_Boot view, Stage primaryStage){
         this.view = view;
         this.primaryStage = primaryStage;
+        this.defaultFileName = "kbh.osm";
         this.path = System.getProperty("user.dir"); // gets which directory the project is placed
-        this.userFile = path + "/kbh.osm"; // To be Looked at
+        this.userFile = path + "/" + defaultFileName; // To be Looked at
     }
 
 
@@ -137,7 +139,7 @@ public class Controller_Boot {
         InputStream mapInputStream = loadDefaultFile();
         if (mapInputStream != null) {
             chosen = true;
-            view.setPath("kbh.osm"); // Set the path to the default filename
+            view.setPath(defaultFileName); // Set the path to the default filename
             view.setChosen(chosen);
             userFilename = userFile;
             runMap(primaryStage, mapInputStream, userFilename);
@@ -151,7 +153,7 @@ public class Controller_Boot {
      * @return - an InputStream for the default file
      */
     private InputStream loadDefaultFile() {
-        InputStream inputStream = getClass().getResourceAsStream("/kbh.osm");
+        InputStream inputStream = getClass().getResourceAsStream("/" + defaultFileName);
         System.out.println("Loaded default file: " + inputStream); // Print loaded file for debugging
         return inputStream;
     }
