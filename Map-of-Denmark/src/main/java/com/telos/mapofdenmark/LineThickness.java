@@ -3,6 +3,11 @@ package com.telos.mapofdenmark;
 import java.io.Serializable;
 import java.util.HashMap;
 
+/**
+ * Represents line thickness for different types of map features.
+ * Line widths are stored in a HashMap with keys representing feature types and
+ * values representing the corresponding line thickness.
+ */
 public class LineThickness implements Serializable {
     // HashMap to store line widths for different feature types
     HashMap<String, Double> linewidth;

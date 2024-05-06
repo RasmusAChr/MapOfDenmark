@@ -504,7 +504,7 @@ public class Model implements Serializable {
                     // parse Ref
                     var ref = Long.parseLong(input1.getAttributeValue(null,"ref"));
                     var role = input1.getAttributeValue(null,"role");
-                    var Member = new Member(role,ref);
+                    var Member = new Member(role);
                     Member.setWay(id2way.get(ref));
                     relationsMembers.add(Member);
                 } else if (insideRelation && name.equals("tag")) {
@@ -518,10 +518,6 @@ public class Model implements Serializable {
                         relationKey = k;
                         relationLandform = v;
                     }
-                    /*else if (k.equals("place") || k.equals("building") || k.equals("natural") || k.equals("leisure") ||
-                               k.equals("amenity") || k.equals("surface")){
-                        relationLandform = v;
-                    }*/
                 }
 
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
@@ -680,9 +676,6 @@ public class Model implements Serializable {
         double x = Endaddress.getLon();
         double y = Endaddress.getLat();
         Node tmpNode = kdTreeWaysRoad.getNearestNeighbor(x,y,true).getArbitraryNode();
-
-        // returns an arraylist of all ways in the KDTree
-        kdTreeWaysRoad.getAllWays();
 
          List<Node> path = new ArrayList<Node>(); // this is everything that needs to be drawn for the path
          HashSet<Node> NodeAdded = new HashSet<Node>();

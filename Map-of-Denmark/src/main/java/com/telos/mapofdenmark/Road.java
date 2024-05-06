@@ -6,10 +6,21 @@ import javafx.scene.paint.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * The class Road represents a road in a OSM map. The class inherits from the Way class, but also adds attributes
+ * such as the kind of road type it is and the line thickness used for it.
+ */
 public class Road extends Way implements Serializable {
     String roadType;
     LineThickness lt;
     boolean sliderDraged = false;
+
+    /**
+     * Constructor used to construct a Road object with the given parameters
+     * @param way - The list of nodes that is representing the road
+     * @param roadType - The type of road
+     * @param lt - The line thickness of the road
+     */
     public Road(ArrayList<Node> way, String roadType, LineThickness lt) {
         super(way, "", "road");
         this.roadType = roadType;
@@ -17,6 +28,13 @@ public class Road extends Way implements Serializable {
 
     }
 
+    /**
+     * Used to draw the road on the canvas/graphics context
+     * @param gc - The graphics context to draw on
+     * @param zoom - The zoom level
+     * @param darkMode - Indicates whether dark mode is enabled
+     * @param cs - The color scheme to use for drawing
+     */
     @Override
     public void draw(GraphicsContext gc, double zoom, boolean darkMode,ColorScheme cs) {
         double zoomValue;
@@ -41,15 +59,18 @@ public class Road extends Way implements Serializable {
         gc.setLineWidth(0.00001);
     }
 
+    /**
+     * Retrieves the type of the road
+     * @return - The type of road in string format
+     */
     public String getRoadType(){
         return roadType;
     }
 
-    /*@Override
-    public void fill(GraphicsContext gc, boolean darkMode, ColorScheme cs, String type){
-        return;
-    }*/
-
+    /**
+     * Indicates whether the object represents a road or not
+     * @return - true = the object does represent a road, false = the object does not represent a road
+     */
     @Override
     public boolean isRoad(){
         return true;

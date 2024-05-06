@@ -6,6 +6,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * The class ColorScheme represents a color scheme used for coloring different relations from an OSM map.
+ * These relations includes: naturals, landuses, roads etc.
+ */
 public class ColorScheme implements Serializable{
     Map<String, String> placeColors;
     Map<String, String> placeDarkColors;
@@ -16,7 +20,9 @@ public class ColorScheme implements Serializable{
     Map<String, String> roadColors;
     Map<String, String> roadDarkColors;
 
-
+    /**
+     * Constructor used to construct a color scheme object and initializes the different color schemes.
+     */
     public ColorScheme(){
         placeColors = new HashMap<>();
         placeDarkColors = new HashMap<>();
@@ -32,6 +38,13 @@ public class ColorScheme implements Serializable{
         roadScheme();
     }
 
+    /**
+     * Retrieves the color based on which type of landform it is
+     * @param landform - The different values a type can have for example: an apartment, a forest etc.
+     * @param dark - Boolean which indicates whether color should be according to dark mode or not
+     * @param type - The different types a relation can be for example: place, natural, landuse etc.
+     * @return - The color corresponding to the type and it's landform
+     */
     public Color getColor(String landform, boolean dark, String type){
         String hex = null;
         try{
@@ -83,11 +96,19 @@ public class ColorScheme implements Serializable{
 
     }
 
+    /**
+     * Retrieves the default color used if no other color was used
+     * @param dark - true = color should be in dark mode, false = color should be in light mode
+     * @return - the default color either in dark mode or in light mode
+     */
     public Color getDefaultColor(boolean dark){
         if(dark) return Color.web("#ff0000");
         return Color.web("#ff0000");
     }
 
+    /**
+     * The color scheme used for the place relations
+     */
     // Scheme for all the colors
     public void placeScheme(){
         // Place
@@ -129,6 +150,9 @@ public class ColorScheme implements Serializable{
         placeDarkColors.put("city_block", "#b5b3ae");
     }
 
+    /**
+     * The color scheme used for natural relations
+     */
     public void naturalScheme(){
         // Natural
         naturalColors.put("peninsula","#f2efe9");
@@ -222,6 +246,9 @@ public class ColorScheme implements Serializable{
         naturalDarkColors.put("gravel", "#b5b5b5");
     }
 
+    /**
+     * The color scheme for landuse relations
+     */
     public void landuseScheme(){
         // Landuse
         landuseColors.put("meadow", "#8cbf80");
@@ -334,6 +361,9 @@ public class ColorScheme implements Serializable{
         landuseDarkColors.put("garages", "#c3c5a9");
     }
 
+    /**
+     * The color scheme for the road relation
+     */
     public void roadScheme(){
         //Roads
         roadColors.put("default", "#000000");

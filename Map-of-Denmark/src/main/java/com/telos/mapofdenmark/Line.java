@@ -4,11 +4,20 @@ import java.io.Serializable;
 import java.util.List;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-
+/**
+ * Represents a line segment connecting a series of nodes.
+ * This class provides methods to draw the line segment on a graphics context.
+ */
 public class Line implements Serializable {
+    // List of nodes forming the line
     List<Node> way;
+    // Array of coordinates representing the line
     double[] coords;
 
+    /**
+     * Constructs a Line object with the specified list of nodes.
+     * @param way The list of nodes forming the line
+     */
     public Line(List<Node> way) {
         this.way = way;
         coords = new double[way.size() * 2];
@@ -19,6 +28,12 @@ public class Line implements Serializable {
         }
     }
 
+    /**
+     * Draws the line segment on the specified graphics context.
+     * @param gc    The graphics context to draw on
+     * @param dark  Whether dark mode is enabled
+     * @param zoom  The zoom level used for line width
+     */
     public void draw(GraphicsContext gc, boolean dark, double zoom) {
         double zoomValue;
         gc.beginPath();

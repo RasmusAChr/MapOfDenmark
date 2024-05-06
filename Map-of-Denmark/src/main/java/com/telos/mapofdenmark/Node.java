@@ -2,9 +2,15 @@ package com.telos.mapofdenmark;
 
 import java.io.Serializable;
 
-
+/**
+ * Represents a geographical node with an id, latitude, and longitude.
+ * This class provides methods to retrieve information about the node, such as its
+ * latitude and longitude.
+ */
 public class Node implements Serializable {
+    // identifier of the node
     int id;
+    // latitude and longitude of the node's location
     public double lat, lon;
 
     /**

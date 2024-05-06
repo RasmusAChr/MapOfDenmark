@@ -7,6 +7,12 @@ import java.util.List;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+/**
+ * Represents a geographic way consisting of a collection of nodes
+ * This class provides methods to retrieve information about the way, such as its coordinates,
+ * center point, and associated nodes. It also provides functionality to draw and fill the way
+ * on a graphics context.
+ */
 public class Way implements Serializable {
     // Array of coordinates representing the way
     double[] coords;

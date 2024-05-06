@@ -369,6 +369,11 @@ public class Controller {
         } catch (NullPointerException E) {}
     }
 
+    /**
+     * Pans over to the given address, and makes sure that it is centered in the canvas and draws a circle on the given address
+     * @param selectedAddress - address given in string that needs to be panned to
+     * @param startPoint - Boolean which decides which tempAddressPoint that should be given the coordinates. True = start address point, false = end address point
+     */
     private void panToAddress(String selectedAddress, boolean startPoint){
         String addressToLowerCase = selectedAddress.toLowerCase();
         if(model.getAddressIdMap().get(addressToLowerCase) != null && lastPannedToAddress != model.getAddressIdMap().get(addressToLowerCase)){
@@ -403,6 +408,11 @@ public class Controller {
         }
     }
 
+    /**
+     * Calculates the distance between to given points in corresponding to real life distance, and updates the distanceLabel accordingly
+     * @param startPoint - start point for the line
+     * @param endPoint - end point for the line
+     */
     //Inspiration for math formula found at https://www.movable-type.co.uk/scripts/latlong.html
     @FXML
     private void CalculateDistance(Point2D startPoint, Point2D endPoint){
