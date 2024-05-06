@@ -399,9 +399,9 @@ public class ColorScheme implements Serializable{
         roadColors.put("path", "#808B96");
         roadDarkColors.put("path", "#ced6e0");
         roadColors.put("motorway_link", "#CB4335");
-        roadDarkColors.put("motorway_link", "#CB4335");
+        roadDarkColors.put("motorway_link", "#5B2C6F");
         roadColors.put("motorway", "#CB4335");
-        roadDarkColors.put("motorway", "#CB4335");
+        roadDarkColors.put("motorway", "#5B2C6F");
     }
 
 }

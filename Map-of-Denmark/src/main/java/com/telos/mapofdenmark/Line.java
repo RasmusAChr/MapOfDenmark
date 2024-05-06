@@ -48,7 +48,7 @@ public class Line implements Serializable {
         }
         gc.setLineWidth(zoomValue);
         gc.setStroke(Color.web("#4834d4"));
-        if (dark) gc.setStroke(Color.web("#686de0"));
+        if (dark) gc.setStroke(Color.web("#f9ca24"));
         gc.stroke();
     }
 
