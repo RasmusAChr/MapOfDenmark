@@ -3,7 +3,6 @@ package com.telos.mapofdenmark.TrieClasses;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -97,6 +96,8 @@ public class RadixTrie implements Serializable {
      * @return A list of suggestions that start with the prefix.
      */
     public List<String> getAddressSuggestions(String prefix, int limit) {
+        // normalization of input
+        String userPrefix = prefix.toLowerCase();
         List<String> addressSuggestions = new ArrayList<>();
         RadixNode currentNode = rootNode;
         String currentPrefix = "";
@@ -104,19 +105,19 @@ public class RadixTrie implements Serializable {
 //        System.out.println("Starting traversal for prefix: " + prefix);
         int prefixPosition = 0;
 
-        while (prefixPosition < prefix.length() && currentNode != null) {
+        while (prefixPosition < userPrefix.length() && currentNode != null) {
             boolean matched = false;
             for (RadixNode child : currentNode.children.values()) {
-                if (prefix.startsWith(currentPrefix + child.value)) {
+                if (userPrefix.startsWith(currentPrefix + child.value)) {
 //                    System.out.println("Traversed to node: " + child.value + ", currentPrefix: " + (currentPrefix + child.value));
                     currentNode = child;
                     currentPrefix += child.value;
                     prefixPosition += child.value.length();
                     matched = true;
                     break;
-                } else if (child.value.startsWith(prefix.substring(prefixPosition))) {
+                } else if (child.value.startsWith(userPrefix.substring(prefixPosition))) {
                     // Handle partial prefix in node
-                    String matchPart = prefix.substring(prefixPosition);
+                    String matchPart = userPrefix.substring(prefixPosition);
 //                    System.out.println("Partially matched node: " + child.value + " with prefix part: " + matchPart);
                     currentNode = child;
                     currentPrefix += child.value; // Ensure the entire node value is appended to currentPrefix
@@ -143,9 +144,6 @@ public class RadixTrie implements Serializable {
         return formatAddressSuggestions(addressSuggestions);
     }
 
-
-
-
     /**
      * Helper method to collect address suggestions recursively.
      * @param node Current node in the trie.
@@ -161,7 +159,6 @@ public class RadixTrie implements Serializable {
 
         if (node.endOfWord) {
             addressSuggestions.add(prefix);
-            System.out.println("Adding to suggestions: " + prefix);
             if (addressSuggestions.size() >= limit) {
                 return;
             }

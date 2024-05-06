@@ -6,7 +6,6 @@ import javafx.scene.shape.FillRule;
 import java.io.Serializable;
 import java.util.*;
 
-
 /**
  * Represents a relation composed of nodes and ways.
  */
@@ -15,8 +14,7 @@ public class Relation implements Serializable {
     private List<Member> members;
     private List<Node> orderedNodes;
     private List<List<Node>> listOfOrderedNodes;
-    private List<Way> innerWays;
-    private List<Way> singleWays;
+    private List<Way> innerWays, singleWays;
     boolean drawable;
     Node lastNode = null;
     ColorScheme cs;
@@ -82,7 +80,6 @@ public class Relation implements Serializable {
             }
             // If the next way is not inner or a single way, then add the first node to the ordered list.
             else if (lastNode == null){
-                //System.out.println("First node " + m.getRef());
                 orderedNodes.addAll(m.getWay().getNodes());
                 lastNode = orderedNodes.get(orderedNodes.size()-1);
                 iterator.remove();
@@ -110,8 +107,7 @@ public class Relation implements Serializable {
                 }
             }
             else {
-                System.out.println("If you see this text loop for over 5 minutes, there are problems in relations");
-                //System.out.println("https://www.openstreetmap.org/way/" + m.getRef() + "#map=11/55.1424/14.9641");
+
                 leftOverMembers.add(m);
             }
         }
@@ -171,19 +167,6 @@ public class Relation implements Serializable {
                     }
                 }
             }
-
-            // FOR NON RELATED MEMBERS
-            /*if (!nonRelatedMembers.isEmpty()){
-                for (Member m : nonRelatedMembers){
-                    Way w = m.getWay();
-                    double[] coords = w.getCoords();
-                    gc.moveTo(coords[0], coords[1]);
-                    for (int i = 2 ; i < coords.length ; i += 2) {
-                        gc.lineTo(coords[i], coords[i+1]);
-                    }
-                }
-            }*/
-
             gc.fill();
             gc.stroke();
         }

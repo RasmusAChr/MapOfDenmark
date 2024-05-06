@@ -35,7 +35,6 @@ public class View_Boot {
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
-
     }
     /**
      * Setter method to set the path of the selected file.

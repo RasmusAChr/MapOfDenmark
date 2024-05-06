@@ -25,7 +25,6 @@ public class Road extends Way implements Serializable {
         super(way, "", "road");
         this.roadType = roadType;
         this.lt = lt;
-
     }
 
     /**
@@ -38,7 +37,6 @@ public class Road extends Way implements Serializable {
     @Override
     public void draw(GraphicsContext gc, double zoom, boolean darkMode,ColorScheme cs) {
         double zoomValue;
-
         if(lt.findKey(roadType)) {
             gc.setStroke(cs.getColor(roadType, darkMode, "road"));
             if (!sliderDraged) {
@@ -46,11 +44,7 @@ public class Road extends Way implements Serializable {
                 zoomValue = lt.getWidth(roadType);
                 gc.setLineWidth(zoomValue);
             } else {
-                if (zoom < 5.0) {
-                    zoomValue = lt.getWidth(roadType) / 0.1;
-                } else {
-                    zoomValue = lt.getWidth(roadType) / (zoom / 45);
-                }
+                zoomValue = lt.getWidth(roadType) / (zoom / 45);
                 gc.setLineWidth(zoomValue);
             }
         }

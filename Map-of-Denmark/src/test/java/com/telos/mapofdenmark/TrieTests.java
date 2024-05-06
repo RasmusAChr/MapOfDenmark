@@ -32,28 +32,30 @@ public class TrieTests {
             System.out.println(e.getMessage());
         }
     }
+
     @Test
     void testNordicChars() {
         // Test inserting a single city and retrieving it
         trie.insert("Åkirkeby");
-        suggestionList = trie.getAddressSuggestions("å",1);
-        assertEquals("åkirkeby", suggestionList.get(0));
+        suggestionList = trie.getAddressSuggestions("å",1, true);
+        assertEquals("Åkirkeby", suggestionList.get(0));
     }
 
     @Test
     void testCaseInsensitivity() {
         // Test that suggestions work regardless of case
-        trie.insert("Lemmino");
-        suggestionList = trie.getAddressSuggestions("lemmino",1);
-        assertEquals("lemmino", suggestionList.get(0));
+        trie.insert("lemmino");
+        suggestionList = trie.getAddressSuggestions("lemmino",4, true);
+        assertEquals("Lemmino", suggestionList.get(0));
     }
+
     @Test
     void testSuggestionsForMultipleCities() {
         trie.insert("a");
         trie.insert("abe");
         trie.insert("Aka");
         // Test inserting multiple cities and retrieving suggestions for a prefix
-        suggestionList = trie.getAddressSuggestions("a",3);
+        suggestionList = trie.getAddressSuggestions("a",3, true);
         for(String word : suggestionList){
             System.out.println(word);
         }

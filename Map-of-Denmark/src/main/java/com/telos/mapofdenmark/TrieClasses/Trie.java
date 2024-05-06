@@ -2,9 +2,7 @@ package com.telos.mapofdenmark.TrieClasses;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,7 +115,6 @@ public class Trie implements Serializable {
         if(node.endOfWord){
             addressSuggestions.add(prefix);
             if(addressSuggestions.size() >= limit){
-                System.out.println("Limit has been reached");
                 return; // If the limit has been reached, we stop collecting anymore suggestions.
             }
         }

@@ -19,11 +19,11 @@ public class RadixTrieTest {
 
     @Test
     public void testInsert() {
-        trie.insert("Strandvejen");
-        trie.insert("Strandvejen");
-        trie.insert("Strandvejen");
-        trie.insert("Østergade");
-        trie.insert("Vestergade");
+        trie.insert("Strandvejen 18 Svaneke Bornholm Denmark");
+        trie.insert("Strandvejen 19 Svaneke Bornholm Denmark");
+        trie.insert("Strandvejen 20 Svaneke Bornholm Denmark");
+        trie.insert("Østergade 20 Rønne Bornholm Denmark");
+        trie.insert("Vestergade 20 Hasle Bornholm Denmark");
     }
 
     @Test
@@ -32,7 +32,7 @@ public class RadixTrieTest {
         String input = "Strandvejen 20 Svaneke Bornholm Denmark";
         List<String> suggestions = trie.getAddressSuggestions(input.toLowerCase(), 10);
         assertEquals(1, suggestions.size());
-        assertEquals("Strandvejen 20 Svaneke Bornholm Denmark", suggestions.get(0));
+        assertEquals("Strandvejen 20 Svaneke Bornholm DENMARK", suggestions.get(0));
     }
 
     @Test
@@ -41,9 +41,9 @@ public class RadixTrieTest {
         List<String> suggestions = trie.getAddressSuggestions("Strandvejen", 10);
         assertEquals(3, suggestions.size());
         assertTrue(suggestions.containsAll(Arrays.asList(
-                "Strandvejen 20 Svaneke Bornholm DENMARK",
-                "Strandvejen 21 Svaneke Bornholm DENMARK",
-                "Strandvejen 22 Svaneke Bornholm DENMARK"
+                "Strandvejen 18 Svaneke Bornholm DENMARK",
+                "Strandvejen 19 Svaneke Bornholm DENMARK",
+                "Strandvejen 20 Svaneke Bornholm DENMARK"
         )));
     }
 
@@ -53,8 +53,8 @@ public class RadixTrieTest {
         List<String> suggestions = trie.getAddressSuggestions("Strand", 2);
         assertEquals(2, suggestions.size());
         assertTrue(suggestions.containsAll(Arrays.asList(
-                "Strandvejen 20 Svaneke Bornholm DENMARK",
-                "Strandvejen 21 Svaneke Bornholm DENMARK"
+                "Strandvejen 18 Svaneke Bornholm DENMARK",
+                "Strandvejen 19 Svaneke Bornholm DENMARK"
         )));
     }
 

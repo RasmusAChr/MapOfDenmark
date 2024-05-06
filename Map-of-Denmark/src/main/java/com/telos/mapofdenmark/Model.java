@@ -174,6 +174,7 @@ public class Model implements Serializable {
         // Saves objects to binary file
         save(filename+".obj");
 
+        // Garbage collection after populating data structure to free up unused memory
         System.gc();
     }
 
@@ -210,8 +211,8 @@ public class Model implements Serializable {
      * The roadIdSet map is used to store the weight for the different roads.
      */
     private void initializeRoadIdSetMap() {
-        this.roadIdSet = new HashMap<String, Double>(Map.of(
-                "motorway",0.4545,
+        this.roadIdSet = new HashMap<>(Map.of(
+                "motorway", 0.4545,
                 "trunk", 0.625,
                 "primary", 0.625,
                 "secondary", 0.7142857,
@@ -267,7 +268,7 @@ public class Model implements Serializable {
      * @throws FactoryConfigurationError if a configuration error occurs while creating XML input factory
      * @throws XMLStreamException         if an error occurs while processing XML
      */
-    private void parseNodeNet(InputStream inputStream) throws IOException, FactoryConfigurationError, XMLStreamException, FactoryConfigurationError {
+    private void parseNodeNet(InputStream inputStream) throws IOException, XMLStreamException, FactoryConfigurationError {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         int NodeCount = 0;
         Node node = null;
@@ -304,7 +305,7 @@ public class Model implements Serializable {
                     }
                     case "way","relation" -> {
                         EWD = new EdgeWeightedDigraph(NodeCount);
-                        parseWaysAndRelations(input, tagKind); // First way element ???? input.getname = way
+                        parseWaysAndRelations(input); // First way element ???? input.getname = way
                         return;
                     }
                 }
@@ -313,7 +314,6 @@ public class Model implements Serializable {
                 if(name.equals("node")){
                     if (address != null && !address.getStreet().isBlank()) {
                         addressList.add(address);
-                        //System.out.println(addressId);
                         addressIdMap.put(address.getFullAddress().toLowerCase(), node);
                         address = null; // Reset for the next address
                     }
@@ -332,13 +332,12 @@ public class Model implements Serializable {
      *
      * @param inputStream The input stream containing the XML data of the route network.
      * @throws IOException Signals that an I/O exception of some sort has occurred.
-     * @throws FileNotFoundException Signals that an attempt to open the file denoted by a specified pathname has failed.
      * @throws XMLStreamException Indicates an error in the XML stream being processed.
      * @throws FactoryConfigurationError Signals an error in the configuration of the XML parser factory.
      *
      * @see #parseNodeNet(InputStream)
      */
-    private void parseRouteNet(InputStream inputStream) throws IOException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
+    private void parseRouteNet(InputStream inputStream) throws IOException, XMLStreamException, FactoryConfigurationError {
         parseNodeNet(inputStream);
     }
 
@@ -377,12 +376,10 @@ public class Model implements Serializable {
      * Parses ways and relations from XML input stream.
      *
      * @param input1    XMLStreamReader representing the input stream
-     * @param tagKind   Current XML tag kind
-     * @throws FileNotFoundException    If the file specified by input1 is not found
      * @throws XMLStreamException        If an error occurs while processing the XML stream
      * @throws FactoryConfigurationError If a configuration error occurs while creating XML input factories
      */
-    private void parseWaysAndRelations(XMLStreamReader input1, int tagKind) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
+    private void parseWaysAndRelations(XMLStreamReader input1) throws XMLStreamException, FactoryConfigurationError {
         var way = new ArrayList<Node>();
         var building = false;
         var coast = false;
@@ -399,28 +396,27 @@ public class Model implements Serializable {
         boolean access = false;
         boolean acccesPostBollean = false;
         long wayid = 0;
+        int tagKind;
         String relationKey = "";
         Node startNode = null;
         String wayKey = "";
         String wayLandform = "";
 
-        //if (!parsedFirstWay){
-
+        // Checking if the current input corresponds to either a "way" or a "relation".
+        // This distinction matters because when we enter the following while loop,
+        // we'll process the next input, potentially overlooking the current one.
         if (input1.getLocalName().equals("way")){
             wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
             wayKey = "";
             wayLandform = "";
         }
-        //}
-        //if (!parsedFirstRelation){
-        if (input1.getLocalName().equals("relation")){
+        else if (input1.getLocalName().equals("relation")){
             relationsMembers = new ArrayList<>();
             insideRelation = true;
             RelationsType = "";
             relationLandform = "";
             relationKey = "";
         }
-        //}
 
         while (input1.hasNext()) {
             tagKind = input1.next();
@@ -429,8 +425,6 @@ public class Model implements Serializable {
                 if (name.equals("way")) {
                     wayid = Long.parseLong(input1.getAttributeValue(null,"id"));
                     way.clear();
-                    building = false;
-                    coast = false;
                     wayKey = "";
                     wayLandform = "";
                 } else if (!insideRelation && name.equals("tag")) {
@@ -510,7 +504,7 @@ public class Model implements Serializable {
                     relationKey = "";
                     validRelation = false;
                 } else if (insideRelation && name.equals("member")) {
-                    // parse Ref
+                    // parses the  Ref id aswell as the role and creates a member
                     var ref = Long.parseLong(input1.getAttributeValue(null,"ref"));
                     var role = input1.getAttributeValue(null,"role");
                     var Member = new Member(role);
@@ -531,15 +525,12 @@ public class Model implements Serializable {
 
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input1.getLocalName();
-                // If you wish to only draw coastline -- if (name == "way" && coast) {
                 if (name.equals("way")) {
                     if (!roadtype.isEmpty()) { // Is a road
                         Road tmpRoad = new Road(way, roadtype, lt);
                         addToCenterWays(tmpRoad, "road");
                         id2way.put(wayid,tmpRoad);
                     } else { // Is not a road
-                        //System.out.println("wayKey: " + wayKey);
-                        //System.out.println("wayLandform: " + wayLandform);
                         Way tmpWay = new Way(way, wayLandform, wayKey);
                         if (!bannedLandforms.contains(wayLandform)) {
                             // If the last node isn't the same as the first then don't draw it.
@@ -548,7 +539,6 @@ public class Model implements Serializable {
                             if (way.get(0) == way.get(way.size()-1)){
                             addToCenterWays(tmpWay, wayKey);
                             }
-
                         }
                         id2way.put(wayid,tmpWay);
                     }
@@ -570,16 +560,15 @@ public class Model implements Serializable {
                             }
                             if (oneway) {
                                 if (onewayBicycle) {
-                                    EWD.addEdge(new DirectedEdge(startNode.id, node.id, weight_cycle, weight_car ));
+                                    EWD.addEdge(new DirectedEdge(startNode.id, node.id, weight_cycle, weight_car )); // adds the weighted edge to the shortes path algorithm
                                 } else {
-                                    EWD.addEdge(new DirectedEdge(startNode.id, node.id, weight_cycle, weight_car ));
-                                    EWD.addEdge(new DirectedEdge(node.id, startNode.id, weight_cycle, 500000.0 ));
+                                    EWD.addEdge(new DirectedEdge(startNode.id, node.id, weight_cycle, weight_car )); // adds the weighted edge to the shortes path algorithm
+                                    EWD.addEdge(new DirectedEdge(node.id, startNode.id, weight_cycle, 500000.0 )); // adds the weighted edge to the shortes path algorithm
                                 }
                             } else {
-                                EWD.addEdge(new DirectedEdge(startNode.id, node.id, weight_cycle, weight_car ));
-                                EWD.addEdge(new DirectedEdge(node.id, startNode.id, weight_cycle, weight_car ));
+                                EWD.addEdge(new DirectedEdge(startNode.id, node.id, weight_cycle, weight_car )); // adds the weighted edge to the shortes path algorithm
+                                EWD.addEdge(new DirectedEdge(node.id, startNode.id, weight_cycle, weight_car )); // adds the weighted edge to the shortes path algorithm
                             }
-
                         }
                         startNode = node;
                     }
@@ -606,13 +595,6 @@ public class Model implements Serializable {
                                 if(relationsMembers.get(0).getWay() != null) {
                                     addToCenterRelations(relationsMembers.get(0).getWay(), tmpRelation, "building");
                                 }
-
-                                // for loop to find all members in relation and add to collection
-//                                for(Member member : relationsMembers){
-//                                    if(member.getWay() != null){
-//                                        addToCenterRelations(member.getWay(), tmpRelation, "building");
-//                                    }
-//                                }
                             } else if (relationKey.equals("natural") && !relationLandform.equals("peninsula")) {
                                 Relation tmpRelation = new Relation(new ArrayList<>(relationsMembers), relationLandform,cs);
                                 RelationsNatural.add(tmpRelation);
@@ -745,15 +727,6 @@ public class Model implements Serializable {
         distance = Math.pow(distance, 2) + Math.pow(height, 2);
 
         return Math.sqrt(distance);
-    }
-
-    /**
-     * Retrieves the list of addresses.
-     *
-     * @return The list of addresses.
-     */
-    public List<Address> getAddressList() {
-        return addressList;
     }
 
     /**

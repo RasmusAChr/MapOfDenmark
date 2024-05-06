@@ -369,55 +369,55 @@ public class ColorScheme implements Serializable{
     public void roadScheme(){
         //Roads
         roadColors.put("default", "#000000");
-        roadDarkColors.put("default", "#FFFFFF");
+        roadDarkColors.put("default", "#ced6e0");
         roadColors.put("highway", "#CB4335");
-        roadDarkColors.put("highway", "#5B2C6F"); // HER
+        roadDarkColors.put("highway", "#5B2C6F");
         roadColors.put("residential", "#808B96");
-        roadDarkColors.put("residential", "#FFFFFF"); // HER
+        roadDarkColors.put("residential", "#ced6e0");
         roadColors.put("trunk", "#CA6F1E");
-        roadDarkColors.put("trunk", "#5B2C6F"); // HER
+        roadDarkColors.put("trunk", "#5B2C6F");
         roadColors.put("primary", "#CA6F1E");
-        roadDarkColors.put("primary", "#4a3523"); // HER
+        roadDarkColors.put("primary", "#4a3523");
         roadColors.put("secondary", "#F39C12");
-        roadDarkColors.put("secondary", "#692720"); // HER
+        roadDarkColors.put("secondary", "#692720");
         roadColors.put("tertiary", "#34495E");
-        roadDarkColors.put("tertiary", "#692720"); // HER
+        roadDarkColors.put("tertiary", "#692720");
         roadColors.put("unclassified", "#566573");
-        roadDarkColors.put("unclassified", "#FFFFFF");
+        roadDarkColors.put("unclassified", "#ced6e0");
         roadColors.put("motorway_link", "#808B96");
-        roadDarkColors.put("motorway_link", "#FFFFFF");
+        roadDarkColors.put("motorway_link", "#ced6e0");
         roadColors.put("trunk_link", "#808B96");
-        roadDarkColors.put("trunk_link", "#FFFFFF");
+        roadDarkColors.put("trunk_link", "#ced6e0");
         roadColors.put("primary_link", "#808B96");
-        roadDarkColors.put("primary_link", "#FFFFFF");
+        roadDarkColors.put("primary_link", "#ced6e0");
         roadColors.put("secondary_link", "#808B96");
-        roadDarkColors.put("secondary_link", "#FFFFFF");
+        roadDarkColors.put("secondary_link", "#ced6e0");
         roadColors.put("tertiary_link", "#808B96");
-        roadDarkColors.put("tertiary_link", "#FFFFFF");
+        roadDarkColors.put("tertiary_link", "#ced6e0");
         roadColors.put("living_street", "#808B96");
-        roadDarkColors.put("living_street", "#FFFFFF");
+        roadDarkColors.put("living_street", "#ced6e0");
         roadColors.put("track", "#566573");
-        roadDarkColors.put("track", "#FFFFFF");
+        roadDarkColors.put("track", "#ced6e0");
         roadColors.put("cycleway", "#808B96");
-        roadDarkColors.put("cycleway", "#FFFFFF");
+        roadDarkColors.put("cycleway", "#ced6e0");
         roadColors.put("designated", "#808B96");
-        roadDarkColors.put("designated", "#FFFFFF");
+        roadDarkColors.put("designated", "#ced6e0");
         roadColors.put("use_sidepath", "#808B96");
-        roadDarkColors.put("use_sidepath", "#FFFFFF");
+        roadDarkColors.put("use_sidepath", "#ced6e0");
         roadColors.put("optional_sidepath", "#808B96");
-        roadDarkColors.put("optional_sidepath", "#FFFFFF");
+        roadDarkColors.put("optional_sidepath", "#ced6e0");
         roadColors.put("permissive", "#808B96");
-        roadDarkColors.put("permissive", "#FFFFFF");
+        roadDarkColors.put("permissive", "#ced6e0");
         roadColors.put("destination", "#808B96");
-        roadDarkColors.put("destination", "#FFFFFF");
+        roadDarkColors.put("destination", "#ced6e0");
         roadColors.put("service", "#808B96");
-        roadDarkColors.put("service", "#FFFFFF");
+        roadDarkColors.put("service", "#ced6e0");
         roadColors.put("pedestrian", "#808B96");
-        roadDarkColors.put("pedestrian", "#FFFFFF");
+        roadDarkColors.put("pedestrian", "#ced6e0");
         roadColors.put("footway", "#808B96");
-        roadDarkColors.put("footway", "#FFFFFF");
+        roadDarkColors.put("footway", "#ced6e0");
         roadColors.put("path", "#808B96");
-        roadDarkColors.put("path", "#FFFFFF");
+        roadDarkColors.put("path", "#ced6e0");
     }
 
 }

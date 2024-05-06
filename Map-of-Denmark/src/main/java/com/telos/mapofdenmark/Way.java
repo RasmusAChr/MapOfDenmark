@@ -2,10 +2,8 @@ package com.telos.mapofdenmark;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 
 /**
  * Represents a geographic way consisting of a collection of nodes

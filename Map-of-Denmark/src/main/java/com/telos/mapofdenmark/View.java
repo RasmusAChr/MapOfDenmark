@@ -1,5 +1,4 @@
 package com.telos.mapofdenmark;
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
@@ -13,7 +12,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Queue;
@@ -25,23 +23,13 @@ import java.util.Queue;
 public class View {
     Canvas canvas = new Canvas(1120.0, 638.0);
     GraphicsContext gc = canvas.getGraphicsContext2D();
-    double x1 = 100;
-    double y1 = 100;
-    double x2 = 200;
-    double y2 = 800;
-
     double slider_value;
-
     Affine trans = new Affine();
     Model model;
-
-
     boolean dark;
 
     @FXML
     private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
-    @FXML
-    private Pane backgroundPane;
 
     Point2D tempAddressStartPoint;
     Point2D tempAddressEndPoint;
@@ -81,15 +69,12 @@ public class View {
         primaryStage.show();
         redraw();
         panToMap(model.minlat, model.minlon, model.maxlat, model.maxlon);
-        zoom(0, 0, 10000); // THIS IS SETTING THE ZOOM DYNAMICALLY: zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
+        zoom(0, 0, 10000);
         //Listens for changes done to the width then changes the canvas acordingly
         primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> resizePanes(primaryStage.getWidth(), primaryStage.getHeight()));
         //Listens for changes done to the Height then changes the canvas acordingly
         primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> resizePanes(primaryStage.getWidth(), primaryStage.getHeight()));
-
-
     }
-
     /**
      * Redraws the entire map when called with relevant data such as ways and relations.
      */
@@ -105,39 +90,31 @@ public class View {
 
         // Drawing place
         drawPlace(canvasTopLeft, canvasBottomRight);
-
         // Drawing landuse
         if (slider_value >= 60){
             drawLanduse(canvasTopLeft, canvasBottomRight);
         }
-
         // Drawing natural
         if (slider_value >= 50){
             drawNatural(canvasTopLeft, canvasBottomRight);
         }
-
         // Drawing building
         if (slider_value >= 70){
             drawBuilding(canvasTopLeft, canvasBottomRight);
         }
-
-
         // Drawing road
         // Slider values are inside the function
         drawRoad(canvasTopLeft, canvasBottomRight);
-
         for (var line : model.list) {
             line.draw(gc, dark, slider_value);
         }
         drawPOI();
-
         if(tempAddressStartPoint != null){
             drawCircle(tempAddressStartPoint.getX(), tempAddressStartPoint.getY());
         }
         if(tempAddressEndPoint != null){
             drawCircle(tempAddressEndPoint.getX(), tempAddressEndPoint.getY());
         }
-
     }
 
     /**
@@ -147,18 +124,14 @@ public class View {
     private void drawPOI() {
         if (!model.getPointsOfInterest().isEmpty()) {
             for (Point2D pointOfInterest : model.getPointsOfInterest()) {
-                System.out.println("Attempted to draw POI at: " + pointOfInterest.getX() + ", " + pointOfInterest.getY());
-
                 // Calculate the visible size of the POI on the canvas
                 double x = pointOfInterest.getX();
                 double y = pointOfInterest.getY();
-
                 // Draw a filled circle centered on the point
                 drawCircle(x,y);
             }
         }
     }
-
     /**
      * Draws a circle on the canvas on the given coordinates when called
      * @param x - The x-coordinate of the center of the circle
@@ -171,7 +144,6 @@ public class View {
         gc.setFill(Color.RED);  // Set the fill color for the circle
         gc.fillOval(x - radius+0.000025, y - radius+0.000025, 1.5 * radius, 1.5 * radius);
     }
-
     /**
      * Pans the view to a specified part of the map defined by the given coordinates
      * @param minlat - The minimum latitude of the map area
@@ -238,7 +210,6 @@ public class View {
         try {
             return trans.inverseTransform(lastX, lastY);
         } catch (NonInvertibleTransformException e) {
-            // TODO Auto-generated catch block
             throw new RuntimeException(e);
         }
     }
@@ -250,9 +221,7 @@ public class View {
      * @return - Corresponding geographical coordinates in pixels
      */
     public Point2D convertGeoCoordsToPixels(double lon, double lat){
-        Point2D transformedGeoPoint = trans.transform(lon, lat);
-
-        return transformedGeoPoint;
+        return trans.transform(lon, lat);
     }
 
     /**
@@ -401,13 +370,12 @@ public class View {
                 else if (model.smallRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 70){
                     roadWay.draw(gc, slider_value, dark, model.getColorScheme());
                 }
-                else if (model.mediumRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 40){
+                else if (model.mediumRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 20){
                     roadWay.draw(gc, slider_value, dark, model.getColorScheme());
                 }
                 else if (model.bigRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 10){
                     roadWay.draw(gc, slider_value, dark, model.getColorScheme());
                 }
-
             }
         }
     }

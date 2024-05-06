@@ -35,19 +35,11 @@ public class Controller {
     private Trie trie;
     private boolean POI_MODE = false;
     @FXML
-    private Pane mapPane; //This is a reference to the pane over in the FXML file aka the GUI
-    @FXML
-    private Pane backgroundPane;
-    @FXML
     private javafx.scene.shape.Line distanceLine;
     @FXML
     private Text distanceLabel;
     @FXML
     private ToggleButton themeToggleBtn;
-    @FXML
-    private Button fileBtn;
-    @FXML
-    private Button markerBtn;
     @FXML
     private Slider zoomSlider;
     @FXML
@@ -88,10 +80,7 @@ public class Controller {
             lastY = e.getY();
 
             if(e.getButton() == MouseButton.PRIMARY && POI_MODE){
-                System.out.println("Point called");
-                System.out.println("lastX: " + lastX + " lastY: " + lastY);
                 Point2D modelPoint = view.mousetoModel(lastX, lastY);
-//                System.out.println(modelPoint.getX()+","+modelPoint.getY());
                 model.addPOI(modelPoint);
                 view.redraw();
             }
@@ -131,8 +120,6 @@ public class Controller {
                     searchBar.setText(chosenSelection);
                     checkForIfTextIsStreet(searchBar);
                     panToAddress(chosenSelection,true);
-
-
                 }
                 // Puts it into the second searchbar
                 else{
@@ -163,11 +150,11 @@ public class Controller {
         });
         searchBar1.setOnKeyPressed(event -> {
             if (!(event.getCode() == KeyCode.BACK_SPACE) && !(searchBar1.getText().isEmpty())) {
-                checkForIfTextIsStreet(searchBar);
+                checkForIfTextIsStreet(searchBar1);
                 addressParsing(searchBar1.getText(), searchBar1);
                 searchBarCounter = 1;
             }
-            if(event.getCode() == KeyCode.BACK_SPACE && searchBar.getText().isEmpty()) {
+            if(event.getCode() == KeyCode.BACK_SPACE && searchBar1.getText().isEmpty()) {
                 // Backspace key was pressed and search bar is empty
                 view.setTempAddressEndPoint(null, null);
                 view.redraw();
@@ -211,14 +198,6 @@ public class Controller {
     }
 
     /**
-     * Handles the search functionality for Dijkstra by starting and stopping the search
-     */
-    @FXML
-    private void handleSearch() {
-        StartSearch();
-    }
-
-    /**
      * Used to initiate the search process for Dijkstra by inputting text from the second search bar
      */
     @FXML
@@ -246,11 +225,6 @@ public class Controller {
         vehicle = true;
         } else {
             vehicle = false;
-        }
-        if(vehicle){
-            System.out.println("BIKE");
-        }else {
-            System.out.println("CAR");
         }
     }
 
@@ -282,10 +256,8 @@ public class Controller {
     private void placeInterest(){
         if(POI_MODE){
             POI_MODE = false;
-            System.out.println("Leaving POI MODE");
         } else {
             POI_MODE = true;
-            System.out.println("Started POI MODE");
         }    }
 
     /**
@@ -334,7 +306,6 @@ public class Controller {
             else{
                 suggestionsList = model.getSuggestionList(newValue);
             }
-
 
 
             // Logic for the suggestionsBox in UI
@@ -394,12 +365,12 @@ public class Controller {
             }
             view.pan(dx, dy);
         }
-        else if (model.getAddressIdMap().get(selectedAddress) == null){
-            System.out.println("Not a valid Address");
-        }
-        else if(lastPannedToAddress == model.getAddressIdMap().get(selectedAddress)){
-            System.out.println("Already panned to this address");
-        }
+//        else if (model.getAddressIdMap().get(selectedAddress) == null){
+//            System.out.println("Not a valid Address");
+//        }
+//        else if(lastPannedToAddress == model.getAddressIdMap().get(selectedAddress)){
+//            System.out.println("Already panned to this address");
+//        }
     }
 
     /**
