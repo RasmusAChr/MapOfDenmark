@@ -6,8 +6,7 @@ import java.util.Stack;
 
 /**
  * The SP class represents a shortest path algorithm implementation for finding the shortest path
- * in a weighted directed graph from a start node as an index to a goal node. It employs Dijkstra's algorithm
- * with the addition of a heuristic function to optimize the search.
+ * in a weighted directed graph from a start node as an index to a goal node. It employs Dijkstra's algorithm.
  */
 public class SP
 {
@@ -56,13 +55,15 @@ public class SP
      */
     private void relax(DirectedEdge e, int goal){
         int v = e.from(), w = e.to();
-        double newDistToW = distTo[v] + e.weight(vehicle);
-        if (distTo[w] > newDistToW) {
-            distTo[w] = newDistToW;
-            double priority = newDistToW + heuristic(w,goal);
+
+        if (distTo[w] > distTo[v] + e.weight(vehicle)) {
+
+            distTo[w] = distTo[v] + e.weight(vehicle);
+
             edgeTo[w] = e;
-            if (pq.contains(w)) pq.decreaseKey(w, priority);
-            else pq.insert (w, priority);
+
+            if (pq.contains(w)) pq.decreaseKey(w, distTo[w]);
+            else pq.insert (w, distTo[w]);
         }
     }
 
@@ -86,27 +87,4 @@ public class SP
      * @param goal The destination for the pathfinding algorith the place we want to end up.
      * @return this returns the distance that has been calculated.
      */
-    private double heuristic(int v, int goal){
-       Node currentNode = nodes.get(v);
-       Node goalNode = nodes.get(goal);
-
-       double lat1 = currentNode.getLat();
-       double lon1 = currentNode.getLon();
-       double lat2 = goalNode.getLat();
-       double lon2 = goalNode.getLon();
-
-        final int R = 6371; // Radius of the earth
-
-        double latDistance = Math.toRadians(lat2 - lat1);
-        double lonDistance = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = R * c * 1000; // convert to meters
-        double height = 0.0;
-
-        distance = Math.pow(distance, 2) + Math.pow(height, 2);
-        return  distance;
-    }
 }
