@@ -341,17 +341,17 @@ public class ColorScheme implements Serializable{
         roadColors.put("default", "#000000");
         roadDarkColors.put("default", "#FFFFFF");
         roadColors.put("highway", "#CB4335");
-        roadDarkColors.put("highway", "#5B2C6F");
+        roadDarkColors.put("highway", "#5B2C6F"); // HER
         roadColors.put("residential", "#808B96");
-        roadDarkColors.put("residential", "#FFFFFF");
+        roadDarkColors.put("residential", "#FFFFFF"); // HER
         roadColors.put("trunk", "#CA6F1E");
-        roadDarkColors.put("trunk", "#5B2C6F");
+        roadDarkColors.put("trunk", "#5B2C6F"); // HER
         roadColors.put("primary", "#CA6F1E");
-        roadDarkColors.put("primary", "#C0392B");
+        roadDarkColors.put("primary", "#4a3523"); // HER
         roadColors.put("secondary", "#F39C12");
-        roadDarkColors.put("secondary", "#C0392B");
+        roadDarkColors.put("secondary", "#692720"); // HER
         roadColors.put("tertiary", "#34495E");
-        roadDarkColors.put("tertiary", "#C0392B");
+        roadDarkColors.put("tertiary", "#692720"); // HER
         roadColors.put("unclassified", "#566573");
         roadDarkColors.put("unclassified", "#FFFFFF");
         roadColors.put("motorway_link", "#808B96");
