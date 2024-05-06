@@ -373,7 +373,7 @@ public class View {
                 else if (model.mediumRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 20){
                     roadWay.draw(gc, slider_value, dark, model.getColorScheme());
                 }
-                else if (model.bigRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 10){
+                else if (model.bigRoads.contains(((Road) roadWay).getRoadType()) && slider_value >= 20){
                     roadWay.draw(gc, slider_value, dark, model.getColorScheme());
                 }
             }
