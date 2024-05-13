@@ -4,6 +4,7 @@ plugins {
   id 'org.javamodularity.moduleplugin' version '1.8.12'
   id 'org.openjfx.javafxplugin' version '0.0.13'
   id 'org.beryx.jlink' version '2.25.0'
+  id 'jacoco'
 }
 
 group 'com.telos'
@@ -59,7 +60,27 @@ dependencies {
 }
 
 test {
-useJUnitPlatform()}
+  useJUnitPlatform()
+  finalizedBy jacocoTestReport
+}
+
+
+jacocoTestReport {
+  reports {
+    xml.required = false
+    csv.required = false
+    html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+  }
+}
+
+
+
+
+jacoco {
+  toolVersion = "0.8.11"
+  reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+
 
 jlink {
   imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")

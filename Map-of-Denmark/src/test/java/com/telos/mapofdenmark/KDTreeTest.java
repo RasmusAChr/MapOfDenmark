@@ -1,5 +1,6 @@
 package com.telos.mapofdenmark;
 
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -69,3 +70,5 @@ class KDTreeTest {
         assertEquals(3, tree.rangeSearch(0,2,0,2).size());
     }
 }
+
+
