@@ -66,7 +66,6 @@ public class SP
             else pq.insert (w, distTo[w]);
         }
     }
-
     /**
      * Gets the path from start to finish and makes an iterable of Directededges that summarise the path.
      * @param v End node as index

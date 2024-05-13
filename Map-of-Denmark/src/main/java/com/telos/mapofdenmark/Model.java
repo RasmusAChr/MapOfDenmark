@@ -1,14 +1,6 @@
 package com.telos.mapofdenmark;
 
-import java.io.BufferedInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.ZipInputStream;
@@ -350,9 +342,10 @@ public class Model implements Serializable {
      * @throws IOException if an I/O error occurs while writing to the file
      */
     void save(String filename) throws FileNotFoundException, IOException {
-        try (var out = new ObjectOutputStream(new FileOutputStream(filename))) {
+        try (var out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filename)))) {
             out.writeObject(this);
         }
+        System.gc();
     }
 
     /**
