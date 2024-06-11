@@ -361,7 +361,7 @@ public class KDTreeWay implements Serializable
      * @return - the smallest node greater than or equal to the given coordinates, either on a road or not depending on boolean
      */
     private KDNode ceiling(KDNode x, Double xCoord, Double yCoord, int depth, boolean shouldFindNearestRoad, KDNode best) {
-        if (x == null) return null;
+        if (x == null) return best;
         int cmp;
         // Determine the axis of comparison based on current depth (0 for x, 1 for y)
         int axis = depth % 2;
@@ -396,21 +396,21 @@ public class KDTreeWay implements Serializable
      * Returns the largest key stored in the KDTree that is less than or equal to the given coordinates
      * @param xCoord - the X coordinate of the given node
      * @param yCoord - the Y coordinate of the given node
-     * @param shouldFindNearestRoad -  true = find nearest node less than or equal to the given coordinates that is on a road, false = nearest node in general
+     * @param findNearestRoad -  true = find nearest node less than or equal to the given coordinates that is on a road, false = nearest node in general
      * @return - the largest node less than or equal to the given coordinates, either one that is on a road or just in general
      */
-    public Way floor(double xCoord, double yCoord, boolean shouldFindNearestRoad) {
-        KDNode x = floor(root, xCoord, yCoord, 0, shouldFindNearestRoad, null);
-        if (x == null) return null; //"argument to floor() is too small"
+    public Way floor(Double xCoord, Double yCoord, boolean findNearestRoad) {
+        if (xCoord == null || yCoord == null) throw new IllegalArgumentException("argument to floor() is null");
+        if (isEmpty()) return null; // "calls floor() with empty symbol table"
+        KDNode x = floor(root, xCoord, yCoord, 0, findNearestRoad, null);
+        if (x == null) return  null; // "argument to floor() is too small"
         else return x.val;
-
     }
 
     /**
-     *
      * Helper method that recursively searches for the largest node in the KDTree less than or equal to the given coordinates.
-     * It also considers the depth of the recursion to determine which axis it should do the comparison (0 for x-axis and 1 for y-axis).
-     * The boolean shouldFindNearestRoad, determines whether the method should account for nodes only on roads, or just find nearest nodes in general
+     * It also considers the depth of the recursion to determine which axis it should do the comparsion (0 for x-axis and 1 for y-axis).
+     * The boolean shouldFindNearestRoad, determines whether the method should account for nodes only on roads, or just find nodes in general
      * @param x - current node that is examined
      * @param xCoord - the X coordinate of the given node
      * @param yCoord - the Y coordinate of the given node
@@ -419,7 +419,7 @@ public class KDTreeWay implements Serializable
      * @param best - best candidate found so far
      * @return - the largest node less than or equal to the given coordinates, either on a road or not depending on boolean
      */
-    private KDNode floor(KDNode x, double xCoord, double yCoord, int depth, boolean shouldFindNearestRoad, KDNode best) {
+    private KDNode floor(KDNode x, Double xCoord, Double yCoord, int depth, boolean shouldFindNearestRoad, KDNode best) {
         if (x == null) return best;
         int cmp;
         // Determine the axis of comparison based on current depth (0 for x, 1 for y)
@@ -428,21 +428,21 @@ public class KDTreeWay implements Serializable
         if (axis == 0) cmp = Double.compare(xCoord, x.x); // Compare x-coordinates if axis is 0
         else cmp = Double.compare(yCoord, x.y); // Compare y-coordinates if axis is 1
 
-        if (!shouldFindNearestRoad) {
-            if (cmp  < 0) return floor(x.left, xCoord, yCoord,depth + 1, shouldFindNearestRoad, best);
-            else if (cmp  > 0) return floor(x.right, xCoord, yCoord,depth + 1, shouldFindNearestRoad, x);
+        // Normal floor
+        if (!shouldFindNearestRoad){
+            if (cmp > 0) return floor(x.right, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
+            else if (cmp < 0) return floor(x.left, xCoord, yCoord, depth + 1, shouldFindNearestRoad, x);
             else return x;
-
         }
         // If we want to find the nearest node that is also a road
         else {
             if (cmp < 0) {
                 if (x.val.isRoad()) best = x;
-                return floor(x.left, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
+                return floor(x.right, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
             }
             else if (cmp > 0) {
                 if (x.val.isRoad()) best = x;
-                return floor(x.right, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
+                return floor(x.left, xCoord, yCoord, depth + 1, shouldFindNearestRoad, best);
             }
             else {
                 if (x.val.isRoad()) return x;
