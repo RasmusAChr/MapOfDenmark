@@ -251,7 +251,7 @@ public class KDTreeWay implements Serializable
 
         // Recursive population call
         // Left Recursive Call, Handles the elements before the median index by only providing from the start of the list to one less than the median index
-        // The subList does not include the end of the range in the list is provides
+        // The subList does not include the end of the range in the list it provides
         if (medianIndex > 0)  populateKDTree(nodelist.subList(0, medianIndex), depth);
         // Right Recursive Call, Handles the elements after the median index by only providing from the median index+1 (avoids duplicates) to the end of the list
         if (medianIndex + 1 < nodelist.size()) populateKDTree(nodelist.subList(medianIndex+1, nodelist.size()), depth);
@@ -290,14 +290,14 @@ public class KDTreeWay implements Serializable
         int axis = depth % 2;
         double cmplo; //CompareToLow
         double cmphi; //CompareToHigh
-        // if the axis is 0, compare the x value long else comp     are lat
+        // if the axis is 0, compare the x value long else comp are lat
         if(axis == 0){
-            // Sort based on the x-axis
+            // Compare based on the x-axis
             cmplo = Double.compare(xMin,x.x);
             cmphi = Double.compare(xMax,x.x);
 
         } else {
-            // Sort based on the y-axis
+            // Compare based on the y-axis
             cmplo = Double.compare(yMin,x.y);
             cmphi = Double.compare(yMax,x.y);
         }
