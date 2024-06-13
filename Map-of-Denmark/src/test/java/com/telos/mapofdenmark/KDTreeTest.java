@@ -28,6 +28,25 @@ class KDTreeTest {
     }
 
     @Test
+    void testNewPopulate(){
+        // init arraylist
+        int size = 4_000_000;
+        List<Way> array = new ArrayList<>(size);
+
+        // Fill arraylist with random numbers
+        for (int i = 0; i < size; i++) {
+            array.add(new Way(createNodeList(Math.random() * 1000000, Math.random() * 1000000), "landform", "type"));
+        }
+
+        // populate and timer
+        long startTime = System.currentTimeMillis();
+        tree.newPopulate(array);
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        System.out.println("Elapsed time for populating kd-tree: \n" + size + " elements  " + elapsedTime + " milliseconds");
+    }
+
+    @Test
     void testGetNonExistentPoint() {
         Way way = new Way(createNodeList(1, 0), "landform", "type");
         tree.put(1, 0, way);

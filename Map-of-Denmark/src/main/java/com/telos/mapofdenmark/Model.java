@@ -98,6 +98,15 @@ public class Model implements Serializable {
      * @throws FactoryConfigurationError If a factory configuration error occurs.
      * @throws IOException If an I/O error occurs while reading the input stream.
      */
+
+    private ArrayList<Node> createNodeList(double lat, double lon) {
+        int index = 0;
+        ArrayList<Node> nodeList = new ArrayList<>();
+        nodeList.add(new Node(index, lat, lon));
+        index++;
+        return nodeList;
+    }
+
     public Model(InputStream inputStream, String filename) throws XMLStreamException, FactoryConfigurationError, IOException {
         cs = new ColorScheme();
         lt = new LineThickness();
@@ -143,10 +152,28 @@ public class Model implements Serializable {
         this.kdTreeWaysBuilding = new KDTreeWay();
         this.kdTreeWaysRoad = new KDTreeWay();
 
+        KDTreeWay tree = new KDTreeWay();
+
+        // init arraylist
+        int size = 128_000_000;
+        List<Way> array = new ArrayList<>(size);
+
+        // Fill arraylist with random numbers
+        for (int i = 0; i < size; i++) {
+            array.add(new Way(createNodeList(Math.random() * 1000000, Math.random() * 1000000), "landform", "type"));
+        }
+
+        // populate and timer
+        long startTime = System.currentTimeMillis();
+        tree.newPopulate(array);
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        System.out.println("Elapsed time for populating kd-tree: \n" + size + " elements  " + elapsedTime + " milliseconds");
+
+
         // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
         // KD-Trees for Relations
-        long startTime = System.currentTimeMillis();
-        kdTreeBuildings.newPopulate(centerPointRelationsBuilding);
+        /*kdTreeBuildings.newPopulate(centerPointRelationsBuilding);
         System.out.println("Size of KD-Tree Relations Building: " + kdTreeBuildings.size());
         kdTreeNaturals.newPopulate(centerPointRelationsNatural);
         System.out.println("Size of KD-Tree Relations Naturals: " + kdTreeNaturals.size());
@@ -163,11 +190,7 @@ public class Model implements Serializable {
         kdTreeWaysBuilding.newPopulate(centerPointWaysBuilding);
         System.out.println("Size of KD-Tree Ways Building: " + kdTreeWaysBuilding.size());
         kdTreeWaysRoad.newPopulate(centerPointWaysRoad);
-        System.out.println("Size of KD-Tree Ways Road: " + kdTreeWaysRoad.size());
-
-        long endTime = System.currentTimeMillis();
-        long elapsedTime = endTime - startTime;
-        System.out.println("Elapsed time for populating all kd-trees: " + elapsedTime + " milliseconds");
+        System.out.println("Size of KD-Tree Ways Road: " + kdTreeWaysRoad.size());*/
 
         // Saves objects to binary file
         //save(filename+".obj");
