@@ -40,7 +40,7 @@ public class RadixTrie implements Serializable {
     private RadixNode insert(RadixNode node, String word, int index) {
         if (node == null) return new RadixNode(word.substring(index), true); // This is redundant
 
-        if (node.value.equals(word.substring(index))) { // This is redundant
+        if (node.value.equals(word.substring(index))) { // This is kinda redundant
             node.endOfWord = true;
             return node;
         }
