@@ -38,9 +38,9 @@ public class RadixTrie implements Serializable {
      * @return The updated node after insertion.
      */
     private RadixNode insert(RadixNode node, String word, int index) {
-        if (node == null) return new RadixNode(word.substring(index), true);
+        if (node == null) return new RadixNode(word.substring(index), true); // This is redundant
 
-        if (node.value.equals(word.substring(index))) {
+        if (node.value.equals(word.substring(index))) { // This is redundant
             node.endOfWord = true;
             return node;
         }
@@ -79,7 +79,7 @@ public class RadixTrie implements Serializable {
                 node.endOfWord = false;
                 node.value = node.value.substring(0, i);
                 return node;
-            } else {
+            } else { // this is redundant
                 // Pattern is shorter than the key
                 // Create a leaf node for the new key and append it to the original node
                 RadixNode newLeaf = new RadixNode(word.substring(index + i), true);
@@ -87,6 +87,7 @@ public class RadixTrie implements Serializable {
                 return node;
             }
         }
+        // just need to return node here if you removed the else to ensure that changes in recursion are propagated back up
     }
 
     /**
