@@ -257,6 +257,72 @@ public class KDTreeWay implements Serializable
         if (medianIndex + 1 < nodelist.size()) populateKDTree(nodelist.subList(medianIndex+1, nodelist.size()), depth);
     }
 
+    public void newPopulate(List<Way> nodelist) {
+        newPopulateKDTree(nodelist, 0);
+    }
+
+    private void newPopulateKDTree(List<Way> nodelist, int depth) {
+        if (nodelist.isEmpty()) return;
+
+        int axis = depth % 2;
+
+        // Find approximate median using Median of Medians
+        Way medianWay = findMedianOfMedians(nodelist, axis);
+
+        // Insert median node into KDTree
+        put(medianWay.getCenterLon() * 0.56, -medianWay.getCenterLat(), medianWay);
+
+        // Determine split index based on the median node
+        int medianIndex = nodelist.indexOf(medianWay);
+
+        // Recursive calls
+        depth++;
+        if (medianIndex > 0) {
+            newPopulateKDTree(nodelist.subList(0, medianIndex), depth);
+        }
+        if (medianIndex + 1 < nodelist.size()) {
+            newPopulateKDTree(nodelist.subList(medianIndex + 1, nodelist.size()), depth);
+        }
+    }
+
+    private Way findMedianOfMedians(List<Way> nodelist, int axis) {
+        int chunkSize = 5; // Choose a chunk size (5 is typical for Median of Medians)
+        int size = nodelist.size();
+
+        // If chunk size is greater than or equal to the size of the list, sort and return middle element
+        if (size <= chunkSize) {
+            // Sort the entire list based on the axis
+            if (axis == 0) {
+                nodelist.sort(Comparator.comparingDouble(Way::getCenterLon));
+            } else {
+                nodelist.sort(Comparator.comparingDouble(Way::getCenterLat));
+            }
+            return nodelist.get(size / 2);
+        }
+
+        // Divide the list into chunks of size chunkSize
+        List<Way> medians = new ArrayList<>();
+        for (int i = 0; i < size; i += chunkSize) {
+            int end = Math.min(i + chunkSize, size);
+            List<Way> chunk = nodelist.subList(i, end);
+
+            // Sort the chunk based on the axis
+            if (axis == 0) {
+                chunk.sort(Comparator.comparingDouble(Way::getCenterLon));
+            } else {
+                chunk.sort(Comparator.comparingDouble(Way::getCenterLat));
+            }
+
+            // Add the median of the chunk to medians list
+            int medianIndex = chunk.size() / 2;
+            medians.add(chunk.get(medianIndex));
+        }
+
+        // Recursively find the median of medians
+        return findMedianOfMedians(medians, axis);
+    }
+
+
     /**
      * Method to perform a range search on the KDTree, so that it only returns nodes within this range
      * @param xMin - the minimum X coordinate of the range

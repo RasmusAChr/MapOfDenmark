@@ -145,27 +145,32 @@ public class Model implements Serializable {
 
         // Populates the KDTree using the centerPointNodes collection such that reference to same way is avoided
         // KD-Trees for Relations
-        kdTreeBuildings.populate(centerPointRelationsBuilding);
+        long startTime = System.currentTimeMillis();
+        kdTreeBuildings.newPopulate(centerPointRelationsBuilding);
         System.out.println("Size of KD-Tree Relations Building: " + kdTreeBuildings.size());
-        kdTreeNaturals.populate(centerPointRelationsNatural);
+        kdTreeNaturals.newPopulate(centerPointRelationsNatural);
         System.out.println("Size of KD-Tree Relations Naturals: " + kdTreeNaturals.size());
-        kdTreeLanduses.populate(centerPointRelationsLanduse);
+        kdTreeLanduses.newPopulate(centerPointRelationsLanduse);
         System.out.println("Size of KD-Tree Relations Landuse: " + kdTreeLanduses.size());
 
         // KD-Trees for Ways
-        kdTreeWaysPlace.populate(centerPointWaysPlace);
+        kdTreeWaysPlace.newPopulate(centerPointWaysPlace);
         System.out.println("Size of KD-Tree Ways Place: " + kdTreeWaysPlace.size());
-        kdTreeWaysNatural.populate(centerPointWaysNatural);
+        kdTreeWaysNatural.newPopulate(centerPointWaysNatural);
         System.out.println("Size of KD-Tree Ways Natural: " + kdTreeWaysNatural.size());
-        kdTreeWaysLanduse.populate(centerPointWaysLanduse);
+        kdTreeWaysLanduse.newPopulate(centerPointWaysLanduse);
         System.out.println("Size of KD-Tree Ways Landuse: " + kdTreeWaysLanduse.size());
-        kdTreeWaysBuilding.populate(centerPointWaysBuilding);
+        kdTreeWaysBuilding.newPopulate(centerPointWaysBuilding);
         System.out.println("Size of KD-Tree Ways Building: " + kdTreeWaysBuilding.size());
-        kdTreeWaysRoad.populate(centerPointWaysRoad);
+        kdTreeWaysRoad.newPopulate(centerPointWaysRoad);
         System.out.println("Size of KD-Tree Ways Road: " + kdTreeWaysRoad.size());
 
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        System.out.println("Elapsed time for populating all kd-trees: " + elapsedTime + " milliseconds");
+
         // Saves objects to binary file
-        save(filename+".obj");
+        //save(filename+".obj");
 
         // Garbage collection after populating data structure to free up unused memory
         System.gc();
