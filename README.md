@@ -23,7 +23,7 @@ Map of Denmark is a simple mapping application designed to visualize Denmark bas
 ## Loading maps
 Once the program has started, you can load a map of Denmark or a custom map file:
 
-### Load Denmark Map:
+### Load default Map:
 **This doesnt work as of right now, due difficulties on uploading large files.**
 1. Press the “Load Denmark” button to load the default map of Denmark.
 
