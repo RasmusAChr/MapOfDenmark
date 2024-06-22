@@ -7,7 +7,6 @@ Map of Denmark is an application developed to visualize the map of Denmark using
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
-- [Requirements](#requirements)
 - [Loading maps](#loading-maps)
 - [License](#license)
 
@@ -30,6 +29,7 @@ Once the program has started, you can load a map of Denmark or a custom map file
 ### Choose Custom File:
 1. Press the “Choose custom file” button to select and load a custom map.
 2. Supported file formats: .osm, .zip (containing .osm), and .obj.
+
 Note: .obj files must be created by this application to avoid errors.
 
 ## License
