@@ -8,6 +8,7 @@ Map of Denmark is an application developed to visualize the map of Denmark using
 - [Introduction](#introduction)
 - [Features](#features)
 - [Loading maps](#loading-maps)
+- [Downloading map files](#downloading-map-files)
 - [License](#license)
 
 ## Introduction
@@ -31,6 +32,10 @@ Once the program has started, you can load a map of Denmark or a custom map file
 2. Supported file formats: .osm, .zip (containing .osm), and .obj.
 
 Note: .obj files must be created by this application to avoid errors.
+
+## Downloading map files
+Download specific map areas [here](#https://www.openstreetmap.org/).
+Download countrie maps [here](#https://download.geofabrik.de/)
 
 ## License
 This project is licensed under the MIT License. See the [License](./LICENSE.md) file for more details.
